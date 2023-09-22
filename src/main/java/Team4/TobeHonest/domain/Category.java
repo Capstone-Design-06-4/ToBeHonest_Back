@@ -3,12 +3,14 @@ package Team4.TobeHonest.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Category {
     @Id
     @GeneratedValue
@@ -22,7 +24,7 @@ public class Category {
     private Category parent;
 
 
-//    orphanremoval, cascade는 문제시 수정해야함
+    //    orphanremoval, cascade는 문제시 수정해야함
     @OneToMany(mappedBy = "parent",
             orphanRemoval = true,
             cascade = CascadeType.ALL)

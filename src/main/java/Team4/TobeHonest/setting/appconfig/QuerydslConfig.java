@@ -1,5 +1,4 @@
-package Team4.TobeHonest.appconfig;
-
+package Team4.TobeHonest.setting.appconfig;
 
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -14,7 +13,7 @@ public class QuerydslConfig {
     private EntityManager em;
 
     @Bean
-    public JPAQueryFactory query(){
+    public JPAQueryFactory query() {
         return new JPAQueryFactory(em);
     }
 }
