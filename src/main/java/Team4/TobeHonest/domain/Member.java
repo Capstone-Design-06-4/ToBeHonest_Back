@@ -31,7 +31,7 @@ public class Member {
     private String phoneNumber;
 
     private LocalDate birthDate;
-
+    //프사 추가해야함
 
     public Member(String email, String name, String passWord, String phoneNumber, LocalDate birthDate) {
         this.email = email;
@@ -40,4 +40,11 @@ public class Member {
         this.phoneNumber = phoneNumber;
         this.birthDate = birthDate;
     }
+
+    public FriendWith addFriend(Member friend){
+
+        return new FriendWith(this, friend);
+    }
+
+
 }

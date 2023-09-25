@@ -21,21 +21,21 @@ public class MemberRepository {
 
     public void join(Member member) {
         em.persist(member);
+    }
 
+    public Member findById(Long memberId){
+        return em.find(Member.class, memberId);
     }
 
     public void deleteByEmail(String email) {
-        Member memberByEmail = getMemberByEmail(email);
+        Member memberByEmail = findByEmail(email);
         if (memberByEmail != null) {
             em.remove(memberByEmail);
         }
 
     }
 
-    //id 중복 찾기..
-    //중복이면 false
-    //중복아니면 true
-    public Member getMemberByEmail(String email) {
+    public Member findByEmail(String email) {
         List<Member> find = jqf.select(m).from(m).where(m.email.eq(email)).fetch();
         if (find.isEmpty()) {
             return null;
@@ -49,10 +49,22 @@ public class MemberRepository {
 
     public Member loginFind(String email, String passWord) {
 //        결과가 둘 이상이면 : com.querydsl.core.NonUniqueResultException
-        return jqf.select(m).from(m).where(m.email.eq(email).and(m.passWord.eq(passWord))).fetchOne();
+        return jqf.select(m)
+                .from(m)
+                .where(m.email.eq(email).and(m.passWord.eq(passWord))).fetchOne();
 
     }
 
-//    친구리스트 찾기
+    public Member findByPhoneNumber(String phoneNumber) {
+        List<Member> find = jqf
+                .select(m)
+                .from(m)
+                .where(m.phoneNumber.eq(phoneNumber)).fetch();
+        if (find.isEmpty()) {
+            return null;
+        }
+        return find.get(0);
+    }
+
 
 }

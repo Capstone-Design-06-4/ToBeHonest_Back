@@ -1,7 +1,9 @@
 package Team4.TobeHonest.controller;
 
 import Team4.TobeHonest.domain.Member;
+import Team4.TobeHonest.dto.JoinDTO;
 import Team4.TobeHonest.dto.LoginDTO;
+import Team4.TobeHonest.exception.DuplicateMemberException;
 import Team4.TobeHonest.service.MemberService;
 import Team4.TobeHonest.setting.login.SessionConst;
 import jakarta.servlet.http.Cookie;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class HomeController {
 
     private final MemberService memberService;
+
 
     @GetMapping("/login")
     public String loginForm() {
@@ -60,5 +63,31 @@ public class HomeController {
         session.invalidate();
         return "redirect:/login";
     }
+
+    @PostMapping("/join")
+    public ResponseEntity join(@Valid @RequestBody JoinDTO joinDTO, BindingResult bindingResult) {
+        //field 관련 에러 확인
+        if (bindingResult.hasErrors()) {
+            String errorMessage = memberService.displayLoginError(bindingResult);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+        }
+        //중복 회원 발생
+        try {
+            memberService.join(joinDTO.toMember());
+        } catch (DuplicateMemberException e) {
+
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("duplicate email");
+        }
+        //세션
+        return ResponseEntity.ok("join Finished!");
+    }
+
+    @GetMapping("/findEmail")
+    public String findEmailForm(){
+        return "ID찾는 폼주세요";
+    }
+
+
+
 
 }

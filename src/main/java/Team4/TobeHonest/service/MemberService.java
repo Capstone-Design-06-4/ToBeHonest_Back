@@ -21,7 +21,7 @@ public class MemberService {
     @Transactional
     public void join(Member member) {
 //      중복이존재
-        if (memberRepository.getMemberByEmail(member.getEmail()) != null) {
+        if (memberRepository.findByEmail(member.getEmail()) != null) {
             throw new DuplicateMemberException("중복된 이메일입니다.");
         }
         memberRepository.join(member);
@@ -42,4 +42,24 @@ public class MemberService {
     public Member login(String email, String passWord) {
         return memberRepository.loginFind(email, passWord);
     }
+
+    public Member findByID(Long id){
+        return memberRepository.findById(id);
+    }
+    public Member findByEmail(String email){
+        return memberRepository.findByEmail(email);
+
+    }
+    public Member findByPhoneNumber(String phoneNumber){
+        return memberRepository.findByPhoneNumber(phoneNumber);
+
+    }
+
+
+
+
+
+
+
+
 }

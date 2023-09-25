@@ -1,9 +1,15 @@
 package Team4.TobeHonest.controller;
 
 
+import Team4.TobeHonest.domain.FriendWith;
+import Team4.TobeHonest.domain.Member;
+import Team4.TobeHonest.dto.FriendWithSpecifyName;
 import Team4.TobeHonest.dto.JoinDTO;
 import Team4.TobeHonest.exception.DuplicateMemberException;
+import Team4.TobeHonest.service.FriendService;
 import Team4.TobeHonest.service.MemberService;
+import Team4.TobeHonest.setting.login.SessionConst;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,44 +17,42 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
-@RequestMapping("/member")
+@RequestMapping("/members")
 @RequiredArgsConstructor
 @Slf4j
-//멤버 로그인, 회원가입
+
 public class MemberController {
 
     private final MemberService memberService;
+    private final FriendService friendService;
 
-    @PostMapping("/join")
-    public ResponseEntity join(@Valid @RequestBody JoinDTO joinDTO, BindingResult bindingResult) {
-        //field 관련 에러 확인
-        if (bindingResult.hasErrors()) {
-            String errorMessage = memberService.displayLoginError(bindingResult);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
-        }
-        //중복 회원 발생
-        try {
-            memberService.join(joinDTO.toMember());
-        } catch (DuplicateMemberException e) {
+    @GetMapping("{memberId}/Friends")
+    //로그인은 인터셉터에서 처리 해 준다고 생각..
+    public ResponseEntity findFriends(@PathVariable Long memberId, HttpServletRequest request){
+        Member loginMember = (Member) request.getSession().getAttribute(SessionConst.LOGIN_MEMBER);
 
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("duplicate email");
+        //다른 회원정보에 들어가려고 하면 not allowed
+        if (!memberId.equals(loginMember.getId())){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("not allowed to other users information");
         }
-        //세션
-        return ResponseEntity.ok("join Finished!");
+
+        List<FriendWithSpecifyName> allFriendsProfile = friendService.findAllFriendsProfile(loginMember);
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("not allowed to other users information");
 
     }
 
 
-//    @GetMapping("/login")
 
-    /*public String loginForm(){
-        return
-    }*/
+
+
+
+
 
 
 }
