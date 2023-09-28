@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -28,7 +29,24 @@ public class Category {
     @OneToMany(mappedBy = "parent",
             orphanRemoval = true,
             cascade = CascadeType.ALL)
-    private List<Category> childs;
+    private List<Category> childs = new ArrayList<>();
 
 
+    public Category(String name, Category parent) {
+        this.name = name;
+        this.parent = parent;
+    }
+
+    public void setParent(Category parent) {
+        this.parent = parent;
+        parent.addChild(this);
+    }
+
+    public Category(String name) {
+        this.name = name;
+    }
+    public void addChild(Category child){
+        this.childs.add(child);
+
+    }
 }

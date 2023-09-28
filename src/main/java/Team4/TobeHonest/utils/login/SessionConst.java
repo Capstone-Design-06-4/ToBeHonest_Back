@@ -1,4 +1,4 @@
-package Team4.TobeHonest.setting.login;
+package Team4.TobeHonest.utils.login;
 
 public class SessionConst {
     public static final String LOGIN_MEMBER = "loginMember";

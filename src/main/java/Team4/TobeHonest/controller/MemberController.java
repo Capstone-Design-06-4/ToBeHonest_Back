@@ -1,34 +1,29 @@
 package Team4.TobeHonest.controller;
 
 
-import Team4.TobeHonest.domain.FriendWith;
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.FriendWithSpecifyName;
-import Team4.TobeHonest.dto.JoinDTO;
-import Team4.TobeHonest.exception.DuplicateMemberException;
 import Team4.TobeHonest.service.FriendService;
 import Team4.TobeHonest.service.MemberService;
-import Team4.TobeHonest.setting.login.SessionConst;
+import Team4.TobeHonest.utils.login.SessionConst;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Controller
 @RequestMapping("/members")
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Slf4j
-
 public class MemberController {
 
-    private final MemberService memberService;
+
     private final FriendService friendService;
 
     @GetMapping("{memberId}/Friends")

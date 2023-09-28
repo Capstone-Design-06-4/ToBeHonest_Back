@@ -1,4 +1,4 @@
-package Team4.TobeHonest.setting.appconfig;
+package Team4.TobeHonest.utils.config;
 
 
 import com.querydsl.jpa.impl.JPAQueryFactory;

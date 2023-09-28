@@ -1,4 +1,4 @@
-package Team4.TobeHonest.setting.login;
+package Team4.TobeHonest.utils.login;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

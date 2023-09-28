@@ -5,12 +5,13 @@ import Team4.TobeHonest.dto.JoinDTO;
 import Team4.TobeHonest.dto.LoginDTO;
 import Team4.TobeHonest.exception.DuplicateMemberException;
 import Team4.TobeHonest.service.MemberService;
-import Team4.TobeHonest.setting.login.SessionConst;
+import Team4.TobeHonest.utils.login.SessionConst;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/")
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class HomeController {
 
     private final MemberService memberService;
@@ -42,8 +43,9 @@ public class HomeController {
             String errorMessage = memberService.displayLoginError(bindingResult);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
         }
-        Member loginMember = memberService.login(loginDTO.getEmail(), loginDTO.getPassWord());
+
         //로그인이 안되는 경우..
+        Member loginMember = memberService.login(loginDTO.getEmail(), loginDTO.getPassWord());
         if (loginMember == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("wrong email or password");
         }
@@ -64,7 +66,7 @@ public class HomeController {
         return "redirect:/login";
     }
 
-    @PostMapping("/join")
+    @PostMapping("/signup")
     public ResponseEntity join(@Valid @RequestBody JoinDTO joinDTO, BindingResult bindingResult) {
         //field 관련 에러 확인
         if (bindingResult.hasErrors()) {
