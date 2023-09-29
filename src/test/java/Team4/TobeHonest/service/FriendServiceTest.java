@@ -51,7 +51,7 @@ public class FriendServiceTest {
                 birthDate(birthDate).
                 build();
         Member registedMember = joinDTO.toMember();
-        memberService.join(registedMember);
+        memberService.join(joinDTO);
 
         email = "alswns2631@gmail.com";
         name = "아이";
@@ -64,7 +64,7 @@ public class FriendServiceTest {
                 birthDate(birthDate).
                 build();
         registedMember = joinDTO.toMember();
-        memberService.join(registedMember);
+        memberService.join(joinDTO);
 
         email = "alswns2631@daum.net";
         name = "아이";
@@ -77,7 +77,7 @@ public class FriendServiceTest {
                 birthDate(birthDate).
                 build();
         registedMember = joinDTO.toMember();
-        memberService.join(registedMember);
+        memberService.join(joinDTO);
 
         email = "alswns2631@kakao.com";
         name = "아이";
@@ -90,7 +90,7 @@ public class FriendServiceTest {
                 birthDate(birthDate).
                 build();
         registedMember = joinDTO.toMember();
-        memberService.join(registedMember);
+        memberService.join(joinDTO);
 
         email = "alswns2631@naver.com";
         name = "아이";
@@ -103,7 +103,7 @@ public class FriendServiceTest {
                 birthDate(birthDate).
                 build();
         registedMember = joinDTO.toMember();
-        memberService.join(registedMember);
+        memberService.join(joinDTO);
 
     }
 

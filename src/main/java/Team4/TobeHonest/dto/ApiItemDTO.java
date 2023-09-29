@@ -1,7 +1,6 @@
 package Team4.TobeHonest.dto;
 
 
-import Team4.TobeHonest.domain.Item;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

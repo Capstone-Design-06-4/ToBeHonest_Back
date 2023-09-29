@@ -49,9 +49,10 @@ public class MemberRepository {
 
     public Member loginFind(String email, String passWord) {
 //        결과가 둘 이상이면 : com.querydsl.core.NonUniqueResultException
+
         return jqf.select(m)
                 .from(m)
-                .where(m.email.eq(email).and(m.passWord.eq(passWord))).fetchOne();
+                .where(m.email.eq(email).and(m.password.eq(passWord))).fetchOne();
 
     }
 

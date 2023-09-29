@@ -2,11 +2,9 @@ package Team4.TobeHonest.controller;
 
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.JoinDTO;
-import Team4.TobeHonest.dto.LoginDTO;
 import Team4.TobeHonest.repo.MemberRepository;
 import Team4.TobeHonest.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.junit.After;
 import org.junit.Before;
@@ -18,11 +16,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
@@ -32,34 +33,28 @@ public class HomeControllerTest {
     @Autowired
     MemberService memberService;
     @Autowired
-    HttpServletRequest request;
-    @Autowired
     ObjectMapper objectMapper;
-    @LocalServerPort
-    private int port;
+    @Autowired
+    WebApplicationContext context;
+/*    @LocalServerPort
+    private int port;*/
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Before
     public void setUp() throws Exception {
-
         String email = "alswns2631@gmail.com";
         String name = "choiminjun";
         String passWord = "passw123";
         String phoneNumber = "010-1234-1231";
         String birthDate = "19990803";
-        JoinDTO joinDTO = JoinDTO.builder().
-                email(email).
-                name(name).
-                passWord(passWord).
-                phoneNumber(phoneNumber).
-                birthDate(birthDate).
-                build();
-
+        JoinDTO joinDTO = JoinDTO.builder().email(email).name(name).passWord(passWord).phoneNumber(phoneNumber).birthDate(birthDate).build();
         Member member = joinDTO.toMember();
-        memberService.join(member);
+        memberService.join(joinDTO);
         //회원가입된 상태..
     }
 
@@ -68,36 +63,66 @@ public class HomeControllerTest {
     }
 
     @Test
-    @DisplayName("post /join, ==> 중복이메일 회원")
-    public void errorJoin() throws Exception {
-//        given
-//        create table이라 yml파일 수정할 경우 test가 안돌아 갈 수 있음..
+    @DisplayName("이메일에러")
+    public void emailTest() throws Exception {
         String email = "alswns2631@gmail.com";
         String name = "마늘오리";
         String passWord = "passw123";
         String phoneNumber = "010-5421-1123";
         String birthDate = "19990803";
-        JoinDTO joinDTO = JoinDTO.builder().
-                email(email).
-                name(name).
-                passWord(passWord).
-                phoneNumber(phoneNumber).
-                birthDate(birthDate).
-                build();
-
-        String url = "http://localhost:" + port + "/join";
+        JoinDTO joinDTO = JoinDTO.builder().email(email).name(name).passWord(passWord).phoneNumber(phoneNumber).birthDate(birthDate).build();
+        joinDTO.setEmail("alswns2631");
         String json = objectMapper.writeValueAsString(joinDTO);
-//        when
-        System.out.println(joinDTO);
-        mockMvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json)
-        ).andExpect(status().isConflict());
+        mockMvc.perform(post("/signup").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(status().isBadRequest()).andDo(print());
+    }
+
+
+    @Test
+    @DisplayName("이름초과")
+    public void nameTest() throws Exception {
+        String email = "alswns2631@gmail.com";
+        String name = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        String passWord = "passw123";
+        String phoneNumber = "010-5421-1123";
+        String birthDate = "19990803";
+        JoinDTO joinDTO = JoinDTO.builder().email(email).name(name).passWord(passWord).phoneNumber(phoneNumber).birthDate(birthDate).build();
+
+        String json = objectMapper.writeValueAsString(joinDTO);
+        mockMvc.perform(post("/signup").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(status().isBadRequest()).andDo(print());
+    }
+
+    @Test
+    @DisplayName("폰번호 타입 에러")
+    public void testPhoneNumber() throws Exception {
+        String email = "alswns2631@gmail.com";
+        String name = "마늘오리";
+        String passWord = "passw123";
+        String phoneNumber = "01054211123";
+        String birthDate = "19990803";
+        JoinDTO joinDTO = JoinDTO.builder().email(email).name(name).passWord(passWord).phoneNumber(phoneNumber).birthDate(birthDate).build();
+        String json = objectMapper.writeValueAsString(joinDTO);
+        mockMvc.perform(post("/signup").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(status().isBadRequest()).andDo(print());
+    }
+
+
+    @Test
+    @DisplayName("중복 회원가입")
+    public void duplicateSignUp() throws Exception {
+
+        String email = "alswns2631@gmail.com";
+        String name = "마늘오리";
+        String passWord = "passw123";
+        String phoneNumber = "010-5421-1123";
+        String birthDate = "19990803";
+        JoinDTO joinDTO = JoinDTO.builder().email(email).name(name).passWord(passWord).phoneNumber(phoneNumber).birthDate(birthDate).build();
+
+        String json = objectMapper.writeValueAsString(joinDTO);
+        mockMvc.perform(post("/signup").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(status().isConflict()).andDo(print());
 
     }
 
     @Test
-    @DisplayName("post /join, 정상회원가입")
+    @DisplayName("정상회원가입")
     public void join() throws Exception {
         String email = "alswns2631@cau.ac.kr";
         String name = "helloThere";
@@ -105,39 +130,12 @@ public class HomeControllerTest {
         String phoneNumber = "010-1214-1234";
         String birthDate = "20000803";
         JoinDTO joinDTO = JoinDTO.builder().email(email).name(name).passWord(passWord).phoneNumber(phoneNumber).birthDate(birthDate).build();
-        String url = "http://localhost:" + port + "/join";
         String json = objectMapper.writeValueAsString(joinDTO);
 
-//        when
-        mockMvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json)
-        ).andExpect(status().isOk());
 
+        mockMvc.perform(post("/signup").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(status().isOk()).andDo(print());
 
     }
 
-
-
-    @Test
-    public void loginAndOutTest() throws Exception {
-        //정상 로그인
-        String email = "alswns2631@gmail.com";
-        String passWord = "passw123";
-        LoginDTO loginDTO = LoginDTO.builder().email(email).passWord(passWord).build();
-        String url = "http://localhost:" + port + "/login";
-
-        String json = objectMapper.writeValueAsString(loginDTO);
-
-        mockMvc.perform(post(url).
-                contentType(MediaType.APPLICATION_JSON).
-                content(json)
-        ).andExpect(status().isOk()).andExpect(cookie().exists("sessionId"));
-
-        url = "http://localhost:" + port + "/logout";
-        mockMvc.perform(post(url)).
-                andExpect(status().is3xxRedirection()).
-                andExpect(redirectedUrl("/login"));
-    }
 
 }

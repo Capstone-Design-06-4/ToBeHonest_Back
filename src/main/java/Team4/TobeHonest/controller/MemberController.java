@@ -5,13 +5,13 @@ import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.FriendWithSpecifyName;
 import Team4.TobeHonest.service.FriendService;
 import Team4.TobeHonest.service.MemberService;
-import Team4.TobeHonest.utils.login.SessionConst;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,23 +23,34 @@ import java.util.List;
 @Slf4j
 public class MemberController {
 
-
+    private final MemberService memberService;
     private final FriendService friendService;
+    /*Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    UserDetails userDetails = (UserDetails)principal;
 
-    @GetMapping("{memberId}/Friends")
+    String username = userDetails.getUsername();
+    String password = userDetails.getPassword();*/
+    @GetMapping("information/Friends")
     //로그인은 인터셉터에서 처리 해 준다고 생각..
-    public ResponseEntity findFriends(@PathVariable Long memberId, HttpServletRequest request){
-        Member loginMember = (Member) request.getSession().getAttribute(SessionConst.LOGIN_MEMBER);
+    public ResponseEntity<String> findFriends(@AuthenticationPrincipal UserDetails userDetails){
+        /*Authentication 객체가 SecurityContext에 저장됩니다.
+            그리고 이 SecurityContext는 HttpSession에 SPRING_SECURITY_CONTEXT라는 키로 저장*/
 
-        //다른 회원정보에 들어가려고 하면 not allowed
-        if (!memberId.equals(loginMember.getId())){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("not allowed to other users information");
-        }
+        //수정해야함 ==> member 엔티티가 controller에 노출되는것을 해결해보자
+        Member loginMember = memberService.findByEmail(userDetails.getUsername());
+
+
 
         List<FriendWithSpecifyName> allFriendsProfile = friendService.findAllFriendsProfile(loginMember);
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("not allowed to other users information");
 
+    }
+
+    @GetMapping("{memberId}")
+    @ResponseBody
+    public String memberInformation(@PathVariable Long memberId){
+        return "" + memberId;
     }
 
 
