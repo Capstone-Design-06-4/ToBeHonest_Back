@@ -3,19 +3,20 @@ package Team4.TobeHonest.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class  Message{
+@NoArgsConstructor
+public abstract class Message {
     @Id
     @GeneratedValue
     @Column(name = "message_id")
     private Long id;
-
-//    이건 타입 미지정
+    //    이건 타입 미지정
     private String content;
 
     private LocalDateTime time;

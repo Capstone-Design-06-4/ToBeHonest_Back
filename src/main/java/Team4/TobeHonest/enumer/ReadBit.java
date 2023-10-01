@@ -1,5 +1,5 @@
 package Team4.TobeHonest.enumer;
 
 public enum ReadBit {
-    read, notRead
+    READ, NOT_READ
 }

@@ -2,11 +2,14 @@ package Team4.TobeHonest.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class WishItem {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     @Column(name = "wish_item_id")
     private Long id;
 
@@ -17,7 +20,7 @@ public class WishItem {
 
     @JoinColumn(name = "user_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    private Member member;
 
     private Integer fundMoney;
 
