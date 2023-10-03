@@ -14,7 +14,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-@Transactional
+//CRUD
 public class CategoryRepository {
 
     private final EntityManager em;

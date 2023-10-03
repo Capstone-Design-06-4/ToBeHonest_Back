@@ -2,7 +2,6 @@ package Team4.TobeHonest.domain;
 
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,8 +26,8 @@ public class Item {
     private Category category;
 
 
-    public Item(Long naverid, String name, Integer price, String image, Category category) {
-        this.naverId = naverid;
+    public Item(Long naverId, String name, Integer price, String image, Category category) {
+        this.naverId = naverId;
         this.name = name;
         this.price = price;
         this.image = image;

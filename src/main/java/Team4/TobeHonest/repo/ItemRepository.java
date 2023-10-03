@@ -14,7 +14,6 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-@Transactional
 public class ItemRepository {
 
     private final EntityManager em;
@@ -34,8 +33,8 @@ public class ItemRepository {
 
 
 
-
-    public List<Item> findItem(String string) {
+//  아이템 검색용도
+    public List<Item> searchItemName(String string) {
 
         return jqf.select(i).
                 from(i).innerJoin(i.category, c).
@@ -43,6 +42,18 @@ public class ItemRepository {
                         or(i.name.like("%"+ string + "%"))).fetch();
 
     }
+
+    public Item findByName(String name){
+        List<Item> result = jqf.select(i)
+                .from(i)
+                .where(i.name.eq(name)).fetch();
+        if (result.isEmpty()){
+            return null;
+        }
+        return result.get(0);
+    }
+
+
 
     public List<Item> findAllItem(){
         return jqf.select(i).from(i).fetch();

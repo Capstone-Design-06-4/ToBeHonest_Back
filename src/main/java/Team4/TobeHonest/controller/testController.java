@@ -1,4 +1,4 @@
-/*package Team4.TobeHonest.controller;
+package Team4.TobeHonest.controller;
 
 import Team4.TobeHonest.domain.Category;
 import Team4.TobeHonest.domain.Item;
@@ -22,7 +22,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @Controller
-@RequestMapping("/items")
+@RequestMapping("/test")
 @RequiredArgsConstructor
 @Slf4j
 public class testController {
@@ -127,4 +127,4 @@ public class testController {
         System.out.println(response);
         return response;
     }
-}*/
+}

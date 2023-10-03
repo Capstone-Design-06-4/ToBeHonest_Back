@@ -38,7 +38,8 @@ public class FriendWith {
     public void changeFriendType(RelationType relationType) {
         this.relationType = relationType;
     }
-    public String changeFriendName(String name){
+
+    public String changeFriendName(String name) {
         this.specifiedName = name;
         return this.specifiedName;
     }
