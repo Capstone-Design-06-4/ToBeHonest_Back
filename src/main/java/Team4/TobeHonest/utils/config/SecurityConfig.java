@@ -34,7 +34,7 @@ public class SecurityConfig {
             csrf().
                 disable()
             .authorizeRequests()
-                .requestMatchers("/login", "/signup").permitAll()
+                .requestMatchers("/login", "/signup", "/test").permitAll()
                 .anyRequest().authenticated()
             .and()
                 .formLogin()
@@ -47,7 +47,6 @@ public class SecurityConfig {
         http.logout()
                 .logoutUrl("/logout")
                 .logoutSuccessHandler(new CustomLogoutHandler());
-
 
         return http.build();
     }

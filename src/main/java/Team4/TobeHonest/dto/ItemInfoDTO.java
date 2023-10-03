@@ -1,7 +1,6 @@
 package Team4.TobeHonest.dto;
 
 
-import Team4.TobeHonest.domain.Category;
 import Team4.TobeHonest.domain.Item;
 import Team4.TobeHonest.enumer.ItemStatus;
 import lombok.AllArgsConstructor;
@@ -24,9 +23,9 @@ public class ItemInfoDTO {
     private String image;
     private ItemStatus itemStatus;
 
-    public static ItemInfoDTO ItemToItemInfoDTO(Item item){
+    public static ItemInfoDTO ItemToItemInfoDTO(Item item) {
         ItemStatus is = ItemStatus.AVAILABLE;
-        if (item.getStockQuantity() <= 0){
+        if (item.getStockQuantity() <= 0) {
             is = ItemStatus.SOLD_OUT;
         }
 
@@ -39,4 +38,4 @@ public class ItemInfoDTO {
                 .build();
     }
 
-    }
+}

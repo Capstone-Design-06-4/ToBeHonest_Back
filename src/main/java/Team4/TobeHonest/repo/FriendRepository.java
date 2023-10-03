@@ -1,10 +1,7 @@
 package Team4.TobeHonest.repo;
 
 
-import Team4.TobeHonest.domain.FriendWith;
-import Team4.TobeHonest.domain.Member;
-import Team4.TobeHonest.domain.QFriendWith;
-import Team4.TobeHonest.domain.QMember;
+import Team4.TobeHonest.domain.*;
 import Team4.TobeHonest.dto.FriendProfileDTO;
 import Team4.TobeHonest.dto.FriendWithSpecifyName;
 import com.querydsl.core.Tuple;
@@ -26,32 +23,33 @@ public class FriendRepository {
     private final EntityManager em;
     private final JPAQueryFactory jqf;
     private final QMember friend = new QMember("friend");
-    private final QFriendWith f = new QFriendWith("f");
+    private final QFriendWith friendWith = new QFriendWith("friendWith");
+    private final QContributor contributor = new QContributor("contributor");
 
     public void join(FriendWith friend) {
         em.persist(friend);
     }
 
     public List<FriendWith> findFriend(Member owner, Member friend){
-        return jqf.select(f).
-                from(f).
-                where(f.owner.eq(owner).and(f.friend.eq(friend))).
+        return jqf.select(friendWith).
+                from(friendWith).
+                where(friendWith.owner.eq(owner).and(friendWith.friend.eq(friend))).
                 fetch();
     }
 
     public List<FriendWith> findAllFriends(Member owner) {
-        return jqf.select(f).
-                from(f).
-                where(f.owner.eq(owner)).
+        return jqf.select(friendWith).
+                from(friendWith).
+                where(friendWith.owner.eq(owner)).
                 fetch();
     }
 
     //지정이름과 friend객체가 return..
     public List<FriendWithSpecifyName> findAllFriendsWithSpecifyName(Member owner) {
 
-        return jqf.select(Projections.constructor(FriendWithSpecifyName.class, f.specifiedName, friend)).
-                from(f).innerJoin(f.friend, friend).
-                where(f.owner.eq(owner)).fetch();
+        return jqf.select(Projections.constructor(FriendWithSpecifyName.class, friendWith.specifiedName, friend)).
+                from(friendWith).innerJoin(friendWith.friend, friend).
+                where(friendWith.owner.eq(owner)).fetch();
 
     }
 

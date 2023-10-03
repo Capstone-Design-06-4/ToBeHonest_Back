@@ -1,18 +1,19 @@
 package Team4.TobeHonest.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor
+
 public class WishItem {
     @Id
     @GeneratedValue
     @Column(name = "wish_item_id")
     private Long id;
-
 
     @JoinColumn(name = "item_id")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -24,5 +25,10 @@ public class WishItem {
 
     private Integer fundMoney;
 
-
+    @Builder
+    public WishItem(Item item, Member member, Integer fundMoney) {
+        this.item = item;
+        this.member = member;
+        this.fundMoney = fundMoney;
+    }
 }

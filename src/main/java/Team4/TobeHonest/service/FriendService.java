@@ -3,18 +3,20 @@ package Team4.TobeHonest.service;
 
 import Team4.TobeHonest.domain.FriendWith;
 import Team4.TobeHonest.domain.Member;
-import Team4.TobeHonest.dto.FriendProfileDTO;
+
 import Team4.TobeHonest.dto.FriendWithSpecifyName;
+
 import Team4.TobeHonest.exception.DuplicateFriendException;
-import Team4.TobeHonest.exception.DuplicateMemberException;
 import Team4.TobeHonest.repo.FriendRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
+
+import org.springframework.security.core.Authentication;
 
 @Service
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
@@ -46,6 +48,8 @@ public class FriendService {
     public List<FriendWithSpecifyName> findAllFriendsProfile(Member member){
         return friendRepository.findAllFriendsWithSpecifyName(member);
     }
+
+
 
 
 }

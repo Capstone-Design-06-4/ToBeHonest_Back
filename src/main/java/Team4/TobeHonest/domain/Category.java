@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,15 +36,16 @@ public class Category {
         this.parent = parent;
     }
 
+    public Category(String name) {
+        this.name = name;
+    }
+
     public void setParent(Category parent) {
         this.parent = parent;
         parent.addChild(this);
     }
 
-    public Category(String name) {
-        this.name = name;
-    }
-    public void addChild(Category child){
+    public void addChild(Category child) {
         this.childs.add(child);
 
     }

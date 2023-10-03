@@ -26,7 +26,7 @@ public class FriendProfileDTO {
 
     //프사
 
-    public static FriendProfileDTO makeFriendProfileDTO(String name, LocalDate birthDate){
+    public static FriendProfileDTO makeFriendProfileDTO(String name, LocalDate birthDate) {
         FriendProfileDTO friendProfileDTO = new FriendProfileDTO();
         friendProfileDTO.specifyName = name;
         friendProfileDTO.birthDate = birthDate;

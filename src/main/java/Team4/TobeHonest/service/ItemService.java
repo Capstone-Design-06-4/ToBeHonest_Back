@@ -19,7 +19,7 @@ public class ItemService {
     private final ItemRepository itemRepository;
 
     public List<ItemInfoDTO> findItem(String string){
-        List<Item> item = itemRepository.findItem(string);
+        List<Item> item = itemRepository.searchItemName(string);
         List<ItemInfoDTO> result = new ArrayList<>();
 
         //Item에서 itemInfoDTO클래스로 변환한 후 controller에 return

@@ -53,7 +53,6 @@ public class MemberRepository {
         return jqf.select(m)
                 .from(m)
                 .where(m.email.eq(email).and(m.password.eq(passWord))).fetchOne();
-
     }
 
     public Member findByPhoneNumber(String phoneNumber) {
