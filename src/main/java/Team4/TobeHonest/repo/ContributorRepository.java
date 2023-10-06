@@ -29,19 +29,36 @@ public class ContributorRepository {
     }
 //    contributor가 wishItem에 참여했는가
 //    내가 지정한 friendName
-    public Contributor findContributionWithNames(Member member, String email, String itemName){
-        List<Contributor> fetch = jqf.select(this.contributor).from(this.contributor)
-                .innerJoin(this.wishItem.member, this.member)
+    public Contributor findContributionWithNamesByEmail(Member member, String email, String itemName){
+        List<Contributor> fetch = jqf.select(this.contributor)
+                .from(this.contributor)
                 .innerJoin(this.contributor.wishItem, this.wishItem)
                 .innerJoin(this.wishItem.item, this.item)
-                .where(this.wishItem.member.email.eq(email)
-                        .and(contributor.contributor.eq(member))
-                        .and(wishItem.item.name.eq(itemName))).fetch();
+                .innerJoin(this.wishItem.member, this.member)
+                .where(this.contributor.contributor.eq(member)
+                        .and(this.item.name.eq(itemName))
+                        .and(this.member.email.eq(email))).fetch();
+
         if (fetch.isEmpty()){
             return null;
         }
         return fetch.get(0);
+    }
 
+    public Contributor findContributionWithNamesById(Member member, Long id, String itemName){
+        List<Contributor> fetch = jqf.select(this.contributor)
+                .from(this.contributor)
+                .innerJoin(this.contributor.wishItem, this.wishItem)
+                .innerJoin(this.wishItem.item, this.item)
+                .innerJoin(this.wishItem.member, this.member)
+                .where(this.contributor.contributor.eq(member)
+                        .and(this.item.name.eq(itemName))
+                        .and(this.member.id.eq(id))).fetch();
+
+        if (fetch.isEmpty()){
+            return null;
+        }
+        return fetch.get(0);
     }
 
 

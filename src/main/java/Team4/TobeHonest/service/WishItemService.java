@@ -3,7 +3,6 @@ package Team4.TobeHonest.service;
 import Team4.TobeHonest.domain.Item;
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.domain.WishItem;
-import Team4.TobeHonest.dto.FriendWishItemInfoDTO;
 import Team4.TobeHonest.dto.ItemInfoDTO;
 import Team4.TobeHonest.exception.DuplicateWishItemException;
 import Team4.TobeHonest.exception.ItemNotInWishlistException;
@@ -13,8 +12,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 
 @Service
@@ -26,18 +23,19 @@ public class WishItemService {
     private final ItemRepository itemRepository;
 
     @Transactional
-    public void addWishList(Member member, ItemInfoDTO itemInfoDTO){
+    public void addWishList(Member member, ItemInfoDTO itemInfoDTO) {
         WishItem wishItem = wishItemRepository.findWishItemByItemName(member, itemInfoDTO.getName());
-        if (wishItem != null){
+        if (wishItem != null) {
             throw new DuplicateWishItemException("이미 위시리스트에 존재하는 아이템입니다!");
         }
         Item item = itemRepository.findByName(itemInfoDTO.getName());
         wishItem = WishItem.builder()
-                        .item(item)
-                                .fundMoney(item.getPrice())
-                                        .member(member).build();
+                .item(item)
+                .money(item.getPrice())
+                .member(member).build();
         wishItemRepository.join(wishItem);
     }
+
     @Transactional
     public void deleteWishList(Member member, String itemName) {
         WishItem wishItem =
@@ -47,10 +45,6 @@ public class WishItemService {
         }
         wishItemRepository.deleteWishItem(wishItem);
     }
-
-
-
-
 
 
 }

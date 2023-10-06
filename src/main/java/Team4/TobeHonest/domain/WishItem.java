@@ -23,12 +23,12 @@ public class WishItem {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    private Integer fundMoney;
+    private Integer price;
 
     @Builder
-    public WishItem(Item item, Member member, Integer fundMoney) {
+    public WishItem(Item item, Member member, Integer money) {
         this.item = item;
         this.member = member;
-        this.fundMoney = fundMoney;
+        this.price = money;
     }
 }
