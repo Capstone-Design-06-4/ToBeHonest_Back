@@ -2,19 +2,17 @@ package Team4.TobeHonest.repo;
 
 
 import Team4.TobeHonest.domain.*;
-import Team4.TobeHonest.dto.FriendProfileDTO;
+
 import Team4.TobeHonest.dto.FriendWithSpecifyName;
-import com.querydsl.core.Tuple;
+
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
+
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -47,7 +45,7 @@ public class FriendRepository {
     //지정이름과 friend객체가 return..
     public List<FriendWithSpecifyName> findAllFriendsWithSpecifyName(Member owner) {
 
-        return jqf.select(Projections.constructor(FriendWithSpecifyName.class, friendWith.specifiedName, friend)).
+        return jqf.select(Projections.constructor(FriendWithSpecifyName.class, friendWith.id, friendWith.specifiedName, friend)).
                 from(friendWith).innerJoin(friendWith.friend, friend).
                 where(friendWith.owner.eq(owner)).fetch();
 

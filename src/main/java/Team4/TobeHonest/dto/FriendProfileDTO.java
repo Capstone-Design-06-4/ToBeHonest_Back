@@ -1,19 +1,16 @@
 package Team4.TobeHonest.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 
 
 @Getter
 @Setter
-@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class FriendProfileDTO {
-
+    private Long friendWithId;
     private String specifyName;
     private LocalDate birthDate;
     //사진

@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 public class ItemInfoDTO {
-
+    private Long id;
     private Integer price;
     private String name;
     private String categoryName;
@@ -30,6 +30,7 @@ public class ItemInfoDTO {
         }
 
         return ItemInfoDTO.builder()
+                .id(item.getId())
                 .price(item.getPrice())
                 .name(item.getName())
                 .categoryName(item.getCategory().getName())
