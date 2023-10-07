@@ -5,6 +5,7 @@ import Team4.TobeHonest.domain.Contributor;
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.domain.QWishItem;
 import Team4.TobeHonest.domain.WishItem;
+import Team4.TobeHonest.dto.ContributorDTO;
 import Team4.TobeHonest.dto.FriendWishItemInfoDTO;
 import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
@@ -48,4 +50,7 @@ public class ContributorService {
         }
     }
 
+    public List<ContributorDTO> findContributor(Long wishItemId){
+        return contributorRepository.findContributorsInWishItem(wishItemId);
+    }
 }
