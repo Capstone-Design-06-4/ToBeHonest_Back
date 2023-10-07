@@ -42,11 +42,26 @@ public class ItemRepository {
                         or(i.name.like("%"+ string + "%"))).fetch();
 
     }
+    public List<Item> searchItemNameByCategory(String name) {
+        return jqf.select(i).
+                from(i).innerJoin(i.category, c).
+                where(c.name.like("%"+ name + "%")).fetch();
+
+    }
 
     public Item findByName(String name){
         List<Item> result = jqf.select(i)
                 .from(i)
                 .where(i.name.eq(name)).fetch();
+        if (result.isEmpty()){
+            return null;
+        }
+        return result.get(0);
+    }
+    public Item findByNameByCategory(String name){
+        List<Item> result = jqf.select(i).
+                from(i).innerJoin(i.category, c)
+                .where(c.name.eq(name)).fetch();
         if (result.isEmpty()){
             return null;
         }
