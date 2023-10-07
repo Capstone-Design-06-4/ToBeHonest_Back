@@ -1,10 +1,8 @@
 package Team4.TobeHonest.controller;
 
-import Team4.TobeHonest.dto.JoinDTO;
+import Team4.TobeHonest.dto.signup.JoinDTO;
 import Team4.TobeHonest.exception.DuplicateMemberException;
 import Team4.TobeHonest.service.MemberService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +22,9 @@ public class HomeController {
     private final MemberService memberService;
 
 
-
     @GetMapping("/signup")
     @ResponseBody
-    public String singUpForm(@AuthenticationPrincipal  UserDetails user) {
+    public String singUpForm(@AuthenticationPrincipal UserDetails user) {
         return "회원가입 폼 주세요";
     }
 
@@ -49,11 +46,9 @@ public class HomeController {
     }
 
     @GetMapping("/findEmail")
-    public String findEmailForm(){
+    public String findEmailForm() {
         return "ID찾는 폼주세요";
     }
-
-
 
 
 }

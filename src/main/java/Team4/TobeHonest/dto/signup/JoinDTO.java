@@ -1,4 +1,4 @@
-package Team4.TobeHonest.dto;
+package Team4.TobeHonest.dto.signup;
 
 import Team4.TobeHonest.domain.Member;
 import jakarta.validation.constraints.Email;

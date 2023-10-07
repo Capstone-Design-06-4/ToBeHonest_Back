@@ -1,7 +1,7 @@
 package Team4.TobeHonest.controller;
 
 import Team4.TobeHonest.domain.Member;
-import Team4.TobeHonest.dto.JoinDTO;
+import Team4.TobeHonest.dto.signup.JoinDTO;
 import Team4.TobeHonest.repo.MemberRepository;
 import Team4.TobeHonest.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +14,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;

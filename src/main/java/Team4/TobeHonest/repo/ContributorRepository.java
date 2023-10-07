@@ -1,7 +1,7 @@
 package Team4.TobeHonest.repo;
 
 import Team4.TobeHonest.domain.*;
-import Team4.TobeHonest.dto.ContributorDTO;
+import Team4.TobeHonest.dto.contributor.ContributorDTO;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
