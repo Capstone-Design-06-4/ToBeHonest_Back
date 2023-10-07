@@ -3,15 +3,20 @@ package Team4.TobeHonest.service;
 import Team4.TobeHonest.domain.Item;
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.domain.WishItem;
+import Team4.TobeHonest.dto.FirstWishItem;
 import Team4.TobeHonest.dto.ItemInfoDTO;
+import Team4.TobeHonest.dto.WishItemDetail;
 import Team4.TobeHonest.exception.DuplicateWishItemException;
 import Team4.TobeHonest.exception.ItemNotInWishlistException;
 import Team4.TobeHonest.repo.ItemRepository;
+import Team4.TobeHonest.repo.MemberRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 @Service
@@ -21,6 +26,7 @@ public class WishItemService {
 
     private final WishItemRepository wishItemRepository;
     private final ItemRepository itemRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     public void addWishList(Member member, ItemInfoDTO itemInfoDTO) {
@@ -46,5 +52,14 @@ public class WishItemService {
         wishItemRepository.deleteWishItem(wishItem);
     }
 
+
+    public List<FirstWishItem> findWishList(Long memberId){
+        Member member = memberRepository.findById(memberId);
+        return wishItemRepository.findFirstWishList(member);
+    }
+
+    public List<WishItemDetail> findWishItemDetail(Long wishItemId){
+        return wishItemRepository.findWishItemDetail(wishItemId);
+    }
 
 }

@@ -2,12 +2,10 @@ package Team4.TobeHonest.dto;
 
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.domain.WishItem;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
@@ -19,6 +17,9 @@ public class FriendWishItemInfoDTO {
     private String itemName;
     private String categoryName;
     private String image;
+    private Integer percentage;
+
+
 
 
 
