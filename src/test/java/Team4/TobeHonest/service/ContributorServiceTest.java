@@ -3,6 +3,10 @@ package Team4.TobeHonest.service;
 
 import Team4.TobeHonest.domain.*;
 import Team4.TobeHonest.dto.*;
+import Team4.TobeHonest.dto.contributor.ContributorDTO;
+import Team4.TobeHonest.dto.item.ItemInfoDTO;
+import Team4.TobeHonest.dto.signup.JoinDTO;
+import Team4.TobeHonest.dto.wishitem.FriendWishItemInfoDTO;
 import Team4.TobeHonest.repo.CategoryRepository;
 import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.ItemRepository;
@@ -22,7 +26,6 @@ import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

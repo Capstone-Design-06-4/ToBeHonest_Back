@@ -1,4 +1,4 @@
-package Team4.TobeHonest.dto;
+package Team4.TobeHonest.dto.item;
 
 
 import Team4.TobeHonest.domain.Item;

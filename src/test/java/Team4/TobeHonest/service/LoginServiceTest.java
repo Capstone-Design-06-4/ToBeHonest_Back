@@ -2,7 +2,7 @@ package Team4.TobeHonest.service;
 
 
 import Team4.TobeHonest.domain.Member;
-import Team4.TobeHonest.dto.JoinDTO;
+import Team4.TobeHonest.dto.signup.JoinDTO;
 import Team4.TobeHonest.repo.MemberRepository;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.Assertions;

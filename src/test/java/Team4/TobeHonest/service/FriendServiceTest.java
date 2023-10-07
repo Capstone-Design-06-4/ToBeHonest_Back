@@ -3,8 +3,8 @@ package Team4.TobeHonest.service;
 
 import Team4.TobeHonest.domain.FriendWith;
 import Team4.TobeHonest.domain.Member;
-import Team4.TobeHonest.dto.FriendWithSpecifyName;
-import Team4.TobeHonest.dto.JoinDTO;
+import Team4.TobeHonest.dto.friendWIth.FriendWithSpecifyName;
+import Team4.TobeHonest.dto.signup.JoinDTO;
 import Team4.TobeHonest.exception.DuplicateFriendException;
 import Team4.TobeHonest.repo.FriendRepository;
 import Team4.TobeHonest.repo.MemberRepository;

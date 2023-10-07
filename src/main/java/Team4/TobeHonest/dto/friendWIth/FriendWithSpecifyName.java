@@ -1,4 +1,4 @@
-package Team4.TobeHonest.dto;
+package Team4.TobeHonest.dto.friendWIth;
 
 import Team4.TobeHonest.domain.Member;
 import lombok.AllArgsConstructor;

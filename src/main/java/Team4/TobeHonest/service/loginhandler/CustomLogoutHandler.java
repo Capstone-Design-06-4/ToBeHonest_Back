@@ -1,4 +1,4 @@
-package Team4.TobeHonest.utils.handler;
+package Team4.TobeHonest.service.loginhandler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

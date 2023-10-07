@@ -1,4 +1,4 @@
-package Team4.TobeHonest.dto;
+package Team4.TobeHonest.dto.wishitem;
 
 
 import lombok.*;

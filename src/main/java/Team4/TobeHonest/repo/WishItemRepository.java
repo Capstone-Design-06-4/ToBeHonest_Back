@@ -1,8 +1,8 @@
 package Team4.TobeHonest.repo;
 
 import Team4.TobeHonest.domain.*;
-import Team4.TobeHonest.dto.FirstWishItem;
-import Team4.TobeHonest.dto.WishItemDetail;
+import Team4.TobeHonest.dto.wishitem.FirstWishItem;
+import Team4.TobeHonest.dto.wishitem.WishItemDetail;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;

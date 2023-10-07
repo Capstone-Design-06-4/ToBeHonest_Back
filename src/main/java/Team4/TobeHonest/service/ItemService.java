@@ -1,7 +1,7 @@
 package Team4.TobeHonest.service;
 
 import Team4.TobeHonest.domain.Item;
-import Team4.TobeHonest.dto.ItemInfoDTO;
+import Team4.TobeHonest.dto.item.ItemInfoDTO;
 import Team4.TobeHonest.repo.ItemRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
