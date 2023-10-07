@@ -17,19 +17,36 @@ public class ItemController {
 
     private final ItemService itemService;
 
-    @PostMapping("/find")
-    public List<ItemInfoDTO> findItem(@RequestBody String name) {
-        log.error(name);
-        List<ItemInfoDTO> item = itemService.findItem(name);
-        for (ItemInfoDTO itemInfoDTO : item) {
-            log.error(itemInfoDTO.getName());
 
-        }
-        return itemService.findItem(name);
+    @GetMapping("{id}")
+    public ItemInfoDTO findById(@PathVariable Long id){
+        return itemService.findByItembyID(id);
+    }
+
+    //아이템 검색
+    @GetMapping("/search/{keyword}")
+    public List<ItemInfoDTO> searchItem(@PathVariable String keyword) {
+        return itemService.findItem(keyword);
+
+    } //아이템 검색
+    @GetMapping("/find/{name}")
+    public List<ItemInfoDTO> findItem(@PathVariable String name) {
+        return itemService.findCertainItem(name);
 
     }
-    @GetMapping("/find")
-    public String findItemForm(){
-        return "물건찾는 폼 주세요";
+
+
+
+
+    @GetMapping("/categories/find/{keyword}")
+    public List<ItemInfoDTO> findItemByCategoryName(@PathVariable String keyword) {
+        return itemService.findCertainItemByCategory(keyword);
+
     }
+    @GetMapping("/categories/search/{keyword}")
+    public List<ItemInfoDTO> searchItemByCategoryName(@PathVariable String keyword) {
+        return itemService.findItemByCategory(keyword);
+
+    }
+
 }
