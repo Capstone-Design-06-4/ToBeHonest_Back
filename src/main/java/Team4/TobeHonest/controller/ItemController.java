@@ -18,24 +18,32 @@ public class ItemController {
     private final ItemService itemService;
 
 
+    @GetMapping("{id}")
+    public ItemInfoDTO findById(@PathVariable Long id){
+        return itemService.findByItembyID(id);
+    }
+
     //아이템 검색
-    @PostMapping("/search/{keyword}")
+    @GetMapping("/search/{keyword}")
     public List<ItemInfoDTO> searchItem(@PathVariable String keyword) {
         return itemService.findItem(keyword);
 
     } //아이템 검색
-    @PostMapping("/find/{name}")
+    @GetMapping("/find/{name}")
     public List<ItemInfoDTO> findItem(@PathVariable String name) {
         return itemService.findCertainItem(name);
 
     }
 
-    @PostMapping("/categories/find/{keyword}")
+
+
+
+    @GetMapping("/categories/find/{keyword}")
     public List<ItemInfoDTO> findItemByCategoryName(@PathVariable String keyword) {
         return itemService.findCertainItemByCategory(keyword);
 
     }
-    @PostMapping("/categories/search/{keyword}")
+    @GetMapping("/categories/search/{keyword}")
     public List<ItemInfoDTO> searchItemByCategoryName(@PathVariable String keyword) {
         return itemService.findItemByCategory(keyword);
 

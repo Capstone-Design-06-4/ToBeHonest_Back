@@ -31,6 +31,9 @@ public class ItemRepository {
 
     //name을 포함하는 문자열 결과 물품 return
 
+    public Item findByItem(Long id){
+        return em.find(Item.class, id);
+    }
 
 
 //  아이템 검색용도

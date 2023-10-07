@@ -51,6 +51,10 @@ public class ItemService {
         return result;
     }
 
+    public ItemInfoDTO findByItembyID(Long itemID){
+        Item item = itemRepository.findByItem(itemID);
+        return ItemInfoDTO.ItemToItemInfoDTO(item);
+    }
 
 
     private void entityToDTO(List<Item> item, List<ItemInfoDTO> result) {
@@ -60,4 +64,6 @@ public class ItemService {
             result.add(itemInfoDTO);
         }
     }
+
+
 }
