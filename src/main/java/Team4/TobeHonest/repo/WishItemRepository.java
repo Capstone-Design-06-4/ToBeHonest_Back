@@ -53,6 +53,32 @@ public class WishItemRepository {
     }
 
 
+    public WishItem findWishItemByEmailAndItemName(String email, String itemName){
+        List<WishItem> result = jqf.select(wishItem)
+                .from(wishItem)
+                .innerJoin(wishItem.item, this.item).innerJoin(wishItem.member, this.member)
+                .where(wishItem.member.email.eq(email).and(this.item.name.eq(itemName)))
+                .fetch();
+        if (result.isEmpty()) {
+            return null;
+        }
+        return result.get(0);
+    }
+
+    public WishItem findWishItemByIdAndItemName(Long friendId, String itemName){
+        List<WishItem> result = jqf.select(wishItem)
+                .from(wishItem)
+                .innerJoin(wishItem.item, this.item).innerJoin(wishItem.member, this.member)
+                .where(wishItem.member.id.eq(friendId).and(this.item.name.eq(itemName)))
+                .fetch();
+        if (result.isEmpty()) {
+            return null;
+        }
+        return result.get(0);
+    }
+
+
+
     public List<WishItem> findAll(Member member){
         return jqf.select(wishItem).
                 from(wishItem).

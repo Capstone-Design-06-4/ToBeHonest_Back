@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 public class FriendWishItemInfoDTO {
-    private String friendEmail;
+    private Long friendId;
+//    내가지정한 친구이름
     private String friendName;
     private Integer price;
     private String itemName;

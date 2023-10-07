@@ -25,11 +25,6 @@ public class MemberController {
 
     private final MemberService memberService;
     private final FriendService friendService;
-    /*Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    UserDetails userDetails = (UserDetails)principal;
-
-    String username = userDetails.getUsername();
-    String password = userDetails.getPassword();*/
     @GetMapping("information/Friends")
     //로그인은 인터셉터에서 처리 해 준다고 생각..
     public ResponseEntity<String> findFriends(@AuthenticationPrincipal UserDetails userDetails){
