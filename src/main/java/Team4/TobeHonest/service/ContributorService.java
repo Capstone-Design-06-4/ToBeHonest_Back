@@ -6,7 +6,7 @@ import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.domain.QWishItem;
 import Team4.TobeHonest.domain.WishItem;
 import Team4.TobeHonest.dto.contributor.ContributorDTO;
-import Team4.TobeHonest.dto.wishitem.FriendWishItemInfoDTO;
+import Team4.TobeHonest.exception.NoWishItemException;
 import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
 import lombok.AccessLevel;
@@ -28,15 +28,17 @@ public class ContributorService {
 
     //    후원하기기능
 //    로그인한 회원이 친구의 wishItem에 펀딩을 하는 기능..
-    public void contributing(Member contributor, FriendWishItemInfoDTO wishItemInfoDTO,
+    @Transactional
+    public void contributing(Member contributor, Long wishItemId,
                              Integer money) {
-        Contributor contribution = contributorRepository
-                .findContributionWithNamesById(contributor, wishItemInfoDTO.getFriendId(),
-                        wishItemInfoDTO.getItemName());
+        Contributor contribution = contributorRepository.findContributorsInWishItem(wishItemId, contributor);
 //        내가 이미 펀딩했다면 그냥 값만 더하기
         if (contribution == null) {
-            WishItem frindsWish = wishItemRepository.findWishItemByIdAndItemName(
-                    wishItemInfoDTO.getFriendId(), wishItemInfoDTO.getItemName());
+
+            WishItem frindsWish = wishItemRepository.findWishItemById(wishItemId);
+            if (frindsWish == null){
+                throw new NoWishItemException("해당 위시아이템이 존재하지 않습니다");
+            }
             contribution = Contributor.builder()
                     .contributor(contributor)
                     .fundMoney(money)
