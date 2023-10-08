@@ -13,6 +13,6 @@ import lombok.*;
 public class FirstWishItem {
     private Long wishItemId;
     private String image;
-    private Integer percentage;
+    private Integer fundAmount;
 
 }

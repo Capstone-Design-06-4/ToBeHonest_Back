@@ -53,6 +53,19 @@ public class WishItemService {
         wishItemRepository.deleteWishItem(wishItem);
     }
 
+    @Transactional
+    public void deleteWishListByItemId(Member member, Long itemId) {
+        WishItem wishItem =
+                wishItemRepository.findWishItemByItemId(member, itemId);
+        if (wishItem == null) {
+            throw new ItemNotInWishlistException("해당 아이템은 위시리스트에 존재하지 않습니다.");
+        }
+        wishItemRepository.deleteWishItem(wishItem);
+    }
+
+
+
+
     public List<FirstWishItem> findWishList(Long memberId){
         Member member = memberRepository.findById(memberId);
         return wishItemRepository.findFirstWishList(member);
