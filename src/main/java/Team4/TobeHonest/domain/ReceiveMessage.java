@@ -3,7 +3,6 @@ package Team4.TobeHonest.domain;
 
 import Team4.TobeHonest.enumer.ReadBit;
 import jakarta.persistence.*;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity

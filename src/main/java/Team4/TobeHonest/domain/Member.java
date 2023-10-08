@@ -1,5 +1,6 @@
 package Team4.TobeHonest.domain;
 
+import Team4.TobeHonest.exception.NoPointsException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,6 +35,8 @@ public class Member implements UserDetails {
     private String phoneNumber;
 
     private LocalDate birthDate;
+
+    private Integer points;
     //프사 추가해야함
 
     public Member(String email, String name, String password, String phoneNumber, LocalDate birthDate) {
@@ -48,6 +51,16 @@ public class Member implements UserDetails {
     public static String hashPassword(String password, PasswordEncoder passwordEncoder) {
         return passwordEncoder.encode(password);
 
+    }
+
+    public void addPoints(Integer money){
+        this.points += money;
+    }
+
+    public void usePoints(Integer money){
+        if (points < money){
+            throw new NoPointsException("포인트가 부족합니다.");
+        }
     }
 
     public FriendWith addFriend(Member friend) {

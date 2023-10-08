@@ -2,16 +2,15 @@
 package Team4.TobeHonest.utils.config;
 
 
-import Team4.TobeHonest.utils.handler.CustomLogoutHandler;
-import Team4.TobeHonest.utils.handler.LoginFailHandler;
-import Team4.TobeHonest.utils.handler.LoginSuccessHandler;
+import Team4.TobeHonest.service.loginhandler.CustomLogoutHandler;
+import Team4.TobeHonest.service.loginhandler.LoginFailHandler;
+import Team4.TobeHonest.service.loginhandler.LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 

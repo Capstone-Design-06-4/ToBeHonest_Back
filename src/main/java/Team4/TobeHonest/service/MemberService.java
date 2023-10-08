@@ -3,6 +3,7 @@ package Team4.TobeHonest.service;
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.signup.JoinDTO;
 import Team4.TobeHonest.exception.DuplicateMemberException;
+import Team4.TobeHonest.exception.NoMemberException;
 import Team4.TobeHonest.repo.MemberRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -67,9 +68,6 @@ public class MemberService {
         return true;
     }
 
-    public Member findByID(Long id) {
-        return memberRepository.findById(id);
-    }
 
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email);

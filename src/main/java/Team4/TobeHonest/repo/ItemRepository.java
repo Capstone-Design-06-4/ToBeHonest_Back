@@ -1,6 +1,5 @@
 package Team4.TobeHonest.repo;
 
-import Team4.TobeHonest.domain.Category;
 import Team4.TobeHonest.domain.Item;
 import Team4.TobeHonest.domain.QCategory;
 import Team4.TobeHonest.domain.QItem;
@@ -8,7 +7,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 

@@ -28,6 +28,10 @@ public class WishItemRepository {
         em.persist(wishItem);
     }
 
+    public WishItem findWishItemById(Long id) {
+        return em.find(WishItem.class, id);
+    }
+
     public void deleteWishItem(WishItem wishItem) {
         em.remove(wishItem);
     }
@@ -71,6 +75,7 @@ public class WishItemRepository {
         return result.get(0);
     }
 
+
     public WishItem findWishItemByIdAndItemName(Long friendId, String itemName){
         List<WishItem> result = jqf.select(wishItem)
                 .from(wishItem)
@@ -92,13 +97,6 @@ public class WishItemRepository {
     }
 
 
-    private Long friendId;
-    //    내가지정한 친구이름
-    private String friendName;
-    private Integer price;
-    private String itemName;
-    private String categoryName;
-    private String image;
 
 //    맨처음에 나오는 위시리스트 화면용
     public List<FirstWishItem> findFirstWishList(Member m){
