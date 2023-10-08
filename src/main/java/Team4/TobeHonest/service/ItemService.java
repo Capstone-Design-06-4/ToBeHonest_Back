@@ -2,6 +2,7 @@ package Team4.TobeHonest.service;
 
 import Team4.TobeHonest.domain.Item;
 import Team4.TobeHonest.dto.item.ItemInfoDTO;
+import Team4.TobeHonest.exception.NoItemException;
 import Team4.TobeHonest.repo.ItemRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,9 @@ public class ItemService {
 
     public ItemInfoDTO findByItembyID(Long itemID){
         Item item = itemRepository.findByItem(itemID);
+        if (item == null){
+            throw new NoItemException("DB에 아이템 정보가 없습니다");
+        }
         return ItemInfoDTO.ItemToItemInfoDTO(item);
     }
 
