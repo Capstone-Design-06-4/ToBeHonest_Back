@@ -2,15 +2,12 @@ package Team4.TobeHonest.repo;
 
 
 import Team4.TobeHonest.domain.*;
-
 import Team4.TobeHonest.dto.friendWIth.FriendWithSpecifyName;
-
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
 
 import java.util.List;
 
@@ -28,7 +25,7 @@ public class FriendRepository {
         em.persist(friend);
     }
 
-    public List<FriendWith> findFriend(Member owner, Member friend){
+    public List<FriendWith> findFriend(Member owner, Member friend) {
         return jqf.select(friendWith).
                 from(friendWith).
                 where(friendWith.owner.eq(owner).and(friendWith.friend.eq(friend))).
@@ -45,21 +42,11 @@ public class FriendRepository {
     //지정이름과 friend객체가 return..
     public List<FriendWithSpecifyName> findAllFriendsWithSpecifyName(Member owner) {
 
-        return jqf.select(Projections.constructor(FriendWithSpecifyName.class, friendWith.id, friendWith.specifiedName, friend)).
+        return jqf.select(Projections.constructor(FriendWithSpecifyName.class, friend.id, friendWith.id, friendWith.specifiedName)).
                 from(friendWith).innerJoin(friendWith.friend, friend).
                 where(friendWith.owner.eq(owner)).fetch();
 
     }
-
-
-
-
-
-
-
-
-
-
 
 
 }

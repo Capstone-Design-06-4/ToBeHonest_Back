@@ -68,6 +68,15 @@ public class MemberService {
         return true;
     }
 
+    public Member findByID(Long id) {
+
+
+        Member member = memberRepository.findById(id);
+        if (member == null){
+            throw new NoMemberException("회원 정보를 찾을 수 없습니다");
+        }
+        return memberRepository.findById(id);
+    }
 
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email);
