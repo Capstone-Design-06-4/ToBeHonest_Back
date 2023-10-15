@@ -6,7 +6,6 @@ import Team4.TobeHonest.repo.MemberRepository;
 import Team4.TobeHonest.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -35,8 +34,8 @@ public class HomeControllerTest {
     ObjectMapper objectMapper;
     @Autowired
     WebApplicationContext context;
-/*    @LocalServerPort
-    private int port;*/
+
+
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -57,9 +56,6 @@ public class HomeControllerTest {
         //회원가입된 상태..
     }
 
-    @After
-    public void tearDown() throws Exception {
-    }
 
     @Test
     @DisplayName("이메일에러")
@@ -107,7 +103,6 @@ public class HomeControllerTest {
     @Test
     @DisplayName("중복 회원가입")
     public void duplicateSignUp() throws Exception {
-
         String email = "alswns2631@gmail.com";
         String name = "마늘오리";
         String passWord = "passw123";

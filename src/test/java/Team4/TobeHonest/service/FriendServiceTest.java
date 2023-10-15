@@ -50,7 +50,7 @@ public class FriendServiceTest {
                 phoneNumber(phoneNumber).
                 birthDate(birthDate).
                 build();
-        Member registedMember = joinDTO.toMember();
+
         memberService.join(joinDTO);
 
         email = "alswns2631@gmail.com";
@@ -63,7 +63,6 @@ public class FriendServiceTest {
                 phoneNumber(phoneNumber).
                 birthDate(birthDate).
                 build();
-        registedMember = joinDTO.toMember();
         memberService.join(joinDTO);
 
         email = "alswns2631@daum.net";
@@ -76,7 +75,6 @@ public class FriendServiceTest {
                 phoneNumber(phoneNumber).
                 birthDate(birthDate).
                 build();
-        registedMember = joinDTO.toMember();
         memberService.join(joinDTO);
 
         email = "alswns2631@kakao.com";
@@ -89,7 +87,6 @@ public class FriendServiceTest {
                 phoneNumber(phoneNumber).
                 birthDate(birthDate).
                 build();
-        registedMember = joinDTO.toMember();
         memberService.join(joinDTO);
 
         email = "alswns2631@naver.com";
@@ -102,7 +99,6 @@ public class FriendServiceTest {
                 phoneNumber(phoneNumber).
                 birthDate(birthDate).
                 build();
-        registedMember = joinDTO.toMember();
         memberService.join(joinDTO);
 
     }
