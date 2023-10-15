@@ -49,6 +49,7 @@ public class MemberController {
 
     }
 
+//   post로 수정..
     @GetMapping("/friends/add/{friendId}")
     public ResponseEntity<String> addFriend(@PathVariable Long friendId,
                                             @AuthenticationPrincipal UserDetails userDetails) {
