@@ -1,21 +1,17 @@
 package Team4.TobeHonest.service;
 
 
-import Team4.TobeHonest.setup.FriendJoinService;
-import Team4.TobeHonest.setup.NaverSearchService;
 import Team4.TobeHonest.domain.*;
-import Team4.TobeHonest.dto.ApiItemDTO;
 import Team4.TobeHonest.dto.contributor.ContributorDTO;
 import Team4.TobeHonest.dto.item.ItemInfoDTO;
-import Team4.TobeHonest.dto.signup.JoinDTO;
 import Team4.TobeHonest.dto.wishitem.FriendWishItemInfoDTO;
 import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.ItemRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
+import Team4.TobeHonest.setup.FriendJoinService;
+import Team4.TobeHonest.setup.NaverSearchService;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.Assertions;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -73,8 +69,6 @@ public class ContributorServiceTest {
         WishItem wishItem = WishItem.builder().item(item).money(item.getPrice()).member(member).build();
         wishItemRepository.join(wishItem);
     }
-
-
 
 
     @Test
@@ -138,6 +132,50 @@ public class ContributorServiceTest {
 
     }
 
+    @Test
+    @DisplayName("나에게 준사람들 전부 받아오기..")
+    public void findMyAllContribution() {
+        Member member = memberService.findByEmail("alswns2631@gmail.com");
+        Member friend1 = memberService.findByEmail("alswns2631@cau.ac.kr");
+        Member friend2 = memberService.findByEmail("alswns2631@naver.com");
+        WishItem wishItem = wishItemRepository.findAll(member).get(0);
+        contributorService.contributing(friend1, wishItem.getId(), 20000);
+        contributorService.contributing(friend2, wishItem.getId(), 30000);
+        List<Long> giftGiversToMe = contributorService.findGiftGiversToMe(member.getId());
+        for (Long l : giftGiversToMe) {
+            System.out.println(l);
+        }
+        Assertions.assertThat(giftGiversToMe).contains(friend1.getId());
+        Assertions.assertThat(giftGiversToMe).contains(friend2.getId());
+
+    }
+
+
+
+
+    @Test
+    @DisplayName("내가 준 사람")
+    public void findMyContribution() {
+        Member member = memberService.findByEmail("alswns2631@gmail.com");
+        Member friend1 = memberService.findByEmail("alswns2631@cau.ac.kr");
+        Member friend2 = memberService.findByEmail("alswns2631@naver.com");
+
+        Item item = galaxy.get(3);
+        WishItem wishItem = WishItem.builder().item(item).money(item.getPrice()).member(friend1).build();
+        wishItemRepository.join(wishItem);
+        item = galaxy.get(4);
+        wishItem = WishItem.builder().item(item).money(item.getPrice()).member(friend2).build();
+        wishItemRepository.join(wishItem);
+        wishItem = wishItemRepository.findAll(friend1).get(0);
+        contributorService.contributing(member, wishItem.getId(), 20000);
+        wishItem = wishItemRepository.findAll(friend2).get(0);
+        contributorService.contributing(member, wishItem.getId(), 30000);
+        List<Long> giftReceiversFromMe = contributorService.getGiftReceiversFromMe(member.getId());
+
+        Assertions.assertThat(giftReceiversFromMe).contains(friend1.getId());
+        Assertions.assertThat(giftReceiversFromMe).contains(friend2.getId());
+
+    }
 
 
 
