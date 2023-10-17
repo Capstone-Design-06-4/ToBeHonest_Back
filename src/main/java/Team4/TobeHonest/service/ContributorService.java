@@ -54,4 +54,12 @@ public class ContributorService {
     public List<ContributorDTO> findContributor(Long wishItemId){
         return contributorRepository.findContributorsInWishItem(wishItemId);
     }
+
+    public List<Long> findGiftGiversToMe(Long myId){
+        return contributorRepository.findAllContributors(myId);
+    }
+
+    public List<Long> getGiftReceiversFromMe(Long myId){
+        return contributorRepository.findMyContributions(myId);
+    }
 }

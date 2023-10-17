@@ -86,5 +86,23 @@ public class ContributorRepository {
         return fetch.get(0);
     }
 
+    //나에게 contribution한 사람들 찾기
+    public List<Long> findAllContributors(Long memberId){
+        return jqf.select(contributor.contributor.id)
+                .from(contributor)
+                .innerJoin(contributor.wishItem, wishItem)
+                .where(wishItem.member.id.eq(memberId)).fetch();
+
+    }
+    //내가 contribution한 놈들 찾기..
+    public List<Long> findMyContributions(Long memberId){
+        return jqf.select(wishItem.member.id)
+                .from(contributor)
+                .innerJoin(contributor.wishItem, wishItem)
+                .innerJoin(wishItem.member, this.member)
+                .where(contributor.contributor.id.eq(memberId)
+                        .and(contributor.wishItem.eq(wishItem))).fetch();
+
+    }
 
 }
