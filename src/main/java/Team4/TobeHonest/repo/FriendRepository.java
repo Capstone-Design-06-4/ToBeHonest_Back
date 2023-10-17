@@ -2,6 +2,7 @@ package Team4.TobeHonest.repo;
 
 
 import Team4.TobeHonest.domain.*;
+import Team4.TobeHonest.dto.friendWIth.FriendProfileDTO;
 import Team4.TobeHonest.dto.friendWIth.FriendWithSpecifyName;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -42,11 +43,23 @@ public class FriendRepository {
     //지정이름과 friend객체가 return..
     public List<FriendWithSpecifyName> findAllFriendsWithSpecifyName(Member owner) {
 
-        return jqf.select(Projections.constructor(FriendWithSpecifyName.class, friend.id, friendWith.id, friendWith.specifiedName)).
+        return jqf.select(Projections.constructor(FriendWithSpecifyName.class,
+                        friend.id, friendWith.id, friendWith.specifiedName, friend.birthDate,
+                        friend.profileImg)).
                 from(friendWith).innerJoin(friendWith.friend, friend).
                 where(friendWith.owner.eq(owner)).fetch();
 
     }
 
+    public List<FriendWithSpecifyName> searchFriendsWithName(String startsWith) {
+
+        return jqf.
+                select(Projections.constructor(FriendWithSpecifyName.class,
+                        friend.id, friendWith.id, friendWith.specifiedName, friend.birthDate,
+                        friend.profileImg))
+                .from(friendWith)
+                .innerJoin(friendWith.friend, friend)
+                .where(friendWith.specifiedName.like(startsWith + "%")).fetch();
+    }
 
 }
