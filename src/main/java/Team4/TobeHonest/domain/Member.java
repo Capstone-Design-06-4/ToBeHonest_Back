@@ -38,6 +38,11 @@ public class Member implements UserDetails {
 
     private Integer points;
     //프사 추가해야함
+    private String profileImg = "profile/default.jpeg";
+
+    public void changeProfileImg(String profileImg) {
+        this.profileImg = profileImg;
+    }
 
     public Member(String email, String name, String password, String phoneNumber, LocalDate birthDate) {
         this.email = email;
