@@ -8,6 +8,7 @@ import Team4.TobeHonest.dto.friendWIth.FriendWithSpecifyName;
 import Team4.TobeHonest.exception.DuplicateFriendException;
 import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.FriendRepository;
+import Team4.TobeHonest.repo.MemberRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,9 +24,11 @@ public class FriendService {
 
     private final FriendRepository friendRepository;
     private final ContributorRepository contributorRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     public FriendWith addFriendList(Member owner, Member friend) {
+
         //이미 존재하는 친구인 경우..
         if (!friendRepository.findFriend(owner, friend).isEmpty()){
             throw new DuplicateFriendException("이미 존재하는 친구입니다");
@@ -37,6 +40,23 @@ public class FriendService {
 
         return friendWith;
     }
+    //오버로딩, 동작은 같음 ==> 테스트 코드 바꾸기 귀찮..
+    @Transactional
+    public FriendWith addFriendList(Member owner, Long friendId) {
+        Member friend = memberRepository.findById(friendId);
+        //이미 존재하는 친구인 경우..
+        if (!friendRepository.findFriend(owner, friend).isEmpty()){
+            throw new DuplicateFriendException("이미 존재하는 친구입니다");
+        }
+        //친구 등록
+        FriendWith friendWith = owner.addFriend(friend);
+        //db에 저장
+        friendRepository.join(friendWith);
+
+        return friendWith;
+    }
+
+
 
     public List<FriendWith> findAllFriends(Member member) {
         return friendRepository.findAllFriends(member);
@@ -60,8 +80,8 @@ public class FriendService {
         return result;
     }
 
-    public List<FriendWithSpecifyName> searchFriendWithName(String startsWith){
-        return friendRepository.searchFriendsWithName(startsWith);
+    public List<FriendWithSpecifyName> searchFriendWithName(Member member, String startsWith){
+        return friendRepository.searchFriendsWithName(member, startsWith);
     }
 
 

@@ -51,7 +51,7 @@ public class FriendRepository {
 
     }
 
-    public List<FriendWithSpecifyName> searchFriendsWithName(String startsWith) {
+    public List<FriendWithSpecifyName> searchFriendsWithName(Member member, String startsWith) {
 
         return jqf.
                 select(Projections.constructor(FriendWithSpecifyName.class,
@@ -59,7 +59,8 @@ public class FriendRepository {
                         friend.profileImg))
                 .from(friendWith)
                 .innerJoin(friendWith.friend, friend)
-                .where(friendWith.specifiedName.like(startsWith + "%")).fetch();
+                .where(friendWith.specifiedName.like(startsWith + "%")
+                        .and(friendWith.owner.eq(member))).fetch();
     }
 
 }

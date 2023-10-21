@@ -49,24 +49,32 @@ public class MemberController {
 
     }
 
-//   post로 수정..
+    //   post로 수정..
     @GetMapping("/friends/add/{friendId}")
     public ResponseEntity<String> addFriend(@PathVariable Long friendId,
                                             @AuthenticationPrincipal UserDetails userDetails) {
         Member member = (Member) userDetails;
-        Member friend;
         try {
-            friend = memberService.findByID(friendId);
-            friendService.addFriendList(member, friend);
+            friendService.addFriendList(member, friendId);
         } catch (DuplicateFriendException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
-        catch (NoMemberException noMemberException){
+        } catch (NoMemberException noMemberException) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noMemberException.getMessage());
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body("friend added: " + friend.getName());
+        return ResponseEntity.status(HttpStatus.OK).body("friend added");
     }
+
+    @GetMapping("/friends/search/{startsWith}")
+    public List<FriendWithSpecifyName> addFriend(@PathVariable String startsWith,
+                                                 @AuthenticationPrincipal UserDetails userDetails) {
+        Member member = (Member) userDetails;
+        //member argument 수정
+        return friendService.searchFriendWithName(member, startsWith);
+
+    }
+
+
 
     /*@GetMapping("/friends/delete/{friendId}")
     public ResponseEntity<String> deleteFriend(@PathVariable Long friendId,
@@ -86,7 +94,6 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body("friend added: " + friend.getName());
 
     }*/
-
 
 
 }
