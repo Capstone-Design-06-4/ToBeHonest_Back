@@ -26,10 +26,18 @@ public class FriendRepository {
         em.persist(friend);
     }
 
+    public void delete(FriendWith friend){em.remove(friend);}
+
     public List<FriendWith> findFriend(Member owner, Member friend) {
         return jqf.select(friendWith).
                 from(friendWith).
                 where(friendWith.owner.eq(owner).and(friendWith.friend.eq(friend))).
+                fetch();
+    }
+    public List<FriendWith> findFriend(Member owner, Long friendId) {
+        return jqf.select(friendWith).
+                from(friendWith).
+                where(friendWith.owner.eq(owner).and(friendWith.friend.id.eq(friendId))).
                 fetch();
     }
 

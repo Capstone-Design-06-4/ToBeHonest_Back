@@ -5,6 +5,7 @@ import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.friendWIth.FriendWithSpecifyName;
 import Team4.TobeHonest.exception.DuplicateFriendException;
 import Team4.TobeHonest.exception.NoMemberException;
+import Team4.TobeHonest.exception.NoSuchFriendException;
 import Team4.TobeHonest.service.FriendService;
 import Team4.TobeHonest.service.MemberService;
 import lombok.AccessLevel;
@@ -76,24 +77,18 @@ public class MemberController {
 
 
 
-    /*@GetMapping("/friends/delete/{friendId}")
+    @GetMapping("/friends/delete/{friendId}")
     public ResponseEntity<String> deleteFriend(@PathVariable Long friendId,
                                             @AuthenticationPrincipal UserDetails userDetails) {
         Member member = (Member) userDetails;
-        Member friend;
         try {
-            friend = memberService.findByID(friendId);
-            friendService.addFriendList(member, friend);
-        } catch (DuplicateFriendException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            friendService.deleteFriend(member, friendId);
+        } catch (NoSuchFriendException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        catch (NoMemberException noMemberException){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noMemberException.getMessage());
-        }
+        return ResponseEntity.status(HttpStatus.OK).body("delete success!");
 
-        return ResponseEntity.status(HttpStatus.OK).body("friend added: " + friend.getName());
-
-    }*/
+    }
 
 
 }

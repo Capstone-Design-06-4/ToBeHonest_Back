@@ -6,6 +6,7 @@ import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.friendWIth.FriendProfileDTO;
 import Team4.TobeHonest.dto.friendWIth.FriendWithSpecifyName;
 import Team4.TobeHonest.exception.DuplicateFriendException;
+import Team4.TobeHonest.exception.NoSuchFriendException;
 import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.FriendRepository;
 import Team4.TobeHonest.repo.MemberRepository;
@@ -82,6 +83,14 @@ public class FriendService {
 
     public List<FriendWithSpecifyName> searchFriendWithName(Member member, String startsWith){
         return friendRepository.searchFriendsWithName(member, startsWith);
+    }
+
+    public void deleteFriend(Member member, Long friendId){
+        List<FriendWith> friend = friendRepository.findFriend(member, friendId);
+        if (friend.isEmpty()){
+            throw new NoSuchFriendException("해당 친구가 존재하지 않습니다.");
+        }
+        friendRepository.delete(friend.get(0));
     }
 
 
