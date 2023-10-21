@@ -112,10 +112,10 @@ public class FriendServiceTest {
         Member member3 = memberService.findByEmail("alswns2631@daum.net");
         Member member4 = memberService.findByEmail("alswns2631@kakao.com");
         Member member5 = memberService.findByPhoneNumber("010-1234-0002");
-        friendService.addFriendList(member1, member2);
-        friendService.addFriendList(member1, member3);
-        friendService.addFriendList(member1, member4);
-        friendService.addFriendList(member1, member5);
+        friendService.addFriendList(member1, member2.getId());
+        friendService.addFriendList(member1, member3.getId());
+        friendService.addFriendList(member1, member4.getId());
+        friendService.addFriendList(member1, member5.getId());
         //중복문제..
         //when
         List<FriendWithSpecifyName> allFriendsProfile = friendService.findAllFriendsProfile(member1);
@@ -129,9 +129,9 @@ public class FriendServiceTest {
         Member member1 = memberService.findByEmail("alswns2631@cau.ac.kr");
         Member member2 = memberService.findByEmail("alswns2631@kakao.com");
         Member member3 = memberService.findByEmail("alswns2631@kakao.com");
-        friendService.addFriendList(member1, member2);
+        friendService.addFriendList(member1, member2.getId());
         org.junit.jupiter.api.Assertions.assertThrows(DuplicateFriendException.class,
-                () -> friendService.addFriendList(member1, member3));
+                () -> friendService.addFriendList(member1, member3.getId()));
 
     }
 
@@ -140,12 +140,28 @@ public class FriendServiceTest {
     public void testSpecifyName(){
         Member member1 = memberService.findByEmail("alswns2631@cau.ac.kr");
         Member member2 = memberService.findByEmail("alswns2631@kakao.com");
-        FriendWith friendWith = friendService.addFriendList(member1, member2);
+        FriendWith friendWith = friendService.addFriendList(member1, member2.getId());
         Assertions.assertThat(friendWith.getSpecifiedName()).isEqualTo(member2.getName());
         friendWith.changeFriendName("아이유");
         Assertions.assertThat(friendWith.getSpecifiedName()).isEqualTo("아이유");
     }
 
+
+    @Test
+    @DisplayName("친구삭제하기")
+    public void deleteFriend(){
+        Member member1 = memberService.findByEmail("alswns2631@cau.ac.kr");
+        Member member2 = memberService.findByEmail("alswns2631@kakao.com");
+        FriendWith friendWith = friendService.addFriendList(member1, member2.getId());
+
+
+        List<FriendWith> friend = friendRepository.findFriend(member1, member2.getId());
+        Assertions.assertThat(friend).contains(friendWith);
+        friendService.deleteFriend(member1, member2.getId());
+        friend = friendRepository.findFriend(member1, member2.getId());
+        Assertions.assertThat(friend).doesNotContain(friendWith);
+
+    }
 
 }
 
