@@ -3,6 +3,7 @@ package Team4.TobeHonest.service;
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.domain.Message;
 import Team4.TobeHonest.domain.WishItem;
+import Team4.TobeHonest.dto.message.MessageResponseDTO;
 import Team4.TobeHonest.dto.message.SendMessageDTO;
 import Team4.TobeHonest.repo.MemberRepository;
 import Team4.TobeHonest.repo.MessageRepository;
@@ -15,19 +16,22 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Transactional(readOnly = true)
 public class MessageService {
 
+    private static final String IMAGE_UPLOAD_DIR = "images/messages";
     private final MessageRepository messageRepository;
     private final MemberRepository memberRepository;
     private final WishItemRepository wishItemRepository;
     private final ImageRepository imageRepository;
-    private static final String IMAGE_UPLOAD_DIR = "images/";
-    public void saveMessage(SendMessageDTO sendMessageDTO){
 
+    //message 전송하기..
+    @Transactional
+    public void sendMessage(SendMessageDTO sendMessageDTO) {
         //통신을 너무 많이 하는 듯..
         Member receiver = memberRepository.findById(sendMessageDTO.getReceiverId());
         Member sender = memberRepository.findById(sendMessageDTO.getSenderId());
@@ -49,7 +53,10 @@ public class MessageService {
             message.addImage(url);
         }
 
-
-
     }
+
+    public List<MessageResponseDTO> messageWithFriend(Long memberId, Long friendId){
+        return messageRepository.msgWithMyFriend(memberId, friendId);
+    }
+
 }
