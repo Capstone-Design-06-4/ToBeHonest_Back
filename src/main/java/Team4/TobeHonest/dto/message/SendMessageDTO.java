@@ -12,6 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+//내가 전송 하는 message
 public class SendMessageDTO {
 
     private Long wishItemId;
@@ -19,6 +20,7 @@ public class SendMessageDTO {
     private Long receiverId;
     private String title;
     private String contents;
+    //이미지와 json은 병렬화 할 수 없다..
     private List<MultipartFile> images = new ArrayList<>();
 
 

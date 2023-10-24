@@ -5,6 +5,7 @@ import Team4.TobeHonest.domain.Message;
 import Team4.TobeHonest.domain.WishItem;
 import Team4.TobeHonest.dto.message.MessageResponseDTO;
 import Team4.TobeHonest.dto.message.SendMessageDTO;
+import Team4.TobeHonest.exception.NoWishItemException;
 import Team4.TobeHonest.repo.MemberRepository;
 import Team4.TobeHonest.repo.MessageRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
@@ -36,6 +37,9 @@ public class MessageService {
         Member receiver = memberRepository.findById(sendMessageDTO.getReceiverId());
         Member sender = memberRepository.findById(sendMessageDTO.getSenderId());
         WishItem wishItem = wishItemRepository.findWishItemById(sendMessageDTO.getWishItemId());
+        if (wishItem == null){
+            throw new NoWishItemException();
+        }
         Message message = Message.builder()
                 .receiver(receiver)
                 .sender(sender)
