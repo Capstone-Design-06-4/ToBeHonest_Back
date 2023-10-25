@@ -7,6 +7,7 @@ import Team4.TobeHonest.dto.wishitem.FirstWishItem;
 import Team4.TobeHonest.dto.wishitem.WishItemDetail;
 import Team4.TobeHonest.dto.wishitem.WishItemResponseDTO;
 import Team4.TobeHonest.exception.DuplicateWishItemException;
+import Team4.TobeHonest.exception.ItemNotInWishlistException;
 import Team4.TobeHonest.service.ContributorService;
 import Team4.TobeHonest.service.ItemService;
 import Team4.TobeHonest.service.WishItemService;
@@ -33,13 +34,32 @@ public class WishlistController {
     private final ItemService itemService;
 
     //    위시리스트 정보들(사진, progress정도.. 추가 정보필요하면 FrirstWishItem수정하기)
-    @GetMapping("{memberId}")
+    //모든 위시리스트 타입 상관없이 달라하기..
+    @GetMapping("/all/{memberId}")
     public List<FirstWishItem> inquireWishList(@PathVariable Long memberId) {
-        return wishItemService.findWishList(memberId);
+        return wishItemService.findAllWishList(memberId);
     }
 
 
-    @GetMapping("{memberId}/{wishItemId}")
+    //현재 펀딩 진행 중인 위시리스트
+    @GetMapping("/progress/{memberId}")
+    public List<FirstWishItem> inquireWishListInProgress(@PathVariable Long memberId) {
+        return wishItemService.findWishListInProgress(memberId);
+    }
+
+    @GetMapping("/completed/{memberId}")
+    public List<FirstWishItem> inquireWishListCompleted(@PathVariable Long memberId) {
+        return wishItemService.findWishListCompleted(memberId);
+    }
+
+    @GetMapping("/used/{memberId}")
+    public List<FirstWishItem> inquireWishListUsed(@PathVariable Long memberId) {
+        return wishItemService.findWishListUsed(memberId);
+    }
+
+
+
+    @GetMapping("/details/{memberId}/{wishItemId}")
     public WishItemResponseDTO seeWishItemDetail(@PathVariable Long memberId, @PathVariable Long wishItemId,
                                                  @AuthenticationPrincipal UserDetails userDetails) {
 
@@ -60,14 +80,14 @@ public class WishlistController {
     @GetMapping("/add/{itemId}")
     public ResponseEntity<String> addWishItem(@PathVariable Long itemId,
                                               @AuthenticationPrincipal UserDetails userDetails) {
-        ItemInfoDTO byItembyID = itemService.findByItembyID(itemId);
+        ItemInfoDTO byItemID = itemService.findByItembyID(itemId);
         try {
             wishItemService.addWishList((Member) userDetails,
-                    byItembyID);
+                    byItemID);
         } catch (DuplicateWishItemException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 존재하는 wishItem입니다");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.OK).body("위시아이템" + byItembyID.getName() + " 추가완료");
+        return ResponseEntity.status(HttpStatus.OK).body("위시아이템" + byItemID.getName() + " 추가완료");
     }
 
     @GetMapping("/delete/{itemId}")
@@ -76,8 +96,8 @@ public class WishlistController {
         ItemInfoDTO itemInfoDTO = itemService.findByItembyID(itemId);
         try {
             wishItemService.deleteWishListByItemId((Member) userDetails, itemInfoDTO.getId());
-        } catch (DuplicateWishItemException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 존재하는 wishItem입니다");
+        } catch (ItemNotInWishlistException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
         return ResponseEntity.status(HttpStatus.OK).body("위시아이템" + itemInfoDTO.getName() + " 추가완료");
     }
