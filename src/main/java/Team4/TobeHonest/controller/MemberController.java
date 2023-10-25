@@ -3,6 +3,7 @@ package Team4.TobeHonest.controller;
 
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.friendWIth.FriendWithSpecifyName;
+import Team4.TobeHonest.dto.member.MemberSearch;
 import Team4.TobeHonest.exception.DuplicateFriendException;
 import Team4.TobeHonest.exception.NoMemberException;
 import Team4.TobeHonest.exception.NoSuchFriendException;
@@ -89,6 +90,21 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body("delete success!");
 
     }
+
+
+    @GetMapping("/search/phoneNumber/{phoneNumber}")
+    @ResponseBody
+    public  MemberSearch findMemberByPhoneNumber(@PathVariable String phoneNumber){
+        return memberService.memberSearchByPhoneNumber(phoneNumber);
+    }
+
+
+    @GetMapping("/search/email/{email}")
+    @ResponseBody
+    public  MemberSearch findMemberByEmail(@PathVariable String email){
+        return memberService.memberSearchByEmail(email);
+    }
+
 
 
 }

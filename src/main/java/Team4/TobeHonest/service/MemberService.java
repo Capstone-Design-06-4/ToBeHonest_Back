@@ -1,6 +1,7 @@
 package Team4.TobeHonest.service;
 
 import Team4.TobeHonest.domain.Member;
+import Team4.TobeHonest.dto.member.MemberSearch;
 import Team4.TobeHonest.dto.signup.JoinDTO;
 import Team4.TobeHonest.exception.DuplicateMemberException;
 import Team4.TobeHonest.exception.NoMemberException;
@@ -79,12 +80,30 @@ public class MemberService {
     }
 
     public Member findByEmail(String email) {
+
         return memberRepository.findByEmail(email);
 
     }
 
     public Member findByPhoneNumber(String phoneNumber) {
         return memberRepository.findByPhoneNumber(phoneNumber);
+
+    }
+
+    public MemberSearch memberSearchByEmail(String email) {
+        Member member = memberRepository.findByEmail(email);
+        return MemberSearch.builder()
+                .memberId(member.getId())
+                .profileImgURL(member.getProfileImg())
+                .memberName(member.getName()).build();
+
+    }
+    public MemberSearch memberSearchByPhoneNumber(String phoneNumber) {
+        Member member = memberRepository.findByPhoneNumber(phoneNumber);
+        return MemberSearch.builder()
+                .memberId(member.getId())
+                .profileImgURL(member.getProfileImg())
+                .memberName(member.getName()).build();
 
     }
 
