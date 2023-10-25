@@ -3,6 +3,7 @@ package Team4.TobeHonest.repo;
 import Team4.TobeHonest.domain.*;
 import Team4.TobeHonest.dto.contributor.ContributorDTO;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -73,6 +74,8 @@ public class ContributorRepository {
                         .and(friendWith.friend.eq(contributor.contributor))).fetch();
 
     }
+
+
     public Contributor findContributorsInWishItem(Long wid, Member member) {
         List<Contributor> fetch = jqf.select(contributor)
                 .from(contributor)
@@ -103,6 +106,13 @@ public class ContributorRepository {
                 .where(contributor.contributor.id.eq(memberId)
                         .and(contributor.wishItem.eq(wishItem))).fetch();
 
+    }
+
+    public Integer findFundedAmount(WishItem wishItem){
+        NumberExpression<Integer> sumFundMoney = contributor.fundMoney.sum();
+        return jqf.select(sumFundMoney).from(contributor)
+                .innerJoin(contributor.wishItem, this.wishItem)
+                .where(this.wishItem.eq(wishItem)).fetchOne();
     }
 
 }

@@ -66,9 +66,24 @@ public class WishItemService {
 
 
 
-    public List<FirstWishItem> findWishList(Long memberId){
+    public List<FirstWishItem> findAllWishList(Long memberId){
         Member member = memberRepository.findById(memberId);
         return wishItemRepository.findFirstWishList(member);
+    }
+
+    public List<FirstWishItem> findWishListInProgress(Member member){
+        return wishItemRepository.findWishItemInProgress(member.getId());
+
+    }
+
+    public List<FirstWishItem> findWishListCompleted(Member member){
+        return wishItemRepository.findWishItemCompleted(member.getId());
+
+    }
+
+    public List<FirstWishItem> findWishListUsed(Member member){
+        return wishItemRepository.findWishItemUsed(member.getId());
+
     }
 
     public List<WishItemDetail> findWishItemDetail(Long wishItemId){

@@ -1,5 +1,6 @@
 package Team4.TobeHonest.domain;
 
+import Team4.TobeHonest.enumer.GiftStatus;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,10 +26,18 @@ public class WishItem {
 
     private Integer price;
 
+    @Enumerated(EnumType.STRING)
+    //오류뜨는데, 나중에 바뀐다..
+    private GiftStatus giftStatus = GiftStatus.IN_PROGRESS;
+
     @Builder
     public WishItem(Item item, Member member, Integer money) {
         this.item = item;
         this.member = member;
         this.price = money;
+    }
+
+    public void changeGiftStatus(GiftStatus giftStatus) {
+        this.giftStatus = giftStatus;
     }
 }

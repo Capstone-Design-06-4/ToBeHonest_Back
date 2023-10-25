@@ -6,6 +6,7 @@ import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.domain.QWishItem;
 import Team4.TobeHonest.domain.WishItem;
 import Team4.TobeHonest.dto.contributor.ContributorDTO;
+import Team4.TobeHonest.enumer.GiftStatus;
 import Team4.TobeHonest.exception.NoWishItemException;
 import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
@@ -33,23 +34,34 @@ public class ContributorService {
                              Integer money) {
         Contributor contribution = contributorRepository.findContributorsInWishItem(wishItemId, contributor);
 //        내가 이미 펀딩했다면 그냥 값만 더하기
+        WishItem friendsWish = wishItemRepository.findWishItemById(wishItemId);
+        if (friendsWish == null){
+            throw new NoWishItemException("해당 위시아이템이 존재하지 않습니다");
+        }
         if (contribution == null) {
 
-            WishItem frindsWish = wishItemRepository.findWishItemById(wishItemId);
-            if (frindsWish == null){
-                throw new NoWishItemException("해당 위시아이템이 존재하지 않습니다");
-            }
+
             contribution = Contributor.builder()
                     .contributor(contributor)
                     .fundMoney(money)
                     .fundDateTime(LocalDateTime.now())
-                    .wishItem(frindsWish).build();
+                    .wishItem(friendsWish).build();
             contributorRepository.join(contribution);
         }
         else {
             contribution.addFundMoney(money);
+
         }
+
+        //가격이상 펀딩되면 상태 변경하기..
+        if (friendsWish.getPrice() <= contributorRepository.findFundedAmount(friendsWish)){
+            friendsWish.changeGiftStatus(GiftStatus.COMPLETED);
+        }
+
+
+
     }
+
 
     public List<ContributorDTO> findContributor(Long wishItemId){
         return contributorRepository.findContributorsInWishItem(wishItemId);
