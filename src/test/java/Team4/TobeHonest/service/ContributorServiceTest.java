@@ -5,6 +5,7 @@ import Team4.TobeHonest.domain.*;
 import Team4.TobeHonest.dto.contributor.ContributorDTO;
 import Team4.TobeHonest.dto.item.ItemInfoDTO;
 import Team4.TobeHonest.dto.wishitem.FriendWishItemInfoDTO;
+import Team4.TobeHonest.enumer.GiftStatus;
 import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.ItemRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
@@ -59,10 +60,10 @@ public class ContributorServiceTest {
         this.member = memberService.findByEmail("alswns2631@cau.ac.kr");
         this.friend1 = memberService.findByEmail("alswns2631@gmail.com");
         this.friend2 = memberService.findByEmail("alswns2631@naver.com");
-        friendService.addFriendList(member, friend1);
-        friendService.addFriendList(member, friend2);
-        friendService.addFriendList(friend1, member);
-        friendService.addFriendList(friend2, member);
+        friendService.addFriendList(member, friend1.getId());
+        friendService.addFriendList(member, friend2.getId());
+        friendService.addFriendList(friend1, member.getId());
+        friendService.addFriendList(friend2, member.getId());
         this.galaxy = itemRepository.searchItemName("갤럭시");
         Item item = galaxy.get(0);
         Member member = memberService.findByEmail("alswns2631@gmail.com");
@@ -177,6 +178,23 @@ public class ContributorServiceTest {
 
     }
 
+
+    @Test
+    @DisplayName("펀딩을 했을 때, 자동으로 상태가 변경되는가 확인")
+    public void contributionChange(){
+        Item item = galaxy.get(3);
+        WishItem wishItem = WishItem.builder().item(item).money(item.getPrice()).member(member).build();
+        wishItemRepository.join(wishItem);
+
+        Assertions.assertThat(wishItem.getGiftStatus()).isEqualTo(GiftStatus.IN_PROGRESS);
+
+
+        Integer price = item.getPrice();
+        contributorService.contributing(friend1, wishItem.getId(), (Integer) (price/2) + 1);
+        contributorService.contributing(friend2, wishItem.getId(), (Integer) (price/2) + 1);
+
+        Assertions.assertThat(wishItem.getGiftStatus()).isEqualTo(GiftStatus.COMPLETED);
+    }
 
 
 

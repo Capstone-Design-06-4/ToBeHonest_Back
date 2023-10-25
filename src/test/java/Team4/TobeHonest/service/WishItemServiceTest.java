@@ -1,10 +1,10 @@
 package Team4.TobeHonest.service;
 
-import Team4.TobeHonest.domain.FriendWith;
-import Team4.TobeHonest.domain.Item;
-import Team4.TobeHonest.domain.Member;
-import Team4.TobeHonest.domain.WishItem;
+import Team4.TobeHonest.enumer.GiftStatus;
+import Team4.TobeHonest.setup.NaverSearchService;
+import Team4.TobeHonest.domain.*;
 import Team4.TobeHonest.dto.item.ItemInfoDTO;
+import Team4.TobeHonest.dto.signup.JoinDTO;
 import Team4.TobeHonest.dto.wishitem.FirstWishItem;
 import Team4.TobeHonest.dto.wishitem.WishItemDetail;
 import Team4.TobeHonest.exception.DuplicateWishItemException;
@@ -13,8 +13,6 @@ import Team4.TobeHonest.repo.CategoryRepository;
 import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.ItemRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
-import Team4.TobeHonest.setup.FriendJoinService;
-import Team4.TobeHonest.setup.NaverSearchService;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
@@ -58,14 +56,28 @@ public class WishItemServiceTest {
 
     @Autowired
     NaverSearchService naverSearchService;
-    @Autowired
-    FriendJoinService friendJoinService;
 
     @Before
     public void setUp() throws Exception {
 
         naverSearchService.saveItemInDB();
-        friendJoinService.saveMemberInDB();
+
+        String email = "alswns2631@cau.ac.kr";
+        String name = "choiminjun";
+        String passWord = "passw123";
+        String phoneNumber = "010-1234-1231";
+        String birthDate = "19990803";
+        JoinDTO joinDTO = JoinDTO.builder().email(email).name(name).passWord(passWord).phoneNumber(phoneNumber).birthDate(birthDate).build();
+        memberService.join(joinDTO);
+        email = "alswns2631@gmail.com";
+        name = "정상수";
+        joinDTO = JoinDTO.builder().email(email).name(name).passWord(passWord).phoneNumber(phoneNumber).birthDate(birthDate).build();
+        memberService.join(joinDTO);
+        email = "alswns2631@naver.com";
+        name = "아이유";
+        joinDTO = JoinDTO.builder().email(email).name(name).passWord(passWord).phoneNumber(phoneNumber).birthDate(birthDate).build();
+        memberService.join(joinDTO);
+
 
         this.galaxy = itemRepository.searchItemName("갤럭시");
         this.member = memberService.findByEmail("alswns2631@cau.ac.kr");
@@ -117,7 +129,8 @@ public class WishItemServiceTest {
 
         wishItemService.addWishList(this.member, DTO);
         DTO = ItemInfoDTO.ItemToItemInfoDTO(nike.get(0));
-        org.junit.jupiter.api.Assertions.assertThrows(ItemNotInWishlistException.class, () -> wishItemService.deleteWishListByItemName(this.member, nike.get(0).getName()));
+        org.junit.jupiter.api.Assertions.assertThrows(ItemNotInWishlistException.class,
+                () -> wishItemService.deleteWishListByItemName(this.member, nike.get(0).getName()));
 
     }
 
@@ -147,7 +160,7 @@ public class WishItemServiceTest {
             }
 
         }
-        List<FirstWishItem> wishList = wishItemService.findWishList(this.member.getId());
+        List<FirstWishItem> wishList = wishItemService.findAllWishList(this.member.getId());
 
         for (FirstWishItem firstWishItem : wishList) {
 
@@ -190,6 +203,48 @@ public class WishItemServiceTest {
         Assertions.assertThat(detail.getImage()).isEqualTo(this.galaxy.get(0).getImage());
 
 
+    }
+
+    @Test
+    @DisplayName("펀딩 덜 한 경우.. == > inprogress에서만 나와야 한다")
+    public void testInProgress() {
+        Item item = galaxy.get(3);
+
+        WishItem wishItem = WishItem.builder().item(item).money(item.getPrice()).member(member).build();
+
+        wishItemRepository.join(wishItem);
+
+
+        Integer price = item.getPrice();
+
+        contributorService.contributing(friend1, wishItem.getId(), (Integer) (price / 3) + 1);
+        contributorService.contributing(friend2, wishItem.getId(), (Integer) (price / 3) + 1);
+
+
+        FirstWishItem inProgress = wishItemService.findWishListInProgress(member.getId()).get(0);
+
+
+        Assertions.assertThat(inProgress.getWishItemId()).isEqualTo(wishItem.getId());
+        Assertions.assertThat(inProgress.getFundAmount()).isLessThan(wishItem.getPrice());
+        Assertions.assertThat(wishItem.getGiftStatus()).isEqualTo(GiftStatus.IN_PROGRESS);
+
+    }
+
+    @Test
+    @DisplayName("완료된 놈들 test")
+    public void testUsed() {
+        Item item = galaxy.get(4);
+        WishItem wishItem = WishItem.builder().item(item).money(item.getPrice()).member(member).build();
+        wishItemRepository.join(wishItem);
+        Integer price2 = item.getPrice();
+
+        contributorService.contributing(friend1, wishItem.getId(), (Integer) (price2 / 2) + 1);
+        contributorService.contributing(friend2, wishItem.getId(), (Integer) (price2 / 2) + 1);
+
+        FirstWishItem completed = wishItemService.findWishListCompleted(member.getId()).get(0);
+        Assertions.assertThat(completed.getWishItemId()).isEqualTo(wishItem.getId());
+        Assertions.assertThat(completed.getFundAmount()).isGreaterThanOrEqualTo(wishItem.getPrice());
+        Assertions.assertThat(wishItem.getGiftStatus()).isEqualTo(GiftStatus.COMPLETED);
     }
 
 
