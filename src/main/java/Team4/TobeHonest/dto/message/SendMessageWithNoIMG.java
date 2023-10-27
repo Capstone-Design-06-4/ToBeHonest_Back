@@ -1,5 +1,6 @@
 package Team4.TobeHonest.dto.message;
 
+import Team4.TobeHonest.enumer.MessageType;
 import lombok.*;
 
 @Getter
@@ -14,4 +15,6 @@ public class SendMessageWithNoIMG {
     private Long receiverId;
     private String title;
     private String contents;
+    private MessageType messageType;
+    private Integer fundMoney;
 }

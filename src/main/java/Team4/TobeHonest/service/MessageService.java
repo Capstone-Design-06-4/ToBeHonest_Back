@@ -47,6 +47,8 @@ public class MessageService {
                 .title(sendMessageDTO.getTitle())
                 .content(sendMessageDTO.getContents())
                 .time(LocalDateTime.now())
+                .messageType(sendMessageDTO.getMessageType())
+                .fundMoney(sendMessageDTO.getFundMoney())
                 .build();
 
         //메시지 레포에 저장?

@@ -1,6 +1,7 @@
 package Team4.TobeHonest.domain;
 
 
+import Team4.TobeHonest.enumer.MessageType;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,6 +27,8 @@ public class Message {
 
     private LocalDateTime time;
 
+    private Integer fundMoney;
+
     @JoinColumn(name = "related_item_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private WishItem relatedItem;
@@ -41,15 +44,21 @@ public class Message {
     @JoinColumn(name = "receiver_id")
     private Member receiver;
 
+    private MessageType messageType;
+
     @Builder
-    public Message(String title, String content, LocalDateTime time, WishItem relatedItem, Member sender, Member receiver) {
+    public Message(String title, String content, LocalDateTime time, WishItem relatedItem, Member sender, Member receiver, MessageType messageType, Integer fundMoney) {
+
         this.title = title;
         this.content = content;
         this.time = time;
         this.relatedItem = relatedItem;
         this.sender = sender;
         this.receiver = receiver;
+        this.messageType = messageType;
+        this.fundMoney = fundMoney;
     }
+
 
 
 //    연관관계 설정 메서드
