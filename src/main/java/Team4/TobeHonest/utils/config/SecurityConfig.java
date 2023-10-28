@@ -1,18 +1,19 @@
-
 package Team4.TobeHonest.utils.config;
 
 
 import Team4.TobeHonest.service.loginhandler.CustomLogoutHandler;
-import Team4.TobeHonest.service.loginhandler.LoginFailHandler;
-import Team4.TobeHonest.service.loginhandler.LoginSuccessHandler;
+import Team4.TobeHonest.utils.jwt.JwtAuthenticationFilter;
+import Team4.TobeHonest.utils.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity//모든 요청 URL이 스프링 시큐리티의 제어를 받도록 만드는 애너테이션이다.
 @EnableMethodSecurity
@@ -20,6 +21,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -29,23 +31,29 @@ public class SecurityConfig {
     @Bean
     protected SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
 
-        http.
-            csrf().
+     /*   http.
+                csrf().
                 disable()
-            .authorizeRequests()
+                .authorizeRequests()
                 .requestMatchers("/login", "/signup", "/test").permitAll()
                 .anyRequest().authenticated()
-            .and()
+                .and()
+                .addFilterBefore(jwtAuthenticationFilter)
                 .formLogin()
-                .loginProcessingUrl("/login")
-                .permitAll()
-                .successHandler(new LoginSuccessHandler())
-                .failureHandler(new LoginFailHandler());
+                .disable();*/
 
-//      로그아웃은 기본이 post방식으로..
-        http.logout()
-                .logoutUrl("/logout")
-                .logoutSuccessHandler(new CustomLogoutHandler());
+
+        http.
+                httpBasic().disable()
+                .csrf().disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeHttpRequests()
+                .requestMatchers("/login", "/signup", "/test").permitAll()
+                .anyRequest().authenticated()
+                .and().addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
