@@ -13,6 +13,13 @@ spring:
         #format_sql: true
         #전부
         default_lazy_behavior: proxy
+
+  jwt:
+    secret:  c2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQtc2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQK
+  data:
+    redis:
+      host: localhost
+      port: 6379
 logging.level:
   org.hibernate.SQL: error
   org.hibernate.orm.jdbc.bind: error #스프링 부트 3.x, hibernate6
