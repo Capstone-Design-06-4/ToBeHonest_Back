@@ -60,12 +60,10 @@ public class MessageController {
 
     //친구랑 주고 받은 메시지를 return 해주는 controller
     @GetMapping("/find/{friendId}")
-
     public List<MessageResponseDTO> findMessageWithFriend(@AuthenticationPrincipal UserDetails userDetails,
                                                           @PathVariable Long friendId){
         Member member = (Member) userDetails;
         return messageService.messageWithFriend(member.getId(), friendId);
-
 
     }
 

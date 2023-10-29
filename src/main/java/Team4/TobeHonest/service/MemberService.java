@@ -50,7 +50,6 @@ public class MemberService {
         }
         return sb.toString();
     }
-
     //로그인
     public boolean login(String email, String passWord) {
         //Member을 return하지 않고 boolean을 return해서 controller에 entity가 노출되는것을 방지하자
@@ -106,6 +105,9 @@ public class MemberService {
                 .memberName(member.getName()).build();
 
     }
-
+    @Transactional
+    public void joinMember(Member member){
+        memberRepository.join(member);
+    }
 
 }

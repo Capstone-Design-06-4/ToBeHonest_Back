@@ -5,7 +5,10 @@ import Team4.TobeHonest.dto.signup.LoginDTO;
 import Team4.TobeHonest.exception.DuplicateMemberException;
 import Team4.TobeHonest.service.MemberService;
 import Team4.TobeHonest.service.login.AuthService;
+import Team4.TobeHonest.service.login.NaverLoginService;
 import Team4.TobeHonest.utils.jwt.TokenInfo;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 
 @Controller
 @RequestMapping("/")
@@ -90,6 +96,16 @@ public class HomeController {
 
 
     }
+
+
+    /**
+     * 프론트에 Redirect URI를 제공하기 위한 메소드
+     * 프론트에서 네이버 인증 센터로 요청을 주기위한 URI를 제공하며, 이를통해 인증코드를 받아 자체 서비스 callback API 호출시 전달
+     *
+     * @return redirect URI
+     * @throws UnsupportedEncodingException
+     */
+
 
 
 }

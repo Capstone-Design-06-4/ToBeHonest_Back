@@ -29,8 +29,10 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String path = httpRequest.getRequestURI();
         log.info(path);
+        log.info(httpRequest.getRequestURL().toString());
         // /login, /signup, /test 경로는 필터를 실행하지 않고 다음 필터로 넘긴다
-        if ("/login".equals(path) || "/signup".equals(path) || path.contains("/test")) {
+        if ("/login".equals(path) || "/signup".equals(path) || path.contains("/test")
+                || "/naver/oauth".equals(path) || "/naver/callback".equals(path)) {
             chain.doFilter(request, response);
             return;
         }
