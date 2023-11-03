@@ -3,7 +3,10 @@ package Team4.TobeHonest.authtest;
 
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.signup.JoinDTO;
+import Team4.TobeHonest.dto.signup.LoginDTO;
 import Team4.TobeHonest.service.MemberService;
+import Team4.TobeHonest.utils.jwt.TokenInfo;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,15 +15,14 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -32,6 +34,8 @@ public class LoginTest {
 
     @Autowired
     MemberService memberService;
+    @Autowired
+    ObjectMapper objectMapper;
     @Autowired
     private MockMvc mockMvc;
 
@@ -61,11 +65,11 @@ public class LoginTest {
         //정상 로그인
         String email = "alswns2631@gmail.com";
         String passWord = "passw123";
-
-        mockMvc.perform(formLogin().loginProcessingUrl("/login").user(email).password(passWord)).
+        LoginDTO login = LoginDTO.builder().email(email).password(passWord).build();
+        String s = objectMapper.writeValueAsString(login);
+        mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(s)).
                 andDo(print())
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/members/information"));
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -75,10 +79,11 @@ public class LoginTest {
         String email = "alswns2631@gmail.com";
         String passWord = "pass23123";
 
-        mockMvc.perform(formLogin().loginProcessingUrl("/login").user(email).password(passWord)).
+        LoginDTO login = LoginDTO.builder().email(email).password(passWord).build();
+        String s = objectMapper.writeValueAsString(login);
+        mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(s)).
                 andDo(print())
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/login")).andDo(print());
+                .andExpect(status().isBadRequest());
     }
 
 
@@ -86,13 +91,30 @@ public class LoginTest {
     @DisplayName("로그아웃")
     public void loginOutTest() throws Exception {
         //정상 로그인
-        mockMvc.perform(post("/logout")
-                        .with(csrf()))
-                .andExpect(status().is3xxRedirection()) // redirect 발생
-                .andExpect(redirectedUrl("/login"))
-                .andExpect(unauthenticated());
+        String email = "alswns2631@gmail.com";
+        String passWord = "passw123";
+        LoginDTO login = LoginDTO.builder().email(email).password(passWord).build();
+        String s = objectMapper.writeValueAsString(login);
+        MvcResult mvcResult = mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(s)).
+                andDo(print())
+                .andExpect(status().isOk()).andReturn();
+
+        String responseBody = mvcResult.getResponse().getContentAsString();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        TokenInfo tokenInfo = objectMapper.readValue(responseBody, TokenInfo.class);
+
+        //access토큰이 정상적으로 expire됐는가?
+
+        String accessToken = tokenInfo.getAccessToken();
+        mockMvc.perform(post("/Logout")
+                .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk());
 
 
+        mockMvc.perform(get("/findEmail")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isForbidden());
     }
 
 
