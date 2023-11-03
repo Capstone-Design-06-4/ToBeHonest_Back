@@ -108,13 +108,58 @@ public class LoginTest {
 
         String accessToken = tokenInfo.getAccessToken();
         mockMvc.perform(post("/Logout")
-                .header("Authorization", "Bearer " + accessToken))
+                        .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk());
 
 
         mockMvc.perform(get("/findEmail")
                         .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isForbidden());
+    }
+
+
+    @Test
+    @DisplayName("이미 로그인 된 상태에서 다른 사람이 로그인하려고 들때.")
+    public void duplicate_login() throws Exception {
+
+        //한명이 로그인 한 상황..
+        String email = "alswns2631@gmail.com";
+        String passWord = "passw123";
+        LoginDTO login = LoginDTO.builder().email(email).password(passWord).build();
+        String s = objectMapper.writeValueAsString(login);
+        MvcResult mvcResult = mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(s))
+                .andExpect(status().isOk()).andReturn();
+
+        String responseBody = mvcResult.getResponse().getContentAsString();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        TokenInfo tokenInfo1 = objectMapper.readValue(responseBody, TokenInfo.class);
+
+
+        //그 뒤 다른 놈이 같은 계정으로 로그인했다
+
+        login = LoginDTO.builder().email(email).password(passWord).build();
+        s = objectMapper.writeValueAsString(login);
+        mvcResult = mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(s))
+                .andExpect(status().isOk()).andReturn();
+
+        responseBody = mvcResult.getResponse().getContentAsString();
+
+
+
+        TokenInfo tokenInfo2 = objectMapper.readValue(responseBody, TokenInfo.class);
+        String accessToken = tokenInfo1.getAccessToken();
+        System.out.println(tokenInfo1.getAccessToken());
+        System.out.println(tokenInfo2.getAccessToken());
+        mockMvc.perform(get("/findEmail")
+                        .header("Authorization", "Bearer " + tokenInfo1.getAccessToken()))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(get("/findEmail")
+                        .header("Authorization", "Bearer " + tokenInfo2.getAccessToken()))
+                .andExpect(status().isOk());
+
+
     }
 
 
