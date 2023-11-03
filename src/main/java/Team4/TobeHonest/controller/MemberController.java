@@ -9,6 +9,7 @@ import Team4.TobeHonest.exception.NoMemberException;
 import Team4.TobeHonest.exception.NoSuchFriendException;
 import Team4.TobeHonest.service.FriendService;
 import Team4.TobeHonest.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/members")
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Slf4j
@@ -38,12 +39,14 @@ public class MemberController {
 
     @GetMapping("/friends")
     //로그인은 인터셉터에서 처리 해 준다고 생각..
-    public List<FriendWithSpecifyName> findAllFriends(@AuthenticationPrincipal UserDetails userDetails) {
+    public List<FriendWithSpecifyName> findAllFriends(@AuthenticationPrincipal UserDetails userDetails, HttpServletRequest request) {
         /*Authentication 객체가 SecurityContext에 저장됩니다.
             그리고 이 SecurityContext는 HttpSession에 SPRING_SECURITY_CONTEXT라는 키로 저장*/
 
         //수정해야함 ==> member 엔티티가 controller에 노출되는것을 해결해보자
-        Member member = (Member) userDetails;
+
+        String userEmail = userDetails.getUsername();
+        Member member = (Member) request.getSession().getAttribute(userEmail);
         return friendService.findAllFriendsProfile(member);
 
     }
@@ -51,8 +54,11 @@ public class MemberController {
     //   post로 수정..
     @GetMapping("/friends/add/{friendId}")
     public ResponseEntity<String> addFriend(@PathVariable Long friendId,
-                                            @AuthenticationPrincipal UserDetails userDetails) {
-        Member member = (Member) userDetails;
+                                            @AuthenticationPrincipal UserDetails userDetails,
+                                            HttpServletRequest request) {
+        String userEmail = userDetails.getUsername();
+        Member member = (Member) request.getSession().getAttribute(userEmail);
+
         try {
             friendService.addFriendList(member, friendId);
         } catch (DuplicateFriendException e) {
@@ -66,8 +72,10 @@ public class MemberController {
 
     @GetMapping("/friends/search/{startsWith}")
     public List<FriendWithSpecifyName> addFriend(@PathVariable String startsWith,
-                                                 @AuthenticationPrincipal UserDetails userDetails) {
-        Member member = (Member) userDetails;
+                                                 @AuthenticationPrincipal UserDetails userDetails,
+                                                 HttpServletRequest request) {
+        String userEmail = userDetails.getUsername();
+        Member member = (Member) request.getSession().getAttribute(userEmail);
         //member argument 수정
         return friendService.searchFriendWithName(member, startsWith);
 
@@ -77,8 +85,10 @@ public class MemberController {
 
     @DeleteMapping("/friends/delete/{friendId}")
     public ResponseEntity<String> deleteFriend(@PathVariable Long friendId,
-                                            @AuthenticationPrincipal UserDetails userDetails) {
-        Member member = (Member) userDetails;
+                                            @AuthenticationPrincipal UserDetails userDetails,
+                                               HttpServletRequest request) {
+        String userEmail = userDetails.getUsername();
+        Member member = (Member) request.getSession().getAttribute(userEmail);
         try {
             friendService.deleteFriend(member, friendId);
         } catch (NoSuchFriendException e) {

@@ -11,6 +11,7 @@ import Team4.TobeHonest.exception.ItemNotInWishlistException;
 import Team4.TobeHonest.service.ContributorService;
 import Team4.TobeHonest.service.ItemService;
 import Team4.TobeHonest.service.WishItemService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,10 +22,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/wishlist")
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class WishlistController {
@@ -61,12 +63,15 @@ public class WishlistController {
 
     @GetMapping("/details/{memberId}/{wishItemId}")
     public WishItemResponseDTO seeWishItemDetail(@PathVariable Long memberId, @PathVariable Long wishItemId,
-                                                 @AuthenticationPrincipal UserDetails userDetails) {
+                                                 @AuthenticationPrincipal UserDetails userDetails,
+                                                 HttpServletRequest request) {
 
         WishItemResponseDTO response = new WishItemResponseDTO();
         List<WishItemDetail> wishItemDetail = wishItemService.findWishItemDetail(wishItemId);
         response.setWishItemDetail(wishItemDetail);
-        Member member = (Member) userDetails;
+        String userEmail = userDetails.getUsername();
+        Member member = (Member) request.getSession().getAttribute(userEmail);
+
 //        만약 로그인한 멤버라면... 추가정보도 제공
         List<ContributorDTO> contributor;
 
@@ -79,10 +84,14 @@ public class WishlistController {
 
     @GetMapping("/add/{itemId}")
     public ResponseEntity<String> addWishItem(@PathVariable Long itemId,
-                                              @AuthenticationPrincipal UserDetails userDetails) {
+                                              @AuthenticationPrincipal UserDetails userDetails,
+                                              HttpServletRequest request) {
+        String userEmail = userDetails.getUsername();
+        Member member = (Member) request.getSession().getAttribute(userEmail);
+
         ItemInfoDTO byItemID = itemService.findByItembyID(itemId);
         try {
-            wishItemService.addWishList((Member) userDetails,
+            wishItemService.addWishList(member,
                     byItemID);
         } catch (DuplicateWishItemException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
@@ -92,7 +101,11 @@ public class WishlistController {
 
     @GetMapping("/delete/{itemId}")
     public ResponseEntity<String> deleteWishItem(@PathVariable Long itemId,
-                                                 @AuthenticationPrincipal UserDetails userDetails) {
+                                                 @AuthenticationPrincipal UserDetails userDetails,
+                                                 HttpServletRequest request) {
+        String userEmail = userDetails.getUsername();
+        Member member = (Member) request.getSession().getAttribute(userEmail);
+
         ItemInfoDTO itemInfoDTO = itemService.findByItembyID(itemId);
         try {
             wishItemService.deleteWishListByItemId((Member) userDetails, itemInfoDTO.getId());

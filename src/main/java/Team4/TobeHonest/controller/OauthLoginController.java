@@ -1,18 +1,23 @@
 package Team4.TobeHonest.controller;
 
+import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.service.MemberService;
 import Team4.TobeHonest.service.login.OauthLogin.GoogleLoginService;
 import Team4.TobeHonest.service.login.OauthLogin.KakaoLoginService;
 import Team4.TobeHonest.service.login.OauthLogin.NaverLoginService;
 import Team4.TobeHonest.utils.jwt.TokenInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.UnsupportedEncodingException;
@@ -49,16 +54,16 @@ public class OauthLoginController {
     }
 
 
-
-
-
     @GetMapping("/naver-login")
-    public ResponseEntity<?> naverLogin(@RequestParam String code, @RequestParam String state, HttpServletResponse response) throws JsonProcessingException, JsonProcessingException {
+    public ResponseEntity<?> naverLogin(@RequestParam String code, @RequestParam String state,
+                                        HttpServletResponse response, HttpServletRequest request) throws JsonProcessingException, JsonProcessingException {
         String email = naverService.login(code, state, response);
         log.info("controller");
         log.info(email);
         try {
             TokenInfo login = naverService.tokenInfo(email);
+            Member member = memberService.findByEmail(email);
+            request.getSession().setAttribute(email, member);
             return ResponseEntity.status(HttpStatus.OK).body(login);
 
         } catch (Exception e) {
@@ -68,12 +73,15 @@ public class OauthLoginController {
         }
 
     }
+
     @GetMapping("/kakao-login")
-    public ResponseEntity<?> kakoLogin(@RequestParam("code") String code, @RequestParam(value = "state", required = false) String state, HttpServletResponse response) throws JsonProcessingException, JsonProcessingException {
+    public ResponseEntity<?> kakoLogin(@RequestParam String code, @RequestParam(required = false) String state,
+                                       HttpServletResponse response, HttpServletRequest request) throws JsonProcessingException, JsonProcessingException {
         String email = kakaoLoginService.login(code, state, response);
 
         TokenInfo tokenInfo = kakaoLoginService.tokenInfo(email);
-        log.info(String.valueOf(tokenInfo));
+        Member member = memberService.findByEmail(email);
+        request.getSession().setAttribute(email, member);
         return ResponseEntity.status(HttpStatus.OK).body(tokenInfo);
 
 

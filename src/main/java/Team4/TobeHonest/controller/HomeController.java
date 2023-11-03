@@ -1,14 +1,13 @@
 package Team4.TobeHonest.controller;
 
+import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.signup.JoinDTO;
 import Team4.TobeHonest.dto.signup.LoginDTO;
 import Team4.TobeHonest.exception.DuplicateMemberException;
 import Team4.TobeHonest.service.MemberService;
 import Team4.TobeHonest.service.login.AuthService;
-import Team4.TobeHonest.service.login.NaverLoginService;
 import Team4.TobeHonest.utils.jwt.TokenInfo;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +22,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 
-@Controller
+@RestController
 @RequestMapping("/")
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Slf4j
@@ -35,7 +33,7 @@ public class HomeController {
     private final AuthService loginService;
 
     @GetMapping("/signup")
-    @ResponseBody
+
     public String singUpForm(@AuthenticationPrincipal UserDetails user) {
         return "회원가입 폼 주세요";
     }
@@ -59,24 +57,24 @@ public class HomeController {
 
 
     @GetMapping("/findEmail")
-    @ResponseBody
     public String findEmailForm() {
         return "ID찾는 폼주세요";
     }
 
     @GetMapping("/login")
-    @ResponseBody
     public String loginGet() {
         return "로그인하쇼";
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginDTO loginDTO) {
+    public ResponseEntity login(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
         String email = loginDTO.getEmail();
         String password = loginDTO.getPassword();
 
         try {
             TokenInfo login = loginService.login(email, password);
+            Member member = memberService.findByEmail(email);
+            request.getSession().setAttribute(email, member);
             return ResponseEntity.status(HttpStatus.OK).body(login);
 
         } catch (Exception e) {
@@ -105,7 +103,6 @@ public class HomeController {
      * @return redirect URI
      * @throws UnsupportedEncodingException
      */
-
 
 
 }

@@ -7,6 +7,7 @@ import Team4.TobeHonest.dto.message.SendMessageDTO;
 import Team4.TobeHonest.dto.message.SendMessageWithNoIMG;
 import Team4.TobeHonest.exception.NoWishItemException;
 import Team4.TobeHonest.service.MessageService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,10 @@ public class MessageController {
     //@RequestBodt ==> only 1개 mapping  ==> @RequestPart로 나누기
     public ResponseEntity<String> sendMessage(@RequestPart SendMessageWithNoIMG sendMessageWithNoIMG,
                                               @RequestPart(required = false) List<MultipartFile> images,
-                                              @AuthenticationPrincipal UserDetails userDetails) {
+                                              @AuthenticationPrincipal UserDetails userDetails,
+                                              HttpServletRequest request) {
+        String userEmail = userDetails.getUsername();
+        Member member = (Member) request.getSession().getAttribute(userEmail);
 
         SendMessageDTO sendMessage = SendMessageDTO.builder()
                 .senderId(sendMessageWithNoIMG.getSenderId())
@@ -41,7 +45,7 @@ public class MessageController {
                 .contents(sendMessageWithNoIMG.getContents())
                 .build();
 
-        Member member = (Member) userDetails;
+
         sendMessage.setImages(images);
         if (!sendMessage.getSenderId().equals(member.getId())){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("sender와 로그인 한 유저의 정보가 다릅니다");
@@ -61,8 +65,11 @@ public class MessageController {
     //친구랑 주고 받은 메시지를 return 해주는 controller
     @GetMapping("/find/{friendId}")
     public List<MessageResponseDTO> findMessageWithFriend(@AuthenticationPrincipal UserDetails userDetails,
-                                                          @PathVariable Long friendId){
-        Member member = (Member) userDetails;
+                                                          @PathVariable Long friendId,
+                                                          HttpServletRequest request){
+        String userEmail = userDetails.getUsername();
+        Member member = (Member) request.getSession().getAttribute(userEmail);
+
         return messageService.messageWithFriend(member.getId(), friendId);
 
     }

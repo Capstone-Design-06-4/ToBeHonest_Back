@@ -25,7 +25,7 @@ public class ItemController {
 
 
     @GetMapping("{id}")
-    public ResponseEntity findById(@PathVariable Long id) {
+    public ResponseEntity<?> findById(@PathVariable Long id) {
         ItemInfoDTO itemInfoDTO;
         try{
          itemInfoDTO = itemService.findByItembyID(id);

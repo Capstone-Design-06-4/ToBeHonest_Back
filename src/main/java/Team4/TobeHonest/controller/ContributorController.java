@@ -7,6 +7,7 @@ import Team4.TobeHonest.exception.NoPointsException;
 import Team4.TobeHonest.exception.NoWishItemException;
 import Team4.TobeHonest.service.ContributorService;
 import Team4.TobeHonest.service.WishItemService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,9 +34,12 @@ public class ContributorController {
     @PostMapping("{wishItemId}")
     public ResponseEntity<String> contributing(@PathVariable Long wishItemId,
                                             @RequestBody Integer fundAmount,
-                                            @AuthenticationPrincipal UserDetails userDetails) {
+                                            @AuthenticationPrincipal UserDetails userDetails,
 
-        Member member = (Member) userDetails;
+    HttpServletRequest request) {
+
+        String userEmail = userDetails.getUsername();
+        Member member = (Member) request.getSession().getAttribute(userEmail);
         try {
             contributorService.contributing(member, wishItemId, fundAmount);
         }
