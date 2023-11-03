@@ -31,11 +31,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         log.info(path);
         log.info(httpRequest.getRequestURL().toString());
         // /login, /signup, /test 경로는 필터를 실행하지 않고 다음 필터로 넘긴다
-        if ("/login".equals(path) || "/signup".equals(path) || path.contains("/test")
-                || "/naver/oauth".equals(path) || "/naver/callback".equals(path)) {
-            chain.doFilter(request, response);
-            return;
-        }
+
 
         // 1. Request Header 에서 JWT 토큰 추출
         String token = resolveToken((HttpServletRequest) request);
@@ -47,8 +43,9 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             String storedToken = redisTemplate.opsForValue().get(key);
             log.info(key);
             log.info(storedToken);
+
             //로그인 여부 확인
-            if (Boolean.TRUE.equals(redisTemplate.hasKey(key)) && storedToken != null) {
+            if (Boolean.TRUE.equals(redisTemplate.hasKey(key)) && storedToken != null && storedToken.equals(token)) {
                 Authentication authentication = jwtTokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 

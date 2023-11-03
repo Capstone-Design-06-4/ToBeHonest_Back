@@ -41,7 +41,7 @@ public class JwtTokenProvider {
                 .collect(Collectors.joining(","));
 
 
-        long now = (new Date()).getTime();
+        Long now = (new Date()).getTime();
         // Access Token 생성
         //일단 1일로 생성..
         Date accessTokenExpiresIn = new Date(now + 86400000);
@@ -49,6 +49,7 @@ public class JwtTokenProvider {
                 .setSubject(authentication.getName())
                 //별도로 authorities를 설정하지 않았음..
                 .claim("auth", authorities)
+                .claim("time", now.toString())
                 .setExpiration(accessTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -82,6 +83,7 @@ public class JwtTokenProvider {
         //근데 나는 별도 권한 정보 나누지 않아서.. 그냥 빈 authorities로 ..
         Collection<? extends GrantedAuthority> authorities =
                 new ArrayList<>();
+        log.info("hi");
         log.info(claims.toString());
         // UserDetails 객체를 만들어서 Authentication 리턴
         UserDetails principal = new User(claims.getSubject(), "", authorities);
