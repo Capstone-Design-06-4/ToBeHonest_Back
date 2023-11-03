@@ -7,6 +7,7 @@ import Team4.TobeHonest.domain.WishItem;
 import Team4.TobeHonest.dto.item.ItemInfoDTO;
 import Team4.TobeHonest.dto.message.SendMessageDTO;
 import Team4.TobeHonest.dto.message.SendMessageWithNoIMG;
+import Team4.TobeHonest.dto.signup.LoginDTO;
 import Team4.TobeHonest.dto.wishitem.FirstWishItem;
 import Team4.TobeHonest.repo.ItemRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
@@ -16,7 +17,9 @@ import Team4.TobeHonest.service.MessageService;
 import Team4.TobeHonest.service.WishItemService;
 import Team4.TobeHonest.setup.FriendJoinService;
 import Team4.TobeHonest.setup.NaverSearchService;
+import Team4.TobeHonest.utils.jwt.TokenInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,13 +30,17 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,6 +54,7 @@ import java.util.List;
 import static org.springframework.http.RequestEntity.post;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -77,8 +85,9 @@ public class MessageControllerTest {
     @Autowired
     WishItemRepository wishItemRepository;
 
-    @MockBean
-    private UserDetails userDetails;
+    MockHttpSession mockSession = new MockHttpSession();
+    @Autowired
+    HttpServletRequest request;
 
     public Member member;
     public Member friend1;
@@ -86,6 +95,7 @@ public class MessageControllerTest {
     public List<Item> galaxy;
 
     public WishItem wishItem;
+    public String accessToken;
 
 
 
@@ -105,10 +115,21 @@ public class MessageControllerTest {
         wishItemService.addWishList(this.member, DTO);
         wishItem = wishItemRepository.findAll(member).get(0);
 
+        String email = "alswns2631@cau.ac.kr";
+        String passWord = "passw123";
+        LoginDTO login = LoginDTO.builder().email(email).password(passWord).build();
+        String s = objectMapper.writeValueAsString(login);
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/login").session(mockSession).contentType(MediaType.APPLICATION_JSON).content(s))
+                .andExpect(status().isOk()).andReturn();
 
-        //member로 로그인한 상황..
-        SecurityContextHolder.getContext()
-                .setAuthentication(new UsernamePasswordAuthenticationToken(member, null, member.getAuthorities()));
+        String responseBody = mvcResult.getResponse().getContentAsString();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        TokenInfo tokenInfo = objectMapper.readValue(responseBody, TokenInfo.class);
+
+        //access토큰이 정상적으로 expire됐는가?
+
+        this.accessToken = tokenInfo.getAccessToken();
 
     }
 
@@ -145,7 +166,8 @@ public class MessageControllerTest {
                         .file(sendMessageWithNoIMGPart)
                         .file(file1)
                         .file(file2)
-                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                        .contentType(MediaType.MULTIPART_FORM_DATA).header("Authorization", "Bearer " + accessToken)
+                        .session(mockSession))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print());
     }
@@ -166,11 +188,16 @@ public class MessageControllerTest {
         MockMultipartFile sendMessageWithNoIMGPart =
                 new MockMultipartFile("sendMessageWithNoIMG", "", "application/json",
                         json.getBytes(StandardCharsets.UTF_8));
+
+
         mockMvc.perform(multipart("/message/send")
                         .file(sendMessageWithNoIMGPart)
-                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                        .file(sendMessageWithNoIMGPart)
+                        .contentType(MediaType.MULTIPART_FORM_DATA).header("Authorization", "Bearer " + accessToken)
+                        .session(mockSession))
                 .andExpect(status().isUnauthorized())
                 .andDo(MockMvcResultHandlers.print());
+
     }
 
 
