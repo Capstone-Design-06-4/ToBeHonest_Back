@@ -1,8 +1,7 @@
-package Team4.TobeHonest.service.login;
+package Team4.TobeHonest.service.login.OauthLogin;
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.login.NaverProfileVo;
 import Team4.TobeHonest.dto.login.NaverTokenVo;
-import Team4.TobeHonest.repo.MemberRepository;
 import Team4.TobeHonest.service.MemberService;
 import Team4.TobeHonest.utils.jwt.JwtTokenProvider;
 import Team4.TobeHonest.utils.jwt.TokenInfo;
@@ -10,8 +9,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -35,38 +32,26 @@ import java.net.URLEncoder;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
-public class NaverLoginService {
+public class NaverLoginService implements OAuthLoginService{
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, String> redisTemplate;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
-    String getNaverClientId;
-    String getNaverClientSecret;
-    @Autowired
-    public NaverLoginService(MemberService memberService, @Value("${spring.oauth.naver.clientId}") String getNaverClientId,
-                             @Value("${spring.oauth.naver.clientSecret}") String getNaverClientSecret,
-                             MemberRepository memberRepository, JwtTokenProvider jwtTokenProvider, RedisTemplate<String, String> redisTemplate, AuthenticationManagerBuilder authenticationManagerBuilder, PasswordEncoder passwordEncoder) {
-        this.memberService = memberService;
-        this.getNaverClientId = getNaverClientId;
-        this.getNaverClientSecret = getNaverClientSecret;
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.redisTemplate = redisTemplate;
-        this.authenticationManagerBuilder = authenticationManagerBuilder;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private String getNaverClientId = "Pi8zB3f4zuenOa7Lpdpl";
+    private String getNaverClientSecret = "cB7nj_4ahS";
 
-    public String createNaverURL() throws UnsupportedEncodingException {
+    @Override
+    public String createURL() throws UnsupportedEncodingException {
         StringBuffer url = new StringBuffer();
 
         // 카카오 API 명세에 맞춰서 작성
-        String redirectURI = URLEncoder.encode("http://www.localhost:8080/naver/callback", "UTF-8"); // redirectURI 설정 부분
+        String redirectURI = URLEncoder.encode("http://www.localhost:8080/oauth/naver-login", "UTF-8"); // redirectURI 설정 부분
         SecureRandom random = new SecureRandom();
         String state = new BigInteger(130, random).toString();
 
@@ -83,8 +68,10 @@ public class NaverLoginService {
 
         return url.toString();
     }
+
+    @Override
     @Transactional
-    public String loginNaver(String code, String state, HttpServletResponse response) throws JsonProcessingException {
+    public String login(String code, String state, HttpServletResponse response) throws JsonProcessingException {
         // 네이버 로그인 Token 발급 API 요청을 위한 header/parameters 설정 부분
         RestTemplate token_rt = new RestTemplate(); // REST API 요청용 Template
 
@@ -112,7 +99,6 @@ public class NaverLoginService {
         );
 
         // body로 access_token, refresh_token, token_type:bearer, expires_in:3600 온 상태
-        log.info(String.valueOf(oauthTokenResponse));
 
         // oauthTokenResponse로 받은 토큰정보 객체화
         ObjectMapper token_om = new ObjectMapper();
@@ -140,7 +126,6 @@ public class NaverLoginService {
         );
 
         // 요청 응답 확인
-        log.info(String.valueOf(userDetailResponse));
 
         // 네이버로부터 받은 정보를 객체화
         // *이때, 공식문서에는 응답 파라미터에 mobile 밖에없지만, 국제전화 표기로 된 mobile_e164도 같이 옴. 따라서 NaverProfileVo에 mobile_e164 필드도 있어야 정상적으로 객체가 생성됨
@@ -151,33 +136,26 @@ public class NaverLoginService {
         } catch (JsonMappingException je) {
             je.printStackTrace();
         }
-        log.info(naverProfile.toString());
-        log.info("hi ");
 
         Member member = memberService.findByEmail(naverProfile.getResponse().getEmail());
 
-        log.info("저장됐는데.. ?");
         member = dtoToEntity(naverProfile);
+
         memberService.joinMember(member);
-        log.info("해치웠나?");
         return member.getEmail();
     }
+
+    @Override
     @Transactional
     public TokenInfo tokenInfo(String memberEmail) {
         Member member = memberService.findByEmail(memberEmail);
-        log.info("t0");
         UsernamePasswordAuthenticationToken authenticationToken
                 //randPassword는 당연히 수정해야하는 문제..
                 = new UsernamePasswordAuthenticationToken(member.getEmail(), "randPassword");
-        log.info(String.valueOf(member.getId()));
-        log.info("t1");
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        log.info("t2");
         TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
-        log.info("t3");
         redisTemplate.opsForValue().set(
                 "JWT_TOKEN:" + member.getEmail(), tokenInfo.getAccessToken());
-        log.info("t4");
         return tokenInfo;
     }
 

@@ -82,10 +82,9 @@ public class JwtTokenProvider {
         //근데 나는 별도 권한 정보 나누지 않아서.. 그냥 빈 authorities로 ..
         Collection<? extends GrantedAuthority> authorities =
                 new ArrayList<>();
-
+        log.info(claims.toString());
         // UserDetails 객체를 만들어서 Authentication 리턴
         UserDetails principal = new User(claims.getSubject(), "", authorities);
-
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 

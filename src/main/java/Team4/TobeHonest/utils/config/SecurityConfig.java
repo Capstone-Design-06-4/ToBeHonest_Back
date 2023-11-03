@@ -55,7 +55,7 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers("/login", "/signup", "/test", "/naver/oauth", "/naver/callback").permitAll()
+                .requestMatchers("/login", "/signup", "/test", "/oauth/**").permitAll()
                 .anyRequest().authenticated()
                 .and().addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, redisTemplate),
                         UsernamePasswordAuthenticationFilter.class);
