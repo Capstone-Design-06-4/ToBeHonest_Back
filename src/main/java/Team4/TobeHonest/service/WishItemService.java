@@ -6,8 +6,12 @@ import Team4.TobeHonest.domain.WishItem;
 import Team4.TobeHonest.dto.item.ItemInfoDTO;
 import Team4.TobeHonest.dto.wishitem.FirstWishItem;
 import Team4.TobeHonest.dto.wishitem.WishItemDetail;
+import Team4.TobeHonest.enumer.GiftStatus;
 import Team4.TobeHonest.exception.DuplicateWishItemException;
 import Team4.TobeHonest.exception.ItemNotInWishlistException;
+import Team4.TobeHonest.exception.NoPointsException;
+import Team4.TobeHonest.exception.NotValidWishItemException;
+import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.ItemRepository;
 import Team4.TobeHonest.repo.MemberRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
@@ -28,6 +32,7 @@ public class WishItemService {
     private final WishItemRepository wishItemRepository;
     private final ItemRepository itemRepository;
     private final MemberRepository memberRepository;
+    private final ContributorRepository contributorRepository;
 
     @Transactional
     public void addWishList(Member member, ItemInfoDTO itemInfoDTO) {
@@ -90,9 +95,23 @@ public class WishItemService {
         return wishItemRepository.findWishItemDetail(wishItemId);
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public void usingItem(String memberEmail){
-        Member member = memberRepository.findByEmail(memberEmail);
-    }
 
+    //wishItem사용하기
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public Integer useWishItem(String memberEmail,  Long wishItemId) {
+        WishItem wishItem = wishItemRepository.findWishItemById(wishItemId);
+        if (!wishItem.getMember().getEmail().equals(memberEmail)){
+            throw new NotValidWishItemException();
+        }
+        Integer fundedAmount = contributorRepository.findFundedAmount(wishItem);
+        Member member = wishItem.getMember();
+        Integer itemPrice = wishItem.getItem().getPrice();
+        if (itemPrice > fundedAmount){
+            throw new NoPointsException();
+        }
+        wishItem.getMember().addPoints(fundedAmount);
+        wishItem.changeGiftStatus(GiftStatus.USED);
+
+        return fundedAmount;
+    }
 }

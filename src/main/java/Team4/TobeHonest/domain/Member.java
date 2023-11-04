@@ -37,7 +37,7 @@ public class Member implements UserDetails {
 
     private LocalDate birthDate;
 
-    private Integer points;
+    private Integer points = 0;
     //프사 추가해야함
     private String profileImg = "profile/default.jpeg";
 
@@ -68,6 +68,7 @@ public class Member implements UserDetails {
         if (points < money){
             throw new NoPointsException("포인트가 부족합니다.");
         }
+        this.points -= money;
     }
 
     public FriendWith addFriend(Member friend) {
