@@ -1,15 +1,16 @@
 package Team4.TobeHonest.service;
 
 import Team4.TobeHonest.domain.Item;
+import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.item.ItemInfoDTO;
 import Team4.TobeHonest.exception.NoItemException;
+import Team4.TobeHonest.exception.NotEnoughStockException;
 import Team4.TobeHonest.repo.ItemRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -66,6 +67,18 @@ public class ItemService {
 
         return item.stream().map(ItemInfoDTO::ItemToItemInfoDTO).toList();
         //Item에서 itemInfoDTO클래스로 변환한 후 controller에 return
+    }
+
+    @Transactional
+    public void buyItem(Member member, Long itemId) {
+
+        Item item = itemRepository.findByItem(itemId);
+        if (item.getStockQuantity() == 0) {
+            throw new NotEnoughStockException();
+        }
+        item.buyItem();
+        member.usePoints(item.getPrice());
+
     }
 }
 

@@ -15,8 +15,10 @@ import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.ItemRepository;
 import Team4.TobeHonest.repo.MemberRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
+import jakarta.persistence.LockModeType;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -111,7 +113,6 @@ public class WishItemService {
         }
         wishItem.getMember().addPoints(fundedAmount);
         wishItem.changeGiftStatus(GiftStatus.USED);
-
         return fundedAmount;
     }
 }

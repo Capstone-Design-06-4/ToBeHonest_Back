@@ -8,6 +8,7 @@ import Team4.TobeHonest.exception.DuplicateFriendException;
 import Team4.TobeHonest.exception.NoMemberException;
 import Team4.TobeHonest.exception.NoSuchFriendException;
 import Team4.TobeHonest.service.FriendService;
+import Team4.TobeHonest.service.ItemService;
 import Team4.TobeHonest.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
@@ -30,7 +31,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final FriendService friendService;
-
+    private final ItemService itemService;
     @GetMapping("{memberId}")
     @ResponseBody
     public String memberInformation(@PathVariable Long memberId) {
@@ -111,13 +112,26 @@ public class MemberController {
         return memberService.memberSearchByEmail(email);
     }
 
-    @GetMapping("/points/add")
+    @PostMapping("/points/add")
     @ResponseBody
-    public void pointsAdd(@AuthenticationPrincipal Authentication authentication,
-                          @RequestBody Integer points) {
+    public void pointsAdd(@AuthenticationPrincipal UserDetails userDetails,
+                          @RequestBody Integer points,
+                          HttpServletRequest request) {
 
-        String memberEmail = authentication.getName();
+        String memberEmail = userDetails.getUsername();
         memberService.pointRecharge(memberEmail, points);
+
+    }
+
+    @PostMapping("/points/use/{itemId}")
+    @ResponseBody
+    public ResponseEntity<String> pointsAdd(@AuthenticationPrincipal UserDetails userDetails,
+                          @PathVariable Long itemId,
+                          HttpServletRequest request) {
+        String userEmail = userDetails.getUsername();
+        Member member = (Member) request.getSession().getAttribute(userEmail);
+        itemService.buyItem(member, itemId);
+        return ResponseEntity.status(HttpStatus.OK).body("구매완료!");
 
     }
 
