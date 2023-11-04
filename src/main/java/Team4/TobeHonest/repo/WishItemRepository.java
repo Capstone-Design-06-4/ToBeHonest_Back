@@ -171,11 +171,11 @@ public class WishItemRepository {
                 .innerJoin(wishItem.item, item)
                 .innerJoin(wishItem.member, member)
                 .where(member.id.eq(memberId)
+
                         .and(wishItem.giftStatus.eq(GiftStatus.COMPLETED)))
                 .groupBy(wishItem.id)
                 .orderBy(sumFundMoney.desc())
                 .fetch();
-
 
     }
 

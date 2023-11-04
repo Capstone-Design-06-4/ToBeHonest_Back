@@ -12,6 +12,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -25,6 +26,7 @@ import java.util.List;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+
     @Transactional
     public void join(JoinDTO joinDTO) {
 //      회원가입 중복 check
@@ -50,6 +52,7 @@ public class MemberService {
         }
         return sb.toString();
     }
+
     //로그인
     public boolean login(String email, String passWord) {
         //Member을 return하지 않고 boolean을 return해서 controller에 entity가 노출되는것을 방지하자
@@ -72,7 +75,7 @@ public class MemberService {
 
 
         Member member = memberRepository.findById(id);
-        if (member == null){
+        if (member == null) {
             throw new NoMemberException("회원 정보를 찾을 수 없습니다");
         }
         return memberRepository.findById(id);
@@ -97,6 +100,7 @@ public class MemberService {
                 .memberName(member.getName()).build();
 
     }
+
     public MemberSearch memberSearchByPhoneNumber(String phoneNumber) {
         Member member = memberRepository.findByPhoneNumber(phoneNumber);
         return MemberSearch.builder()
@@ -105,9 +109,39 @@ public class MemberService {
                 .memberName(member.getName()).build();
 
     }
+
     @Transactional
-    public void joinMember(Member member){
+    public void joinMember(Member member) {
         memberRepository.join(member);
     }
+
+
+    //돈 충전은 최고 높은 트랜잭션 격리수준 적용..
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public Integer pointRecharge(String memberEmail, Integer money) {
+
+        Member member = memberRepository.findByEmail(memberEmail);
+
+        if (member == null){
+            throw new NoMemberException(memberEmail + " not Found");
+        }
+        member.addPoints(money);
+        return member.getPoints();
+    }
+    //돈 충전은 최고 높은 트랜잭션 격리수준 적용..
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public Integer usePoints(String memberEmail, Integer money) {
+
+        Member member = memberRepository.findByEmail(memberEmail);
+
+        if (member == null){
+            throw new NoMemberException(memberEmail + " not Found");
+        }
+        member.usePoints(money);
+        return member.getPoints();
+    }
+
+
+
 
 }

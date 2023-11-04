@@ -28,7 +28,6 @@ import java.net.URI;
 public class ContributorController {
 
     private final ContributorService contributorService;
-    private final WishItemService wishItemService;
 
 
     @PostMapping("{wishItemId}")
@@ -48,7 +47,7 @@ public class ContributorController {
         }
         catch (NoPointsException e){
             HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(URI.create("/member/points/add"));
+            headers.setLocation(URI.create("/members/points/add"));
             return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
         }
         return ResponseEntity.ok(fundAmount + "원 펀딩 완료!");

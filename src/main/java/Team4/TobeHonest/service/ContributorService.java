@@ -7,6 +7,7 @@ import Team4.TobeHonest.domain.QWishItem;
 import Team4.TobeHonest.domain.WishItem;
 import Team4.TobeHonest.dto.contributor.ContributorDTO;
 import Team4.TobeHonest.enumer.GiftStatus;
+import Team4.TobeHonest.exception.NoPointsException;
 import Team4.TobeHonest.exception.NoWishItemException;
 import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
@@ -32,6 +33,11 @@ public class ContributorService {
     @Transactional
     public void contributing(Member contributor, Long wishItemId,
                              Integer money) {
+
+
+        //내가 충전한 포인트 사용
+        contributor.usePoints(money);
+
         Contributor contribution = contributorRepository.findContributorsInWishItem(wishItemId, contributor);
 //        내가 이미 펀딩했다면 그냥 값만 더하기
         WishItem friendsWish = wishItemRepository.findWishItemById(wishItemId);
@@ -74,4 +80,7 @@ public class ContributorService {
     public List<Long> getGiftReceiversFromMe(Long myId){
         return contributorRepository.findMyContributions(myId);
     }
+
+    
+
 }

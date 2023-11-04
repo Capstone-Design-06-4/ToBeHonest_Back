@@ -36,7 +36,6 @@ public class MessageController {
                                               HttpServletRequest request) {
         String userEmail = userDetails.getUsername();
         Member member = (Member) request.getSession().getAttribute(userEmail);
-
         SendMessageDTO sendMessage = SendMessageDTO.builder()
                 .senderId(sendMessageWithNoIMG.getSenderId())
                 .receiverId(sendMessageWithNoIMG.getReceiverId())

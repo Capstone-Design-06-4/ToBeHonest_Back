@@ -14,6 +14,7 @@ import Team4.TobeHonest.repo.WishItemRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -87,6 +88,11 @@ public class WishItemService {
 
     public List<WishItemDetail> findWishItemDetail(Long wishItemId) {
         return wishItemRepository.findWishItemDetail(wishItemId);
+    }
+
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public void usingItem(String memberEmail){
+        Member member = memberRepository.findByEmail(memberEmail);
     }
 
 }

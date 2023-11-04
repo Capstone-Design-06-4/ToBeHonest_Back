@@ -15,9 +15,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -82,10 +82,9 @@ public class MemberController {
     }
 
 
-
     @DeleteMapping("/friends/delete/{friendId}")
     public ResponseEntity<String> deleteFriend(@PathVariable Long friendId,
-                                            @AuthenticationPrincipal UserDetails userDetails,
+                                               @AuthenticationPrincipal UserDetails userDetails,
                                                HttpServletRequest request) {
         String userEmail = userDetails.getUsername();
         Member member = (Member) request.getSession().getAttribute(userEmail);
@@ -101,17 +100,26 @@ public class MemberController {
 
     @GetMapping("/search/phoneNumber/{phoneNumber}")
     @ResponseBody
-    public  MemberSearch findMemberByPhoneNumber(@PathVariable String phoneNumber){
+    public MemberSearch findMemberByPhoneNumber(@PathVariable String phoneNumber) {
         return memberService.memberSearchByPhoneNumber(phoneNumber);
     }
 
 
     @GetMapping("/search/email/{email}")
     @ResponseBody
-    public  MemberSearch findMemberByEmail(@PathVariable String email){
+    public MemberSearch findMemberByEmail(@PathVariable String email) {
         return memberService.memberSearchByEmail(email);
     }
 
+    @GetMapping("/points/add")
+    @ResponseBody
+    public void pointsAdd(@AuthenticationPrincipal Authentication authentication,
+                          @RequestBody Integer points) {
+
+        String memberEmail = authentication.getName();
+        memberService.pointRecharge(memberEmail, points);
+
+    }
 
 
 }
