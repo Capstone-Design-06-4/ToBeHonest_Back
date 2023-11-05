@@ -46,12 +46,7 @@ public class HomeController {
             String errorMessage = memberService.displayLoginError(bindingResult);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
         }
-        //중복 회원 발생
-        try {
-            memberService.join(joinDTO);
-        } catch (DuplicateMemberException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
+        memberService.join(joinDTO);
         //세션
         return ResponseEntity.ok("signUp Finished!");
     }
@@ -71,18 +66,10 @@ public class HomeController {
     public ResponseEntity login(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
         String email = loginDTO.getEmail();
         String password = loginDTO.getPassword();
-
-        try {
-            TokenInfo login = loginService.login(email, password);
-            Member member = memberService.findByEmail(email);
-            request.getSession().setAttribute(email, member);
-            return ResponseEntity.status(HttpStatus.OK).body(login);
-
-        } catch (Exception e) {
-            log.info(e.getMessage());
-            log.info(e.getClass().getName());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        TokenInfo login = loginService.login(email, password);
+        Member member = memberService.findByEmail(email);
+        request.getSession().setAttribute(email, member);
+        return ResponseEntity.status(HttpStatus.OK).body(login);
 
     }
 

@@ -39,17 +39,7 @@ public class ContributorController {
 
         String userEmail = userDetails.getUsername();
         Member member = (Member) request.getSession().getAttribute(userEmail);
-        try {
-            contributorService.contributing(member, wishItemId, fundAmount);
-        }
-        catch (NoWishItemException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-        catch (NoPointsException e){
-            HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(URI.create("/members/points/add"));
-            return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
-        }
+        contributorService.contributing(member, wishItemId, fundAmount);
         return ResponseEntity.ok(fundAmount + "원 펀딩 완료!");
 
 

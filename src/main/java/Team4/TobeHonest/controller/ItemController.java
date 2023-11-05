@@ -27,12 +27,7 @@ public class ItemController {
     @GetMapping("{id}")
     public ResponseEntity<?> findById(@PathVariable Long id) {
         ItemInfoDTO itemInfoDTO;
-        try{
-         itemInfoDTO = itemService.findByItembyID(id);
-        }
-        catch (NoItemException e){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
+        itemInfoDTO = itemService.findByItembyID(id);
         return ResponseEntity.ok(itemInfoDTO);
 
     }

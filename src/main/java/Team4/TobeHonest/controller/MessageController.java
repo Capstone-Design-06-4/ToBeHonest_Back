@@ -49,14 +49,7 @@ public class MessageController {
         if (!sendMessage.getSenderId().equals(member.getId())){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("sender와 로그인 한 유저의 정보가 다릅니다");
         }
-
-        try {
-            messageService.sendMessage(sendMessage);
-        }
-        catch (NoWishItemException e){
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
-                    .body(e.getMessage());
-        }
+        messageService.sendMessage(sendMessage);
 
         return ResponseEntity.ok("메세지 전송 완료");
     }

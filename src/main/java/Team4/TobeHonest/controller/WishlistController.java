@@ -87,12 +87,7 @@ public class WishlistController {
         Member member = (Member) request.getSession().getAttribute(userEmail);
 
         ItemInfoDTO byItemID = itemService.findByItembyID(itemId);
-        try {
-            wishItemService.addWishList(member,
-                    byItemID);
-        } catch (DuplicateWishItemException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
+        wishItemService.addWishList(member, byItemID);
         return ResponseEntity.status(HttpStatus.OK).body("위시아이템" + byItemID.getName() + " 추가완료");
     }
 
@@ -104,11 +99,7 @@ public class WishlistController {
         Member member = (Member) request.getSession().getAttribute(userEmail);
 
         ItemInfoDTO itemInfoDTO = itemService.findByItembyID(itemId);
-        try {
-            wishItemService.deleteWishListByItemId((Member) userDetails, itemInfoDTO.getId());
-        } catch (ItemNotInWishlistException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
+        wishItemService.deleteWishListByItemId((Member) userDetails, itemInfoDTO.getId());
         return ResponseEntity.status(HttpStatus.OK).body("위시아이템" + itemInfoDTO.getName() + " 추가완료");
     }
 

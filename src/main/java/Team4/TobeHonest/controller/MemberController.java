@@ -59,15 +59,7 @@ public class MemberController {
                                             HttpServletRequest request) {
         String userEmail = userDetails.getUsername();
         Member member = (Member) request.getSession().getAttribute(userEmail);
-
-        try {
-            friendService.addFriendList(member, friendId);
-        } catch (DuplicateFriendException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        } catch (NoMemberException noMemberException) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(noMemberException.getMessage());
-        }
-
+        friendService.addFriendList(member, friendId);
         return ResponseEntity.status(HttpStatus.OK).body("friend added");
     }
 
@@ -89,11 +81,7 @@ public class MemberController {
                                                HttpServletRequest request) {
         String userEmail = userDetails.getUsername();
         Member member = (Member) request.getSession().getAttribute(userEmail);
-        try {
-            friendService.deleteFriend(member, friendId);
-        } catch (NoSuchFriendException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        friendService.deleteFriend(member, friendId);
         return ResponseEntity.status(HttpStatus.OK).body("delete success!");
 
     }

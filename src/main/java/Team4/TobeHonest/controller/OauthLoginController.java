@@ -58,19 +58,10 @@ public class OauthLoginController {
     public ResponseEntity<?> naverLogin(@RequestParam String code, @RequestParam String state,
                                         HttpServletResponse response, HttpServletRequest request) throws JsonProcessingException, JsonProcessingException {
         String email = naverService.login(code, state, response);
-        log.info("controller");
-        log.info(email);
-        try {
-            TokenInfo login = naverService.tokenInfo(email);
-            Member member = memberService.findByEmail(email);
-            request.getSession().setAttribute(email, member);
-            return ResponseEntity.status(HttpStatus.OK).body(login);
-
-        } catch (Exception e) {
-            log.info(e.getMessage());
-            log.info(e.getClass().getName());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        TokenInfo login = naverService.tokenInfo(email);
+        Member member = memberService.findByEmail(email);
+        request.getSession().setAttribute(email, member);
+        return ResponseEntity.status(HttpStatus.OK).body(login);
 
     }
 
