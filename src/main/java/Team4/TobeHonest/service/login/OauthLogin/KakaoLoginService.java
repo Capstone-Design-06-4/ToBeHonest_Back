@@ -123,9 +123,10 @@ public class KakaoLoginService implements OAuthLoginService{
         }
 
         Member member = memberService.findByEmail(kakaoProfileVo.getKakao_account().getEmail());
-
-        member = dtoToEntity(kakaoProfileVo);
-        memberService.joinMember(member);
+        if (member == null){
+            member = dtoToEntity(kakaoProfileVo);
+            memberService.joinMember(member);
+        }
         return member.getEmail();
 
     }

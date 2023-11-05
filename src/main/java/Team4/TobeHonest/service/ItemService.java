@@ -23,35 +23,27 @@ public class ItemService {
     //검색
     public List<ItemInfoDTO> findItem(String name) {
         List<Item> item = itemRepository.searchItemName(name);
-        List<ItemInfoDTO> result;
-        result = entityToDTO(item);
-        return result;
+        return entityToDTO(item);
     }
 
 
     //검색
     public List<ItemInfoDTO> findCertainItem(String name) {
         List<Item> item = List.of(itemRepository.findByName(name));
-        List<ItemInfoDTO> result;
-        result = entityToDTO(item);
-        return result;
+        return entityToDTO(item);
     }
 
 
     public List<ItemInfoDTO> findCertainItemByCategory(String name) {
 
         List<Item> item = List.of(itemRepository.findByNameByCategory(name));
-        List<ItemInfoDTO> result;
-        result = entityToDTO(item);
-        return result;
+        return entityToDTO(item);
     }
 
     public List<ItemInfoDTO> findItemByCategory(String name) {
 
         List<Item> item = itemRepository.searchItemNameByCategory(name);
-        List<ItemInfoDTO> result;
-        result = entityToDTO(item);
-        return result;
+        return entityToDTO(item);
     }
 
     public ItemInfoDTO findByItembyID(Long itemID) {

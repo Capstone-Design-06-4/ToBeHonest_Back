@@ -78,22 +78,29 @@ public class MemberService {
         if (member == null) {
             throw new NoMemberException("회원 정보를 찾을 수 없습니다");
         }
-        return memberRepository.findById(id);
+        return member;
     }
 
     public Member findByEmail(String email) {
 
-        return memberRepository.findByEmail(email);
-
+        Member member = memberRepository.findByEmail(email);
+        if (member == null) {
+            throw new NoMemberException("회원 정보를 찾을 수 없습니다");
+        }
+        return member;
     }
 
     public Member findByPhoneNumber(String phoneNumber) {
-        return memberRepository.findByPhoneNumber(phoneNumber);
+        Member member = memberRepository.findByPhoneNumber(phoneNumber);
+        if (member == null) {
+            throw new NoMemberException("회원 정보를 찾을 수 없습니다");
+        }
+        return member;
 
     }
 
     public MemberSearch memberSearchByEmail(String email) {
-        Member member = memberRepository.findByEmail(email);
+        Member member = this.findByEmail(email);
         return MemberSearch.builder()
                 .memberId(member.getId())
                 .profileImgURL(member.getProfileImg())
@@ -102,7 +109,7 @@ public class MemberService {
     }
 
     public MemberSearch memberSearchByPhoneNumber(String phoneNumber) {
-        Member member = memberRepository.findByPhoneNumber(phoneNumber);
+        Member member = this.findByPhoneNumber(phoneNumber);
         return MemberSearch.builder()
                 .memberId(member.getId())
                 .profileImgURL(member.getProfileImg())
@@ -112,6 +119,8 @@ public class MemberService {
 
     @Transactional
     public void joinMember(Member member) {
+
+
         memberRepository.join(member);
     }
 

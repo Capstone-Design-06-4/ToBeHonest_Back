@@ -138,10 +138,13 @@ public class NaverLoginService implements OAuthLoginService{
         }
 
         Member member = memberService.findByEmail(naverProfile.getResponse().getEmail());
+        if (member == null){
+            member = dtoToEntity(naverProfile);
+            memberService.joinMember(member);
+        }
 
-        member = dtoToEntity(naverProfile);
 
-        memberService.joinMember(member);
+
         return member.getEmail();
     }
 

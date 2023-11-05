@@ -6,12 +6,14 @@ import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.friendWIth.FriendProfileDTO;
 import Team4.TobeHonest.dto.friendWIth.FriendWithSpecifyName;
 import Team4.TobeHonest.exception.DuplicateFriendException;
+import Team4.TobeHonest.exception.NoMemberException;
 import Team4.TobeHonest.exception.NoSuchFriendException;
 import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.FriendRepository;
 import Team4.TobeHonest.repo.MemberRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Transactional(readOnly = true)
+@Slf4j
 public class FriendService {
 
     private final FriendRepository friendRepository;
@@ -44,16 +47,23 @@ public class FriendService {
     //오버로딩, 동작은 같음 ==> 테스트 코드 바꾸기 귀찮..
     @Transactional
     public FriendWith addFriendList(Member owner, Long friendId) {
+
         Member friend = memberRepository.findById(friendId);
+        if (friend == null){
+            throw new NoMemberException();
+        }
+
         //이미 존재하는 친구인 경우..
         if (!friendRepository.findFriend(owner, friend).isEmpty()){
             throw new DuplicateFriendException("이미 존재하는 친구입니다");
         }
+        log.info(friend.toString());
+
         //친구 등록
         FriendWith friendWith = owner.addFriend(friend);
         //db에 저장
         friendRepository.join(friendWith);
-
+        log.info(friend.toString());
         return friendWith;
     }
 

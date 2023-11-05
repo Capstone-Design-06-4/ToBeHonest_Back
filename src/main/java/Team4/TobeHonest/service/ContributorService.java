@@ -12,7 +12,6 @@ import Team4.TobeHonest.repo.WishItemRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -36,15 +35,15 @@ public class ContributorService {
         //내가 충전한 포인트 사용
         contributor.usePoints(money);
 
-        Contributor contribution = contributorRepository.findContributorsInWishItem(wishItemId, contributor);
+
 //        내가 이미 펀딩했다면 그냥 값만 더하기
         WishItem friendsWish = wishItemRepository.findWishItemById(wishItemId);
         if (friendsWish == null) {
             throw new NoWishItemException("해당 위시아이템이 존재하지 않습니다");
         }
+
+        Contributor contribution = contributorRepository.findContributorsInWishItem(wishItemId, contributor);
         if (contribution == null) {
-
-
             contribution = Contributor.builder()
                     .contributor(contributor)
                     .fundMoney(money)

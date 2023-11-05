@@ -5,6 +5,7 @@ import Team4.TobeHonest.domain.Message;
 import Team4.TobeHonest.domain.WishItem;
 import Team4.TobeHonest.dto.message.MessageResponseDTO;
 import Team4.TobeHonest.dto.message.SendMessageDTO;
+import Team4.TobeHonest.exception.NoMemberException;
 import Team4.TobeHonest.exception.NoWishItemException;
 import Team4.TobeHonest.repo.MemberRepository;
 import Team4.TobeHonest.repo.MessageRepository;
@@ -34,12 +35,19 @@ public class MessageService {
     @Transactional
     public void sendMessage(SendMessageDTO sendMessageDTO) {
         //통신을 너무 많이 하는 듯..
+
         Member receiver = memberRepository.findById(sendMessageDTO.getReceiverId());
         Member sender = memberRepository.findById(sendMessageDTO.getSenderId());
+        if (receiver == null || sender == null) {
+            throw new NoMemberException();
+        }
+
         WishItem wishItem = wishItemRepository.findWishItemById(sendMessageDTO.getWishItemId());
-        if (wishItem == null){
+
+        if (wishItem == null) {
             throw new NoWishItemException();
         }
+
         Message message = Message.builder()
                 .receiver(receiver)
                 .sender(sender)
@@ -61,7 +69,7 @@ public class MessageService {
 
     }
 
-    public List<MessageResponseDTO> messageWithFriend(Long memberId, Long friendId){
+    public List<MessageResponseDTO> messageWithFriend(Long memberId, Long friendId) {
         return messageRepository.msgWithMyFriend(memberId, friendId);
     }
 

@@ -52,7 +52,7 @@ public class MemberController {
 
     }
 
-    //   post로 수정..
+    //post로 수정..
     @GetMapping("/friends/add/{friendId}")
     public ResponseEntity<String> addFriend(@PathVariable Long friendId,
                                             @AuthenticationPrincipal UserDetails userDetails,
@@ -60,6 +60,7 @@ public class MemberController {
         String userEmail = userDetails.getUsername();
         Member member = (Member) request.getSession().getAttribute(userEmail);
         friendService.addFriendList(member, friendId);
+
         return ResponseEntity.status(HttpStatus.OK).body("friend added");
     }
 

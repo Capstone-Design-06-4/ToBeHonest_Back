@@ -66,7 +66,7 @@ public class OauthLoginController {
     }
 
     @GetMapping("/kakao-login")
-    public ResponseEntity<?> kakoLogin(@RequestParam String code, @RequestParam(required = false) String state,
+    public ResponseEntity<?> kakaoLogin(@RequestParam String code, @RequestParam(required = false) String state,
                                        HttpServletResponse response, HttpServletRequest request) throws JsonProcessingException, JsonProcessingException {
         String email = kakaoLoginService.login(code, state, response);
 
