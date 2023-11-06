@@ -1,13 +1,9 @@
 package Team4.TobeHonest.controller;
 
-import Team4.TobeHonest.domain.Member;
-import Team4.TobeHonest.service.MemberService;
-import Team4.TobeHonest.service.login.OauthLogin.GoogleLoginService;
 import Team4.TobeHonest.service.login.OauthLogin.KakaoLoginService;
 import Team4.TobeHonest.service.login.OauthLogin.NaverLoginService;
 import Team4.TobeHonest.utils.jwt.TokenInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +50,7 @@ public class OauthLoginController {
 
     @GetMapping("/naver-login")
     public ResponseEntity<?> naverLogin(@RequestParam String code, @RequestParam String state,
-                                        HttpServletResponse response) throws JsonProcessingException, JsonProcessingException {
+                                        HttpServletResponse response) throws JsonProcessingException {
         String email = naverService.login(code, state, response);
         TokenInfo login = naverService.tokenInfo(email);
         return ResponseEntity.status(HttpStatus.OK).body(login);
@@ -63,7 +59,7 @@ public class OauthLoginController {
 
     @GetMapping("/kakao-login")
     public ResponseEntity<?> kakaoLogin(@RequestParam String code, @RequestParam(required = false) String state,
-                                       HttpServletResponse response) throws JsonProcessingException, JsonProcessingException {
+                                       HttpServletResponse response) throws JsonProcessingException {
         String email = kakaoLoginService.login(code, state, response);
 
         TokenInfo tokenInfo = kakaoLoginService.tokenInfo(email);
