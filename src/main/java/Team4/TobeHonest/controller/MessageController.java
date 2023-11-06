@@ -6,6 +6,7 @@ import Team4.TobeHonest.dto.message.MessageResponseDTO;
 import Team4.TobeHonest.dto.message.SendMessageDTO;
 import Team4.TobeHonest.dto.message.SendMessageWithNoIMG;
 import Team4.TobeHonest.exception.NoWishItemException;
+import Team4.TobeHonest.service.MemberService;
 import Team4.TobeHonest.service.MessageService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
@@ -27,15 +28,15 @@ import java.util.List;
 public class MessageController {
 
     private final MessageService messageService;
+    private final MemberService memberService;
 
     @PostMapping("/send")
     //@RequestBodt ==> only 1개 mapping  ==> @RequestPart로 나누기
     public ResponseEntity<String> sendMessage(@RequestPart SendMessageWithNoIMG sendMessageWithNoIMG,
                                               @RequestPart(required = false) List<MultipartFile> images,
-                                              @AuthenticationPrincipal UserDetails userDetails,
-                                              HttpServletRequest request) {
+                                              @AuthenticationPrincipal UserDetails userDetails) {
         String userEmail = userDetails.getUsername();
-        Member member = (Member) request.getSession().getAttribute(userEmail);
+        Member member = memberService.findByEmail(userEmail);
         SendMessageDTO sendMessage = SendMessageDTO.builder()
                 .senderId(sendMessageWithNoIMG.getSenderId())
                 .receiverId(sendMessageWithNoIMG.getReceiverId())
@@ -57,10 +58,9 @@ public class MessageController {
     //친구랑 주고 받은 메시지를 return 해주는 controller
     @GetMapping("/find/{friendId}")
     public List<MessageResponseDTO> findMessageWithFriend(@AuthenticationPrincipal UserDetails userDetails,
-                                                          @PathVariable Long friendId,
-                                                          HttpServletRequest request){
+                                                          @PathVariable Long friendId){
         String userEmail = userDetails.getUsername();
-        Member member = (Member) request.getSession().getAttribute(userEmail);
+        Member member = memberService.findByEmail(userEmail);
 
         return messageService.messageWithFriend(member.getId(), friendId);
 

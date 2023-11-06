@@ -6,6 +6,7 @@ import Team4.TobeHonest.dto.wishitem.WishItemResponseDTO;
 import Team4.TobeHonest.exception.NoPointsException;
 import Team4.TobeHonest.exception.NoWishItemException;
 import Team4.TobeHonest.service.ContributorService;
+import Team4.TobeHonest.service.MemberService;
 import Team4.TobeHonest.service.WishItemService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
@@ -26,19 +27,17 @@ import java.net.URI;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Slf4j
 public class ContributorController {
-
+    private final MemberService memberService;
     private final ContributorService contributorService;
 
 
     @PostMapping("{wishItemId}")
     public ResponseEntity<String> contributing(@PathVariable Long wishItemId,
                                             @RequestBody Integer fundAmount,
-                                            @AuthenticationPrincipal UserDetails userDetails,
-
-    HttpServletRequest request) {
+                                            @AuthenticationPrincipal UserDetails userDetails) {
 
         String userEmail = userDetails.getUsername();
-        Member member = (Member) request.getSession().getAttribute(userEmail);
+        Member member = memberService.findByEmail(userEmail);
         contributorService.contributing(member, wishItemId, fundAmount);
         return ResponseEntity.ok(fundAmount + "원 펀딩 완료!");
 

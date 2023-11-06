@@ -40,14 +40,16 @@ public class MemberController {
 
     @GetMapping("/friends")
     //로그인은 인터셉터에서 처리 해 준다고 생각..
-    public List<FriendWithSpecifyName> findAllFriends(@AuthenticationPrincipal UserDetails userDetails, HttpServletRequest request) {
+    public List<FriendWithSpecifyName> findAllFriends(@AuthenticationPrincipal UserDetails userDetails) {
         /*Authentication 객체가 SecurityContext에 저장됩니다.
             그리고 이 SecurityContext는 HttpSession에 SPRING_SECURITY_CONTEXT라는 키로 저장*/
 
         //수정해야함 ==> member 엔티티가 controller에 노출되는것을 해결해보자
 
         String userEmail = userDetails.getUsername();
-        Member member = (Member) request.getSession().getAttribute(userEmail);
+        Member member = memberService.findByEmail(userEmail);
+
+
         return friendService.findAllFriendsProfile(member);
 
     }
@@ -55,10 +57,9 @@ public class MemberController {
     //post로 수정..
     @GetMapping("/friends/add/{friendId}")
     public ResponseEntity<String> addFriend(@PathVariable Long friendId,
-                                            @AuthenticationPrincipal UserDetails userDetails,
-                                            HttpServletRequest request) {
+                                            @AuthenticationPrincipal UserDetails userDetails) {
         String userEmail = userDetails.getUsername();
-        Member member = (Member) request.getSession().getAttribute(userEmail);
+        Member member = memberService.findByEmail(userEmail);
         friendService.addFriendList(member, friendId);
 
         return ResponseEntity.status(HttpStatus.OK).body("friend added");
@@ -66,10 +67,10 @@ public class MemberController {
 
     @GetMapping("/friends/search/{startsWith}")
     public List<FriendWithSpecifyName> addFriend(@PathVariable String startsWith,
-                                                 @AuthenticationPrincipal UserDetails userDetails,
-                                                 HttpServletRequest request) {
+                                                 @AuthenticationPrincipal UserDetails userDetails) {
         String userEmail = userDetails.getUsername();
-        Member member = (Member) request.getSession().getAttribute(userEmail);
+        Member member = memberService.findByEmail(userEmail);
+
         //member argument 수정
         return friendService.searchFriendWithName(member, startsWith);
 
@@ -78,10 +79,10 @@ public class MemberController {
 
     @DeleteMapping("/friends/delete/{friendId}")
     public ResponseEntity<String> deleteFriend(@PathVariable Long friendId,
-                                               @AuthenticationPrincipal UserDetails userDetails,
-                                               HttpServletRequest request) {
+                                               @AuthenticationPrincipal UserDetails userDetails) {
         String userEmail = userDetails.getUsername();
-        Member member = (Member) request.getSession().getAttribute(userEmail);
+        Member member = memberService.findByEmail(userEmail);
+
         friendService.deleteFriend(member, friendId);
         return ResponseEntity.status(HttpStatus.OK).body("delete success!");
 
@@ -104,8 +105,7 @@ public class MemberController {
     @PostMapping("/points/add")
     @ResponseBody
     public void pointsAdd(@AuthenticationPrincipal UserDetails userDetails,
-                          @RequestBody Integer points,
-                          HttpServletRequest request) {
+                          @RequestBody Integer points) {
 
         String memberEmail = userDetails.getUsername();
         memberService.pointRecharge(memberEmail, points);
@@ -115,10 +115,9 @@ public class MemberController {
     @PostMapping("/points/use/{itemId}")
     @ResponseBody
     public ResponseEntity<String> pointsAdd(@AuthenticationPrincipal UserDetails userDetails,
-                          @PathVariable Long itemId,
-                          HttpServletRequest request) {
+                          @PathVariable Long itemId) {
         String userEmail = userDetails.getUsername();
-        Member member = (Member) request.getSession().getAttribute(userEmail);
+        Member member = memberService.findByEmail(userEmail);
         itemService.buyItem(member, itemId);
         return ResponseEntity.status(HttpStatus.OK).body("구매완료!");
 

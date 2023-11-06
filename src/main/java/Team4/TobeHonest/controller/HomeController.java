@@ -63,7 +63,7 @@ public class HomeController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
         String email = loginDTO.getEmail();
         String password = loginDTO.getPassword();
         TokenInfo login = loginService.login(email, password);

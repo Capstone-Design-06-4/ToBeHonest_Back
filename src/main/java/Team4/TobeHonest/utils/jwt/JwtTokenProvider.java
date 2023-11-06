@@ -49,7 +49,6 @@ public class JwtTokenProvider {
                 .setSubject(authentication.getName())
                 //별도로 authorities를 설정하지 않았음..
                 .claim("auth", authorities)
-                .claim("time", now.toString())
                 .setExpiration(accessTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();

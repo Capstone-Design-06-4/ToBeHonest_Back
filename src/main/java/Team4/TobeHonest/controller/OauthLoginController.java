@@ -29,9 +29,7 @@ import java.io.UnsupportedEncodingException;
 public class OauthLoginController {
 
     private final NaverLoginService naverService;
-    private final GoogleLoginService googleLoginService;
     private final KakaoLoginService kakaoLoginService;
-    private final MemberService memberService;
 
 
     /**
@@ -56,23 +54,19 @@ public class OauthLoginController {
 
     @GetMapping("/naver-login")
     public ResponseEntity<?> naverLogin(@RequestParam String code, @RequestParam String state,
-                                        HttpServletResponse response, HttpServletRequest request) throws JsonProcessingException, JsonProcessingException {
+                                        HttpServletResponse response) throws JsonProcessingException, JsonProcessingException {
         String email = naverService.login(code, state, response);
         TokenInfo login = naverService.tokenInfo(email);
-        Member member = memberService.findByEmail(email);
-        request.getSession().setAttribute(email, member);
         return ResponseEntity.status(HttpStatus.OK).body(login);
 
     }
 
     @GetMapping("/kakao-login")
     public ResponseEntity<?> kakaoLogin(@RequestParam String code, @RequestParam(required = false) String state,
-                                       HttpServletResponse response, HttpServletRequest request) throws JsonProcessingException, JsonProcessingException {
+                                       HttpServletResponse response) throws JsonProcessingException, JsonProcessingException {
         String email = kakaoLoginService.login(code, state, response);
 
         TokenInfo tokenInfo = kakaoLoginService.tokenInfo(email);
-        Member member = memberService.findByEmail(email);
-        request.getSession().setAttribute(email, member);
         return ResponseEntity.status(HttpStatus.OK).body(tokenInfo);
 
 

@@ -10,6 +10,7 @@ import Team4.TobeHonest.exception.DuplicateWishItemException;
 import Team4.TobeHonest.exception.ItemNotInWishlistException;
 import Team4.TobeHonest.service.ContributorService;
 import Team4.TobeHonest.service.ItemService;
+import Team4.TobeHonest.service.MemberService;
 import Team4.TobeHonest.service.WishItemService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
@@ -31,6 +32,7 @@ public class WishlistController {
     private final WishItemService wishItemService;
     private final ContributorService contributorService;
     private final ItemService itemService;
+    private final MemberService memberService;
 
     //    위시리스트 정보들(사진, progress정도.. 추가 정보필요하면 FrirstWishItem수정하기)
     //모든 위시리스트 타입 상관없이 달라하기..
@@ -60,14 +62,14 @@ public class WishlistController {
 
     @GetMapping("/details/{memberId}/{wishItemId}")
     public WishItemResponseDTO seeWishItemDetail(@PathVariable Long memberId, @PathVariable Long wishItemId,
-                                                 @AuthenticationPrincipal UserDetails userDetails,
-                                                 HttpServletRequest request) {
+                                                 @AuthenticationPrincipal UserDetails userDetails) {
 
         WishItemResponseDTO response = new WishItemResponseDTO();
         List<WishItemDetail> wishItemDetail = wishItemService.findWishItemDetail(wishItemId);
         response.setWishItemDetail(wishItemDetail);
         String userEmail = userDetails.getUsername();
-        Member member = (Member) request.getSession().getAttribute(userEmail);
+
+        Member member = memberService.findByEmail(userEmail);
 
 //        만약 로그인한 멤버라면... 추가정보도 제공
         List<ContributorDTO> contributor;
@@ -81,10 +83,10 @@ public class WishlistController {
 
     @GetMapping("/add/{itemId}")
     public ResponseEntity<String> addWishItem(@PathVariable Long itemId,
-                                              @AuthenticationPrincipal UserDetails userDetails,
-                                              HttpServletRequest request) {
+                                              @AuthenticationPrincipal UserDetails userDetails) {
         String userEmail = userDetails.getUsername();
-        Member member = (Member) request.getSession().getAttribute(userEmail);
+        Member member = memberService.findByEmail(userEmail);
+
 
         ItemInfoDTO byItemID = itemService.findByItembyID(itemId);
         wishItemService.addWishList(member, byItemID);
@@ -93,10 +95,10 @@ public class WishlistController {
 
     @GetMapping("/delete/{itemId}")
     public ResponseEntity<String> deleteWishItem(@PathVariable Long itemId,
-                                                 @AuthenticationPrincipal UserDetails userDetails,
-                                                 HttpServletRequest request) {
+                                                 @AuthenticationPrincipal UserDetails userDetails) {
         String userEmail = userDetails.getUsername();
-        Member member = (Member) request.getSession().getAttribute(userEmail);
+        Member member = memberService.findByEmail(userEmail);
+
 
         ItemInfoDTO itemInfoDTO = itemService.findByItembyID(itemId);
         wishItemService.deleteWishListByItemId((Member) userDetails, itemInfoDTO.getId());
