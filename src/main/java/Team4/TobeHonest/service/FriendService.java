@@ -95,6 +95,11 @@ public class FriendService {
         return friendRepository.searchFriendsWithName(member, startsWith);
     }
 
+    public List<Long> searchFriendWithNameOnlyFriendIdReturn(Member member, String startsWith){
+        return friendRepository.searchFriendsWithNameOnlyFriendId(member, startsWith);
+    }
+
+
     public void deleteFriend(Member member, Long friendId){
         List<FriendWith> friend = friendRepository.findFriend(member, friendId);
         if (friend.isEmpty()){

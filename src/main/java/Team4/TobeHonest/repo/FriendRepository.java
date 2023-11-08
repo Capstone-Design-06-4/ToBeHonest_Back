@@ -67,7 +67,19 @@ public class FriendRepository {
                         friend.profileImg))
                 .from(friendWith)
                 .innerJoin(friendWith.friend, friend)
-                .where(friendWith.specifiedName.like(startsWith + "%")
+                .where(friendWith.specifiedName.like("%" + startsWith + "%")
+                        .and(friendWith.owner.eq(member))).fetch();
+    }
+
+
+
+    public List<Long> searchFriendsWithNameOnlyFriendId(Member member, String startsWith) {
+
+        return jqf.
+                select(friend.id)
+                .from(friendWith)
+                .innerJoin(friendWith.friend, friend)
+                .where(friendWith.specifiedName.like("%" + startsWith + "%")
                         .and(friendWith.owner.eq(member))).fetch();
     }
 

@@ -66,7 +66,7 @@ public class MemberController {
     }
 
     @GetMapping("/friends/search/{startsWith}")
-    public List<FriendWithSpecifyName> addFriend(@PathVariable String startsWith,
+    public List<FriendWithSpecifyName> searchFriends(@PathVariable String startsWith,
                                                  @AuthenticationPrincipal UserDetails userDetails) {
         String userEmail = userDetails.getUsername();
         Member member = memberService.findByEmail(userEmail);
@@ -75,6 +75,20 @@ public class MemberController {
         return friendService.searchFriendWithName(member, startsWith);
 
     }
+
+    @GetMapping("/friends/searchId/{startsWith}")
+    public List<Long> searchFriendIds(@PathVariable String startsWith,
+                                                 @AuthenticationPrincipal UserDetails userDetails) {
+        String userEmail = userDetails.getUsername();
+        Member member = memberService.findByEmail(userEmail);
+
+        //member argument 수정
+        return friendService.searchFriendWithNameOnlyFriendIdReturn(member, startsWith);
+
+    }
+
+
+
 
 
     @DeleteMapping("/friends/delete/{friendId}")
