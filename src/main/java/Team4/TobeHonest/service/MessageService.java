@@ -33,7 +33,7 @@ public class MessageService {
 
     //message 전송하기..
     @Transactional
-    public void sendMessage(SendMessageDTO sendMessageDTO) {
+    public Message sendMessage(SendMessageDTO sendMessageDTO) {
         //통신을 너무 많이 하는 듯..
 
         Member receiver = memberRepository.findById(sendMessageDTO.getReceiverId());
@@ -62,10 +62,7 @@ public class MessageService {
         //메시지 레포에 저장?
         messageRepository.join(message);
         //이미지 저장
-        for (MultipartFile image : sendMessageDTO.getImages()) {
-            String url = imageRepository.saveImg(image, message.getId());
-            message.addImage(url);
-        }
+        return message;
 
     }
 

@@ -39,7 +39,7 @@ public class Member implements UserDetails {
 
     private Integer points = 0;
     //프사 추가해야함
-    private String profileImg = "profile/default.jpeg";
+    private String profileImg = "https://tobehonest.s3.ap-northeast-2.amazonaws.com/default.jpeg";
 
     public void changeProfileImg(String profileImg) {
         this.profileImg = profileImg;

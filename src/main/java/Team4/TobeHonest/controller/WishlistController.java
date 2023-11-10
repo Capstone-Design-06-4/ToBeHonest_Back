@@ -81,7 +81,7 @@ public class WishlistController {
         return response;
     }
 
-    @GetMapping("/add/{itemId}")
+    @PostMapping("/add/{itemId}")
     public ResponseEntity<String> addWishItem(@PathVariable Long itemId,
                                               @AuthenticationPrincipal UserDetails userDetails) {
         String userEmail = userDetails.getUsername();

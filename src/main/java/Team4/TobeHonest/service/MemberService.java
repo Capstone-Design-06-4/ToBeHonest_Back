@@ -6,8 +6,11 @@ import Team4.TobeHonest.dto.signup.JoinDTO;
 import Team4.TobeHonest.exception.DuplicateMemberException;
 import Team4.TobeHonest.exception.NoMemberException;
 import Team4.TobeHonest.repo.MemberRepository;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,7 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Service
@@ -26,7 +33,9 @@ import java.util.List;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final AmazonS3Client amazonS3Client;
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
     @Transactional
     public void join(JoinDTO joinDTO) {
 //      회원가입 중복 check
@@ -150,6 +159,20 @@ public class MemberService {
         return member.getPoints();
     }
 
+
+    @Transactional
+    public String changeProfileImg(MultipartFile file, Member member) throws IOException {
+        String fileName = "profile/" + member.getId();
+        ObjectMetadata metadata= new ObjectMetadata();
+        metadata.setContentType(file.getContentType());
+        metadata.setContentLength(file.getSize());
+        amazonS3Client.putObject(bucket, fileName, file.getInputStream(), metadata);
+
+        String encodedReturnURL = "https://" + bucket + ".s3.amazonaws.com/" + fileName;
+        member.changeProfileImg(encodedReturnURL);
+        return encodedReturnURL;
+
+    }
 
 
 

@@ -8,6 +8,7 @@ import Team4.TobeHonest.exception.DuplicateFriendException;
 import Team4.TobeHonest.exception.NoMemberException;
 import Team4.TobeHonest.exception.NoSuchFriendException;
 import Team4.TobeHonest.service.FriendService;
+import Team4.TobeHonest.service.ImageService;
 import Team4.TobeHonest.service.ItemService;
 import Team4.TobeHonest.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +21,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -132,5 +135,15 @@ public class MemberController {
 
     }
 
+
+    @PostMapping("/changeProfileImg")
+    public ResponseEntity<?> changeProfileImg(@RequestParam MultipartFile file,
+                                              @AuthenticationPrincipal UserDetails userDetails) throws IOException {
+
+        String userEmail = userDetails.getUsername();
+        Member member = memberService.findByEmail(userEmail);
+        String returnURL = memberService.changeProfileImg(file, member);
+        return ResponseEntity.status(HttpStatus.OK).body(returnURL);
+    }
 
 }
