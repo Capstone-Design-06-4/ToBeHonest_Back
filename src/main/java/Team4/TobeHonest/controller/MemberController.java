@@ -32,11 +32,6 @@ public class MemberController {
     private final MemberService memberService;
     private final FriendService friendService;
     private final ItemService itemService;
-    @GetMapping("{memberId}")
-    @ResponseBody
-    public String memberInformation(@PathVariable Long memberId) {
-        return "" + memberId;
-    }
 
     @GetMapping("/friends")
     //로그인은 인터셉터에서 처리 해 준다고 생각..
@@ -55,7 +50,7 @@ public class MemberController {
     }
 
     //post로 수정..
-    @GetMapping("/friends/add/{friendId}")
+    @PostMapping("/friends/add/{friendId}")
     public ResponseEntity<String> addFriend(@PathVariable Long friendId,
                                             @AuthenticationPrincipal UserDetails userDetails) {
         String userEmail = userDetails.getUsername();
@@ -128,7 +123,7 @@ public class MemberController {
 
     @PostMapping("/points/use/{itemId}")
     @ResponseBody
-    public ResponseEntity<String> pointsAdd(@AuthenticationPrincipal UserDetails userDetails,
+    public ResponseEntity<String> pointsUse(@AuthenticationPrincipal UserDetails userDetails,
                           @PathVariable Long itemId) {
         String userEmail = userDetails.getUsername();
         Member member = memberService.findByEmail(userEmail);

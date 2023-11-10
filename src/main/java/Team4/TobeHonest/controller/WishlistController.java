@@ -93,7 +93,7 @@ public class WishlistController {
         return ResponseEntity.status(HttpStatus.OK).body("위시아이템" + byItemID.getName() + " 추가완료");
     }
 
-    @GetMapping("/delete/{itemId}")
+    @DeleteMapping("/delete/{itemId}")
     public ResponseEntity<String> deleteWishItem(@PathVariable Long itemId,
                                                  @AuthenticationPrincipal UserDetails userDetails) {
         String userEmail = userDetails.getUsername();

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.net.URI;
+import java.security.SignatureException;
 
 @Slf4j
 @ControllerAdvice
@@ -92,6 +93,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
+
+    @ExceptionHandler(SignatureException.class)
+    public ResponseEntity<String> handleNotValidTokenException(SignatureException e) {
+        log.info("로그인하쇼: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+
+S
 
 }
 

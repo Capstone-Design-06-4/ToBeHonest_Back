@@ -33,12 +33,6 @@ public class HomeController {
     private final MemberService memberService;
     private final AuthService loginService;
 
-    @GetMapping("/signup")
-
-    public String singUpForm(@AuthenticationPrincipal UserDetails user) {
-        return "회원가입 폼 주세요";
-    }
-
     @PostMapping("/signup")
     public ResponseEntity<String> join(@Valid @RequestBody JoinDTO joinDTO, BindingResult bindingResult) {
         //field 관련 에러 확인
@@ -51,16 +45,6 @@ public class HomeController {
         return ResponseEntity.ok("signUp Finished!");
     }
 
-
-    @GetMapping("/findEmail")
-    public String findEmailForm() {
-        return "ID찾는 폼주세요";
-    }
-
-    @GetMapping("/login")
-    public String loginGet() {
-        return "로그인하쇼";
-    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
@@ -84,13 +68,6 @@ public class HomeController {
     }
 
 
-    /**
-     * 프론트에 Redirect URI를 제공하기 위한 메소드
-     * 프론트에서 네이버 인증 센터로 요청을 주기위한 URI를 제공하며, 이를통해 인증코드를 받아 자체 서비스 callback API 호출시 전달
-     *
-     * @return redirect URI
-     * @throws UnsupportedEncodingException
-     */
 
 
 }

@@ -99,7 +99,7 @@ public class FriendService {
         return friendRepository.searchFriendsWithNameOnlyFriendId(member, startsWith);
     }
 
-
+    @Transactional
     public void deleteFriend(Member member, Long friendId){
         List<FriendWith> friend = friendRepository.findFriend(member, friendId);
         if (friend.isEmpty()){
