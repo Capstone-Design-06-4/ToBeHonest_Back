@@ -7,6 +7,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class ItemRepository {
     private final QItem i = new QItem("i");
     private final QCategory c = new QCategory("c");
 
+    @Transactional
     public void join(Item item) {
         em.persist(item);
     }
