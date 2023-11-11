@@ -57,6 +57,9 @@ dependencies {
 	//amazon s3
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
+	//이미지 파일들
+	implementation 'commons-io:commons-io:2.6'
+
 }
 
 tasks.named('test') {

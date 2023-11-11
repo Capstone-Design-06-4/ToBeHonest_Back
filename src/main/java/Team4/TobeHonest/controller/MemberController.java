@@ -1,9 +1,11 @@
 package Team4.TobeHonest.controller;
 
 
+import Team4.TobeHonest.domain.FriendWith;
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.friendWIth.FriendWithSpecifyName;
 import Team4.TobeHonest.dto.member.MemberSearch;
+import Team4.TobeHonest.enumer.FriendStatus;
 import Team4.TobeHonest.exception.DuplicateFriendException;
 import Team4.TobeHonest.exception.NoMemberException;
 import Team4.TobeHonest.exception.NoSuchFriendException;
@@ -54,13 +56,13 @@ public class MemberController {
 
     //post로 수정..
     @PostMapping("/friends/add/{friendId}")
-    public ResponseEntity<String> addFriend(@PathVariable Long friendId,
+    public ResponseEntity<?> addFriend(@PathVariable Long friendId,
                                             @AuthenticationPrincipal UserDetails userDetails) {
         String userEmail = userDetails.getUsername();
         Member member = memberService.findByEmail(userEmail);
-        friendService.addFriendList(member, friendId);
+        FriendWithSpecifyName friendWithSpecifyName = friendService.addFriendList(member, friendId);
 
-        return ResponseEntity.status(HttpStatus.OK).body("friend added");
+        return ResponseEntity.status(HttpStatus.OK).body(friendWithSpecifyName);
     }
 
     @GetMapping("/friends/search/{startsWith}")
@@ -110,8 +112,18 @@ public class MemberController {
 
     @GetMapping("/search/email/{email}")
     @ResponseBody
-    public MemberSearch findMemberByEmail(@PathVariable String email) {
-        return memberService.memberSearchByEmail(email);
+    public MemberSearch findMemberByEmail( @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable String email) {
+
+        String memberEmail = userDetails.getUsername();
+        FriendStatus friendStatus = findFriendStatus( email, memberEmail);
+        if (friendStatus == FriendStatus.EMPTY)
+        {
+            return MemberSearch.builder().friendStatus(friendStatus).build();
+        }
+        MemberSearch memberSearch = memberService.memberSearchByEmail(email);
+        memberSearch.setFriendStatus(friendStatus);
+        return memberSearch;
     }
 
     @PostMapping("/points/add")
@@ -144,6 +156,20 @@ public class MemberController {
         Member member = memberService.findByEmail(userEmail);
         String returnURL = memberService.changeProfileImg(file, member);
         return ResponseEntity.status(HttpStatus.OK).body(returnURL);
+    }
+
+    private FriendStatus findFriendStatus(String searchEmail, String loginEmail){
+        Member member = memberService.findByEmailWithNoException(searchEmail);
+        Member loginMember = memberService.findByEmail(loginEmail);
+        if (member == null){
+            return FriendStatus.EMPTY;
+        }
+        else if (member == loginMember){
+            return FriendStatus.ME;
+        } else if (friendService.isFriend(loginMember, member)) {
+            return FriendStatus.FRIEND;
+        }
+        return FriendStatus.NOT_FRIEND;
     }
 
 }
