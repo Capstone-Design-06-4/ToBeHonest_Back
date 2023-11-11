@@ -2,7 +2,6 @@ package Team4.TobeHonest.repo;
 
 
 import Team4.TobeHonest.domain.*;
-import Team4.TobeHonest.dto.friendWIth.FriendProfileDTO;
 import Team4.TobeHonest.dto.friendWIth.FriendWithSpecifyName;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -68,6 +67,18 @@ public class FriendRepository {
                 .from(friendWith)
                 .innerJoin(friendWith.friend, friend)
                 .where(friendWith.specifiedName.like("%" + startsWith + "%")
+                        .and(friendWith.owner.eq(member))).fetch();
+    }
+
+    public List<FriendWithSpecifyName> searchFriendsWithEmail(Member member, String friendEmail) {
+
+        return jqf.
+                select(Projections.constructor(FriendWithSpecifyName.class,
+                        friend.id, friendWith.id, friendWith.specifiedName, friend.birthDate,
+                        friend.profileImg))
+                .from(friendWith)
+                .innerJoin(friendWith.friend, friend)
+                .where(friendWith.friend.email.eq(friendEmail)
                         .and(friendWith.owner.eq(member))).fetch();
     }
 

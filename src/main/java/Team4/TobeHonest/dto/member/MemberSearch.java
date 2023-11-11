@@ -1,5 +1,6 @@
 package Team4.TobeHonest.dto.member;
 
+import Team4.TobeHonest.enumer.FriendStatus;
 import lombok.*;
 
 @Getter
@@ -11,5 +12,6 @@ public class MemberSearch {
     Long memberId;
     String memberName;
     String profileImgURL;
+    FriendStatus friendStatus;
 
 }

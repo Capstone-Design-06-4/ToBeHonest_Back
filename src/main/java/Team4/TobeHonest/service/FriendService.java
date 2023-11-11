@@ -3,7 +3,6 @@ package Team4.TobeHonest.service;
 
 import Team4.TobeHonest.domain.FriendWith;
 import Team4.TobeHonest.domain.Member;
-import Team4.TobeHonest.dto.friendWIth.FriendProfileDTO;
 import Team4.TobeHonest.dto.friendWIth.FriendWithSpecifyName;
 import Team4.TobeHonest.exception.DuplicateFriendException;
 import Team4.TobeHonest.exception.NoMemberException;
@@ -46,7 +45,7 @@ public class FriendService {
     }
     //오버로딩, 동작은 같음 ==> 테스트 코드 바꾸기 귀찮..
     @Transactional
-    public FriendWith addFriendList(Member owner, Long friendId) {
+    public FriendWithSpecifyName addFriendList(Member owner, Long friendId) {
 
         Member friend = memberRepository.findById(friendId);
         if (friend == null){
@@ -57,14 +56,17 @@ public class FriendService {
         if (!friendRepository.findFriend(owner, friend).isEmpty()){
             throw new DuplicateFriendException("이미 존재하는 친구입니다");
         }
-        log.info(friend.toString());
 
         //친구 등록
         FriendWith friendWith = owner.addFriend(friend);
+
         //db에 저장
         friendRepository.join(friendWith);
-        log.info(friend.toString());
-        return friendWith;
+        FriendWithSpecifyName friendWithSpecifyName = this.searchFriendWithName(owner, friend.getEmail()).get(0);
+        friendWithSpecifyName.setMyGive(false);
+        friendWithSpecifyName.setMyTake(false);
+
+        return friendWithSpecifyName;
     }
 
 
@@ -91,13 +93,16 @@ public class FriendService {
         return result;
     }
 
-    public List<FriendWithSpecifyName> searchFriendWithName(Member member, String startsWith){
-        return friendRepository.searchFriendsWithName(member, startsWith);
+    public List<FriendWithSpecifyName> searchFriendWithName(Member member, String friendEmail){
+        return friendRepository.searchFriendsWithEmail(member, friendEmail);
     }
 
     public List<Long> searchFriendWithNameOnlyFriendIdReturn(Member member, String startsWith){
         return friendRepository.searchFriendsWithNameOnlyFriendId(member, startsWith);
     }
+
+
+
 
     @Transactional
     public void deleteFriend(Member member, Long friendId){
@@ -108,7 +113,9 @@ public class FriendService {
         friendRepository.delete(friend.get(0));
     }
 
-
+    public boolean isFriend(Member owner, Member friend){
+        return !friendRepository.findFriend(owner, friend).isEmpty();
+    }
 
 
 

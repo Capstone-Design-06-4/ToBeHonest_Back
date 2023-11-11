@@ -3,8 +3,10 @@ package Team4.TobeHonest.service;
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.member.MemberSearch;
 import Team4.TobeHonest.dto.signup.JoinDTO;
+import Team4.TobeHonest.enumer.FriendStatus;
 import Team4.TobeHonest.exception.DuplicateMemberException;
 import Team4.TobeHonest.exception.NoMemberException;
+import Team4.TobeHonest.repo.FriendRepository;
 import Team4.TobeHonest.repo.MemberRepository;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -36,6 +38,7 @@ public class MemberService {
     private final AmazonS3Client amazonS3Client;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
+
     @Transactional
     public void join(JoinDTO joinDTO) {
 //      회원가입 중복 check
@@ -99,6 +102,14 @@ public class MemberService {
         return member;
     }
 
+    public Member findByEmailWithNoException(String email) {
+
+        Member member = memberRepository.findByEmail(email);
+        return member;
+    }
+
+
+
     public Member findByPhoneNumber(String phoneNumber) {
         Member member = memberRepository.findByPhoneNumber(phoneNumber);
         if (member == null) {
@@ -110,6 +121,7 @@ public class MemberService {
 
     public MemberSearch memberSearchByEmail(String email) {
         Member member = this.findByEmail(email);
+
         return MemberSearch.builder()
                 .memberId(member.getId())
                 .profileImgURL(member.getProfileImg())
