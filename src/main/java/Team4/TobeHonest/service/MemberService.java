@@ -1,20 +1,32 @@
 package Team4.TobeHonest.service;
 
 import Team4.TobeHonest.domain.Member;
+import Team4.TobeHonest.dto.member.MemberSearch;
 import Team4.TobeHonest.dto.signup.JoinDTO;
+import Team4.TobeHonest.enumer.FriendStatus;
 import Team4.TobeHonest.exception.DuplicateMemberException;
+import Team4.TobeHonest.exception.NoMemberException;
+import Team4.TobeHonest.repo.FriendRepository;
 import Team4.TobeHonest.repo.MemberRepository;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Service
@@ -23,6 +35,10 @@ import java.util.List;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AmazonS3Client amazonS3Client;
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
+
     @Transactional
     public void join(JoinDTO joinDTO) {
 //      회원가입 중복 check
@@ -68,18 +84,108 @@ public class MemberService {
     }
 
     public Member findByID(Long id) {
-        return memberRepository.findById(id);
+
+
+        Member member = memberRepository.findById(id);
+        if (member == null) {
+            throw new NoMemberException("회원 정보를 찾을 수 없습니다");
+        }
+        return member;
     }
 
     public Member findByEmail(String email) {
-        return memberRepository.findByEmail(email);
 
+        Member member = memberRepository.findByEmail(email);
+        if (member == null) {
+            throw new NoMemberException("회원 정보를 찾을 수 없습니다");
+        }
+        return member;
     }
+
+    public Member findByEmailWithNoException(String email) {
+
+        Member member = memberRepository.findByEmail(email);
+        return member;
+    }
+
+
 
     public Member findByPhoneNumber(String phoneNumber) {
-        return memberRepository.findByPhoneNumber(phoneNumber);
+        Member member = memberRepository.findByPhoneNumber(phoneNumber);
+        if (member == null) {
+            throw new NoMemberException("회원 정보를 찾을 수 없습니다");
+        }
+        return member;
 
     }
+
+    public MemberSearch memberSearchByEmail(String email) {
+        Member member = this.findByEmail(email);
+
+        return MemberSearch.builder()
+                .memberId(member.getId())
+                .profileImgURL(member.getProfileImg())
+                .memberName(member.getName()).build();
+
+    }
+
+    public MemberSearch memberSearchByPhoneNumber(String phoneNumber) {
+        Member member = this.findByPhoneNumber(phoneNumber);
+        return MemberSearch.builder()
+                .memberId(member.getId())
+                .profileImgURL(member.getProfileImg())
+                .memberName(member.getName()).build();
+
+    }
+
+    @Transactional
+    public void joinMember(Member member) {
+
+
+        memberRepository.join(member);
+    }
+
+
+    //돈 충전은 최고 높은 트랜잭션 격리수준 적용..
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public Integer pointRecharge(String memberEmail, Integer money) {
+
+        Member member = memberRepository.findByEmail(memberEmail);
+
+        if (member == null){
+            throw new NoMemberException(memberEmail + " not Found");
+        }
+        member.addPoints(money);
+        return member.getPoints();
+    }
+    //돈 충전은 최고 높은 트랜잭션 격리수준 적용..
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public Integer usePoints(String memberEmail, Integer money) {
+
+        Member member = memberRepository.findByEmail(memberEmail);
+
+        if (member == null){
+            throw new NoMemberException(memberEmail + " not Found");
+        }
+        member.usePoints(money);
+        return member.getPoints();
+    }
+
+
+    @Transactional
+    public String changeProfileImg(MultipartFile file, Member member) throws IOException {
+        String fileName = "profile/" + member.getId();
+        ObjectMetadata metadata= new ObjectMetadata();
+        metadata.setContentType(file.getContentType());
+        metadata.setContentLength(file.getSize());
+        amazonS3Client.putObject(bucket, fileName, file.getInputStream(), metadata);
+
+        String encodedReturnURL = "https://" + bucket + ".s3.amazonaws.com/" + fileName;
+        member.changeProfileImg(encodedReturnURL);
+        return encodedReturnURL;
+
+    }
+
 
 
 }

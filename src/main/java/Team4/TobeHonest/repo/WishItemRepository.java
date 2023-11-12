@@ -3,6 +3,7 @@ package Team4.TobeHonest.repo;
 import Team4.TobeHonest.domain.*;
 import Team4.TobeHonest.dto.wishitem.FirstWishItem;
 import Team4.TobeHonest.dto.wishitem.WishItemDetail;
+import Team4.TobeHonest.enumer.GiftStatus;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -26,6 +27,10 @@ public class WishItemRepository {
 
     public void join(WishItem wishItem) {
         em.persist(wishItem);
+    }
+
+    public WishItem findWishItemById(Long id) {
+        return em.find(WishItem.class, id);
     }
 
     public void deleteWishItem(WishItem wishItem) {
@@ -59,6 +64,19 @@ public class WishItemRepository {
     }
 
 
+    public WishItem findWishItemByItemId(Member member, Long id) {
+        List<WishItem> result = jqf.select(wishItem)
+                .from(wishItem)
+                .innerJoin(wishItem.item, this.item).innerJoin(wishItem.member, this.member)
+                .where(wishItem.member.eq(member).and(this.item.id.eq(id)))
+                .fetch();
+        if (result.isEmpty()) {
+            return null;
+        }
+        return result.get(0);
+    }
+
+
     public WishItem findWishItemByEmailAndItemName(String email, String itemName){
         List<WishItem> result = jqf.select(wishItem)
                 .from(wishItem)
@@ -70,6 +88,7 @@ public class WishItemRepository {
         }
         return result.get(0);
     }
+
 
     public WishItem findWishItemByIdAndItemName(Long friendId, String itemName){
         List<WishItem> result = jqf.select(wishItem)
@@ -92,20 +111,13 @@ public class WishItemRepository {
     }
 
 
-    private Long friendId;
-    //    내가지정한 친구이름
-    private String friendName;
-    private Integer price;
-    private String itemName;
-    private String categoryName;
-    private String image;
 
 //    맨처음에 나오는 위시리스트 화면용
     public List<FirstWishItem> findFirstWishList(Member m){
 //      집계함수
         NumberExpression<Integer> sumFundMoney = contributor.fundMoney.sum();
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, sumFundMoney))
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.price, sumFundMoney))
                 .from(contributor)
                 .innerJoin(contributor.wishItem, wishItem)
                 .innerJoin(wishItem.item, item)
@@ -131,7 +143,58 @@ public class WishItemRepository {
                 .fetch();
     }
 
+    //미 완료된 선물 찾기
+    public List<FirstWishItem> findWishItemInProgress(Long memberId){
+        NumberExpression<Integer> sumFundMoney = contributor.fundMoney.sum();
+        //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.price, sumFundMoney))
+                .from(contributor)
+                .innerJoin(contributor.wishItem, wishItem)
+                .innerJoin(wishItem.item, item)
+                .innerJoin(wishItem.member, member)
+                .where(member.id.eq(memberId)
+                        .and(wishItem.giftStatus.eq(GiftStatus.IN_PROGRESS)))
+                .groupBy(wishItem.id)
+                .orderBy(sumFundMoney.desc())
+                .fetch();
 
+    }
+
+    //미 완료된 선물 찾기
+
+    public List<FirstWishItem> findWishItemCompleted(Long memberId){
+        NumberExpression<Integer> sumFundMoney = contributor.fundMoney.sum();
+        //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.price, sumFundMoney))
+                .from(contributor)
+                .innerJoin(contributor.wishItem, wishItem)
+                .innerJoin(wishItem.item, item)
+                .innerJoin(wishItem.member, member)
+                .where(member.id.eq(memberId)
+
+                        .and(wishItem.giftStatus.eq(GiftStatus.COMPLETED)))
+                .groupBy(wishItem.id)
+                .orderBy(sumFundMoney.desc())
+                .fetch();
+
+    }
+
+    //미 완료된 선물 찾기
+    public List<FirstWishItem> findWishItemUsed(Long memberId){
+        NumberExpression<Integer> sumFundMoney = contributor.fundMoney.sum();
+        //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.price, sumFundMoney))
+                .from(contributor)
+                .innerJoin(contributor.wishItem, wishItem)
+                .innerJoin(wishItem.item, item)
+                .innerJoin(wishItem.member, member)
+                .where(member.id.eq(memberId)
+                        .and(wishItem.giftStatus.eq(GiftStatus.USED)))
+                .groupBy(wishItem.id)
+                .orderBy(sumFundMoney.desc())
+                .fetch();
+
+    }
 
 
 

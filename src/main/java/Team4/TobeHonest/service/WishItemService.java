@@ -3,17 +3,24 @@ package Team4.TobeHonest.service;
 import Team4.TobeHonest.domain.Item;
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.domain.WishItem;
-import Team4.TobeHonest.dto.wishitem.FirstWishItem;
 import Team4.TobeHonest.dto.item.ItemInfoDTO;
+import Team4.TobeHonest.dto.wishitem.FirstWishItem;
 import Team4.TobeHonest.dto.wishitem.WishItemDetail;
+import Team4.TobeHonest.enumer.GiftStatus;
 import Team4.TobeHonest.exception.DuplicateWishItemException;
 import Team4.TobeHonest.exception.ItemNotInWishlistException;
+import Team4.TobeHonest.exception.NoPointsException;
+import Team4.TobeHonest.exception.NotValidWishItemException;
+import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.ItemRepository;
 import Team4.TobeHonest.repo.MemberRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
+import jakarta.persistence.LockModeType;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -27,10 +34,11 @@ public class WishItemService {
     private final WishItemRepository wishItemRepository;
     private final ItemRepository itemRepository;
     private final MemberRepository memberRepository;
+    private final ContributorRepository contributorRepository;
 
     @Transactional
     public void addWishList(Member member, ItemInfoDTO itemInfoDTO) {
-        WishItem wishItem = wishItemRepository.findWishItemByItemName(member, itemInfoDTO.getName());
+        WishItem wishItem = wishItemRepository.findWishItemByItemId(member, itemInfoDTO.getId());
         if (wishItem != null) {
             throw new DuplicateWishItemException("이미 위시리스트에 존재하는 아이템입니다!");
         }
@@ -40,10 +48,11 @@ public class WishItemService {
                 .money(item.getPrice())
                 .member(member).build();
         wishItemRepository.join(wishItem);
+
     }
 
     @Transactional
-    public void deleteWishList(Member member, String itemName) {
+    public void deleteWishListByItemName(Member member, String itemName) {
         WishItem wishItem =
                 wishItemRepository.findWishItemByItemName(member, itemName);
         if (wishItem == null) {
@@ -52,14 +61,58 @@ public class WishItemService {
         wishItemRepository.deleteWishItem(wishItem);
     }
 
+    @Transactional
+    public void deleteWishListByItemId(Member member, Long itemId) {
+        WishItem wishItem =
+                wishItemRepository.findWishItemByItemId(member, itemId);
+        if (wishItem == null) {
+            throw new ItemNotInWishlistException("해당 아이템은 위시리스트에 존재하지 않습니다.");
+        }
+        wishItemRepository.deleteWishItem(wishItem);
+    }
 
-    public List<FirstWishItem> findWishList(Long memberId){
+
+    public List<FirstWishItem> findAllWishList(Long memberId) {
         Member member = memberRepository.findById(memberId);
         return wishItemRepository.findFirstWishList(member);
     }
 
-    public List<WishItemDetail> findWishItemDetail(Long wishItemId){
+    public List<FirstWishItem> findWishListInProgress(Long memberId) {
+        return wishItemRepository.findWishItemInProgress(memberId);
+
+    }
+
+
+    public List<FirstWishItem> findWishListCompleted(Long memberId) {
+        return wishItemRepository.findWishItemCompleted(memberId);
+
+    }
+
+    public List<FirstWishItem> findWishListUsed(Long memberId) {
+        return wishItemRepository.findWishItemUsed(memberId);
+    }
+
+
+    public List<WishItemDetail> findWishItemDetail(Long wishItemId) {
         return wishItemRepository.findWishItemDetail(wishItemId);
     }
 
+
+    //wishItem사용하기
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public Integer useWishItem(String memberEmail,  Long wishItemId) {
+        WishItem wishItem = wishItemRepository.findWishItemById(wishItemId);
+        if (!wishItem.getMember().getEmail().equals(memberEmail)){
+            throw new NotValidWishItemException();
+        }
+        Integer fundedAmount = contributorRepository.findFundedAmount(wishItem);
+        Member member = wishItem.getMember();
+        Integer itemPrice = wishItem.getItem().getPrice();
+        if (itemPrice > fundedAmount){
+            throw new NoPointsException();
+        }
+        wishItem.getMember().addPoints(fundedAmount);
+        wishItem.changeGiftStatus(GiftStatus.USED);
+        return fundedAmount;
+    }
 }

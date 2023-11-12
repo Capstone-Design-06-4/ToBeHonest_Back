@@ -2,29 +2,24 @@ package Team4.TobeHonest.service;
 
 
 import Team4.TobeHonest.domain.*;
-import Team4.TobeHonest.dto.*;
 import Team4.TobeHonest.dto.contributor.ContributorDTO;
 import Team4.TobeHonest.dto.item.ItemInfoDTO;
-import Team4.TobeHonest.dto.signup.JoinDTO;
 import Team4.TobeHonest.dto.wishitem.FriendWishItemInfoDTO;
-import Team4.TobeHonest.repo.CategoryRepository;
+import Team4.TobeHonest.enumer.GiftStatus;
 import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.ItemRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
-import jakarta.persistence.EntityManager;
+import Team4.TobeHonest.setup.FriendJoinService;
+import Team4.TobeHonest.setup.NaverSearchService;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.Assertions;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -32,8 +27,7 @@ import java.util.List;
 @RunWith(SpringRunner.class)
 @Transactional
 public class ContributorServiceTest {
-    @Autowired
-    public CategoryRepository categoryRepository;
+
     @Autowired
     public ItemRepository itemRepository;
     public Member member;
@@ -52,60 +46,24 @@ public class ContributorServiceTest {
     @Autowired
     WishItemService wishItemService;
     @Autowired
-    EntityManager em;
+    NaverSearchService naverSearchService;
+    @Autowired
+    FriendJoinService friendJoinService;
     private List<Item> galaxy;
 
     @Before
     public void setUp() throws Exception {
-        String[] data = {"아이폰", "갤럭시S", "나이키", "아이패드", "에어팟", "갤럭시탭", "비스포크냉장고", "비스포크청소기"};
-        for (String datum : data) {
-            JSONObject rjson = new JSONObject(search(datum));
-            JSONArray items = rjson.getJSONArray("items");
-            categoryProcess(items);
-            for (int i = 0; i < items.length(); i++) {
-                JSONObject itemJson = (JSONObject) items.get(i);
-                if (itemJson.getInt("productType") != 1) {
-                    continue;
-                }
-                ApiItemDTO itemDTO = new ApiItemDTO(itemJson);
-                Category category = null;
-                for (int j = 3; j >= 0; j--) {
-                    String name = itemDTO.getCategoryList().get(j);
-                    if (name.length() != 0) {
-                        category = categoryRepository.findByName(name);
-                        break;
-                    }
-                }
-                Item item = new Item(itemDTO.getId(), itemDTO.getItemName(), itemDTO.getLprice(), itemDTO.getImage(), category);
-                itemRepository.join(item);
-
-            }
-        }
-
-        String email = "alswns2631@cau.ac.kr";
-        String name = "choiminjun";
-        String passWord = "passw123";
-        String phoneNumber = "010-1234-1231";
-        String birthDate = "19990803";
-        JoinDTO joinDTO = JoinDTO.builder().email(email).name(name).passWord(passWord).phoneNumber(phoneNumber).birthDate(birthDate).build();
-        memberService.join(joinDTO);
-        email = "alswns2631@gmail.com";
-        name = "정상수";
-        joinDTO = JoinDTO.builder().email(email).name(name).passWord(passWord).phoneNumber(phoneNumber).birthDate(birthDate).build();
-        memberService.join(joinDTO);
-        email = "alswns2631@naver.com";
-        name = "아이유";
-        joinDTO = JoinDTO.builder().email(email).name(name).passWord(passWord).phoneNumber(phoneNumber).birthDate(birthDate).build();
-        memberService.join(joinDTO);
+        naverSearchService.saveItemInDB();
+        friendJoinService.saveMemberInDB();
 
 
         this.member = memberService.findByEmail("alswns2631@cau.ac.kr");
         this.friend1 = memberService.findByEmail("alswns2631@gmail.com");
         this.friend2 = memberService.findByEmail("alswns2631@naver.com");
-        friendService.addFriendList(member, friend1);
-        friendService.addFriendList(member, friend2);
-        friendService.addFriendList(friend1, member);
-        friendService.addFriendList(friend2, member);
+        friendService.addFriendList(member, friend1.getId());
+        friendService.addFriendList(member, friend2.getId());
+        friendService.addFriendList(friend1, member.getId());
+        friendService.addFriendList(friend2, member.getId());
         this.galaxy = itemRepository.searchItemName("갤럭시");
         Item item = galaxy.get(0);
         Member member = memberService.findByEmail("alswns2631@gmail.com");
@@ -121,8 +79,8 @@ public class ContributorServiceTest {
         Member me = memberService.findByEmail("alswns2631@cau.ac.kr");
         WishItem wishItem = wishItemRepository.findAll(friend).get(0);
         Item item = wishItem.getItem();
-        FriendWishItemInfoDTO friendWishItemInfoDTO = FriendWishItemInfoDTO.builder().friendId(friend.getId()).itemName(item.getName()).friendName(friend.getName()).categoryName(item.getCategory().getName()).image(item.getImage()).price(item.getPrice()).build();
-        contributorService.contributing(me, friendWishItemInfoDTO, 10000);
+        FriendWishItemInfoDTO friendWishItemInfoDTO = FriendWishItemInfoDTO.builder().friendId(friend.getId()).itemName(item.getName()).categoryName(item.getCategory().getName()).image(item.getImage()).price(item.getPrice()).build();
+        contributorService.contributing(me, wishItem.getId(), 10000);
         Contributor contributionWithNames = contributorRepository.findContributionWithNamesById(me, friend.getId(), item.getName());
         Assertions.assertThat(contributionWithNames.getContributor()).isEqualTo(me);
         Assertions.assertThat(contributionWithNames.getFundMoney()).isEqualTo(10000);
@@ -138,10 +96,10 @@ public class ContributorServiceTest {
         Member me = memberService.findByEmail("alswns2631@cau.ac.kr");
         WishItem wishItem = wishItemRepository.findAll(friend).get(0);
         Item item = wishItem.getItem();
-        FriendWishItemInfoDTO friendWishItemInfoDTO = FriendWishItemInfoDTO.builder().friendId(friend.getId()).itemName(item.getName()).friendName(friend.getName()).categoryName(item.getCategory().getName()).image(item.getImage()).price(item.getPrice()).build();
+        FriendWishItemInfoDTO friendWishItemInfoDTO = FriendWishItemInfoDTO.builder().friendId(friend.getId()).itemName(item.getName()).categoryName(item.getCategory().getName()).image(item.getImage()).price(item.getPrice()).build();
 
-        contributorService.contributing(me, friendWishItemInfoDTO, 10000);
-        contributorService.contributing(me, friendWishItemInfoDTO, 10000);
+        contributorService.contributing(me, wishItem.getId(), 10000);
+        contributorService.contributing(me, wishItem.getId(), 10000);
         Contributor contributionWithNames = contributorRepository.findContributionWithNamesById(me, friend.getId(), item.getName());
         Assertions.assertThat(contributionWithNames.getContributor()).isEqualTo(me);
         Assertions.assertThat(contributionWithNames.getFundMoney()).isEqualTo(20000);
@@ -154,20 +112,18 @@ public class ContributorServiceTest {
     public void testFindContributor() {
         ItemInfoDTO g1 = ItemInfoDTO.ItemToItemInfoDTO(this.galaxy.get(0));
         wishItemService.addWishList(this.member, g1);
-
         List<FriendWith> allFriends = friendService.findAllFriends(member);
-        FriendWishItemInfoDTO friendWishItemInfoDTO = FriendWishItemInfoDTO.builder().friendId(member.getId()).itemName(this.galaxy.get(0).getName()).friendName(member.getName()).categoryName(this.galaxy.get(0).getCategory().getName()).image(galaxy.get(0).getImage()).price(galaxy.get(0).getPrice()).build();
+        WishItem wishItem = wishItemRepository.findAll(member).get(0);
+        FriendWishItemInfoDTO friendWishItemInfoDTO = FriendWishItemInfoDTO.builder().friendId(member.getId()).itemName(this.galaxy.get(0).getName()).categoryName(this.galaxy.get(0).getCategory().getName()).image(galaxy.get(0).getImage()).price(galaxy.get(0).getPrice()).build();
         for (FriendWith allFriend : allFriends) {
-            contributorService.contributing(allFriend.getFriend(), friendWishItemInfoDTO, 10000);
+            contributorService.contributing(allFriend.getFriend(), wishItem.getId(), 10000);
 
         }
 
         List<WishItem> all = wishItemRepository.findAll(member);
         Long wishItemId = all.get(0).getId();
         List<ContributorDTO> contributors = contributorService.findContributor(wishItemId);
-        List<Long> cIds = contributors.stream().map(contributorDTO -> {
-            return contributorDTO.getFriendId();
-        }).toList();
+        List<Long> cIds = contributors.stream().map(ContributorDTO::getFriendId).toList();
         for (ContributorDTO contributor : contributors) {
             Assertions.assertThat(contributor.getContribution()).isEqualTo(10000);
             Assertions.assertThat(cIds).contains(contributor.getFriendId());
@@ -177,61 +133,69 @@ public class ContributorServiceTest {
 
     }
 
-
-    private String search(String query) {
-        RestTemplate rest = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Naver-Client-Id", "Pi8zB3f4zuenOa7Lpdpl");
-        headers.add("X-Naver-Client-Secret", "cB7nj_4ahS");
-        String body = "";
-
-        HttpEntity<String> requestEntity = new HttpEntity<String>(body, headers);
-        ResponseEntity<String> responseEntity = rest.exchange("https://openapi.naver.com/v1/search/shop.json?" + "display=100" + "&filter=1" + "&exclude=used:rental:cbshop" + "&query=" + query, HttpMethod.GET, requestEntity, String.class);
-        HttpStatusCode httpStatus = responseEntity.getStatusCode();
-        int status = httpStatus.value();
-        String response = responseEntity.getBody();
-        return response;
-    }
-
-    private void categoryProcess(JSONArray items) {
-        for (int i = 0; i < items.length(); i++) {
-            JSONObject itemJson = (JSONObject) items.get(i);
-            if (itemJson.getInt("productType") != 1) {
-                continue;
-            }
-            Category[] c = new Category[4];
-            ApiItemDTO itemDTO = new ApiItemDTO(itemJson);
-            List<String> categoryList = itemDTO.getCategoryList();
-            for (int j = 0; j < 4; j++) {
-                {   //카테고리 존재 x
-                    Category category;
-                    if (categoryList.get(j).length() == 0) {
-                        break;
-                    }
-                    if (categoryRepository.findByName(categoryList.get(j)) == null) {
-                        category = new Category(categoryList.get(j));
-
-
-                    } else {
-                        category = categoryRepository.findByName(categoryList.get(j));
-                    }
-
-                    c[j] = category;
-                    categoryRepository.join(category);
-                }
-            }
-            for (int j = 1; j < 4; j++) {
-                {   //카테고리 존재 x
-                    if (c[j] == null) {
-                        break;
-                    }
-                    c[j].setParent(c[j - 1]);
-                }
-
-            }
-
-
+    @Test
+    @DisplayName("나에게 준사람들 전부 받아오기..")
+    public void findMyAllContribution() {
+        Member member = memberService.findByEmail("alswns2631@gmail.com");
+        Member friend1 = memberService.findByEmail("alswns2631@cau.ac.kr");
+        Member friend2 = memberService.findByEmail("alswns2631@naver.com");
+        WishItem wishItem = wishItemRepository.findAll(member).get(0);
+        contributorService.contributing(friend1, wishItem.getId(), 20000);
+        contributorService.contributing(friend2, wishItem.getId(), 30000);
+        List<Long> giftGiversToMe = contributorService.findGiftGiversToMe(member.getId());
+        for (Long l : giftGiversToMe) {
+            System.out.println(l);
         }
+        Assertions.assertThat(giftGiversToMe).contains(friend1.getId());
+        Assertions.assertThat(giftGiversToMe).contains(friend2.getId());
+
     }
+
+
+
+
+    @Test
+    @DisplayName("내가 준 사람")
+    public void findMyContribution() {
+        Member member = memberService.findByEmail("alswns2631@gmail.com");
+        Member friend1 = memberService.findByEmail("alswns2631@cau.ac.kr");
+        Member friend2 = memberService.findByEmail("alswns2631@naver.com");
+
+        Item item = galaxy.get(3);
+        WishItem wishItem = WishItem.builder().item(item).money(item.getPrice()).member(friend1).build();
+        wishItemRepository.join(wishItem);
+        item = galaxy.get(4);
+        wishItem = WishItem.builder().item(item).money(item.getPrice()).member(friend2).build();
+        wishItemRepository.join(wishItem);
+        wishItem = wishItemRepository.findAll(friend1).get(0);
+        contributorService.contributing(member, wishItem.getId(), 20000);
+        wishItem = wishItemRepository.findAll(friend2).get(0);
+        contributorService.contributing(member, wishItem.getId(), 30000);
+        List<Long> giftReceiversFromMe = contributorService.getGiftReceiversFromMe(member.getId());
+
+        Assertions.assertThat(giftReceiversFromMe).contains(friend1.getId());
+        Assertions.assertThat(giftReceiversFromMe).contains(friend2.getId());
+
+    }
+
+
+    @Test
+    @DisplayName("펀딩을 했을 때, 자동으로 상태가 변경되는가 확인")
+    public void contributionChange(){
+        Item item = galaxy.get(3);
+        WishItem wishItem = WishItem.builder().item(item).money(item.getPrice()).member(member).build();
+        wishItemRepository.join(wishItem);
+
+        Assertions.assertThat(wishItem.getGiftStatus()).isEqualTo(GiftStatus.IN_PROGRESS);
+
+
+        Integer price = item.getPrice();
+        contributorService.contributing(friend1, wishItem.getId(), (Integer) (price/2) + 1);
+        contributorService.contributing(friend2, wishItem.getId(), (Integer) (price/2) + 1);
+
+        Assertions.assertThat(wishItem.getGiftStatus()).isEqualTo(GiftStatus.COMPLETED);
+    }
+
+
 
 }

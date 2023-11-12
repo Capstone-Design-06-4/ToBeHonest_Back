@@ -1,11 +1,11 @@
 package Team4.TobeHonest.service;
 
+import Team4.TobeHonest.enumer.GiftStatus;
+import Team4.TobeHonest.setup.NaverSearchService;
 import Team4.TobeHonest.domain.*;
-import Team4.TobeHonest.dto.*;
 import Team4.TobeHonest.dto.item.ItemInfoDTO;
 import Team4.TobeHonest.dto.signup.JoinDTO;
 import Team4.TobeHonest.dto.wishitem.FirstWishItem;
-import Team4.TobeHonest.dto.wishitem.FriendWishItemInfoDTO;
 import Team4.TobeHonest.dto.wishitem.WishItemDetail;
 import Team4.TobeHonest.exception.DuplicateWishItemException;
 import Team4.TobeHonest.exception.ItemNotInWishlistException;
@@ -15,17 +15,13 @@ import Team4.TobeHonest.repo.ItemRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.Assertions;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,37 +54,13 @@ public class WishItemServiceTest {
     @Autowired
     FriendService friendService;
 
+    @Autowired
+    NaverSearchService naverSearchService;
+
     @Before
     public void setUp() throws Exception {
 
-        String[] data = {"아이폰", "갤럭시S", "나이키", "아이패드", "에어팟", "갤럭시탭", "비스포크냉장고", "비스포크청소기"};
-
-        for (String datum : data) {
-            JSONObject rjson = new JSONObject(search(datum));
-
-            JSONArray items = rjson.getJSONArray("items");
-
-            categoryProcess(items);
-            for (int i = 0; i < items.length(); i++) {
-                JSONObject itemJson = (JSONObject) items.get(i);
-                if (itemJson.getInt("productType") != 1) {
-                    continue;
-                }
-                ApiItemDTO itemDTO = new ApiItemDTO(itemJson);
-                Category category = null;
-                for (int j = 3; j >= 0; j--) {
-                    String name = itemDTO.getCategoryList().get(j);
-                    if (name.length() != 0) {
-                        category = categoryRepository.findByName(name);
-                        break;
-
-                    }
-                }
-                Item item = new Item(itemDTO.getId(), itemDTO.getItemName(), itemDTO.getLprice(), itemDTO.getImage(), category);
-                itemRepository.join(item);
-            }
-
-        }
+        naverSearchService.saveItemInDB();
 
         String email = "alswns2631@cau.ac.kr";
         String name = "choiminjun";
@@ -132,7 +104,7 @@ public class WishItemServiceTest {
         Assertions.assertThat(wishItemRepository.findAll(this.member).size()).isEqualTo(1);
 
         //위시아이템 삭제
-        wishItemService.deleteWishList(this.member, DTO.getName());
+        wishItemService.deleteWishListByItemName(this.member, DTO.getName());
 
         Assertions.assertThat(wishItemRepository.findAll(this.member).size()).isEqualTo(0);
     }
@@ -157,7 +129,8 @@ public class WishItemServiceTest {
 
         wishItemService.addWishList(this.member, DTO);
         DTO = ItemInfoDTO.ItemToItemInfoDTO(nike.get(0));
-        org.junit.jupiter.api.Assertions.assertThrows(ItemNotInWishlistException.class, () -> wishItemService.deleteWishList(this.member, nike.get(0).getName()));
+        org.junit.jupiter.api.Assertions.assertThrows(ItemNotInWishlistException.class,
+                () -> wishItemService.deleteWishListByItemName(this.member, nike.get(0).getName()));
 
     }
 
@@ -180,18 +153,19 @@ public class WishItemServiceTest {
 
         List<FriendWith> allFriends = friendService.findAllFriends(member);
         for (FriendWith allFriend : allFriends) {
-            for (int i = 0; i < 3; i++) {
-                FriendWishItemInfoDTO friendWishItemInfoDTO = FriendWishItemInfoDTO.builder().friendId(member.getId()).itemName(this.galaxy.get(i).getName()).friendName(member.getName()).categoryName(this.galaxy.get(i).getCategory().getName()).image(galaxy.get(i).getImage()).price(galaxy.get(i).getPrice()).build();
-                contributorService.contributing(allFriend.getFriend(), friendWishItemInfoDTO, 10000);
+            List<WishItem> all = wishItemRepository.findAll(member);
+
+            for (WishItem wishItem : all) {
+                contributorService.contributing(allFriend.getFriend(), wishItem.getId(), 10000);
             }
 
         }
-        List<FirstWishItem> wishList = wishItemService.findWishList(this.member.getId());
+        List<FirstWishItem> wishList = wishItemService.findAllWishList(this.member.getId());
 
         for (FirstWishItem firstWishItem : wishList) {
 
             Assertions.assertThat(images).contains(firstWishItem.getImage());
-            Assertions.assertThat(firstWishItem.getPercentage()).isEqualTo(20000);
+            Assertions.assertThat(firstWishItem.getFundAmount()).isEqualTo(20000);
         }
         //friend가 투자한 상황..
 
@@ -205,9 +179,13 @@ public class WishItemServiceTest {
         wishItemService.addWishList(this.member, g1);
 //        멤버가 wishItem넣은 상황
         List<FriendWith> allFriends = friendService.findAllFriends(member);
-        FriendWishItemInfoDTO friendWishItemInfoDTO = FriendWishItemInfoDTO.builder().friendId(member.getId()).itemName(this.galaxy.get(0).getName()).friendName(member.getName()).categoryName(this.galaxy.get(0).getCategory().getName()).image(galaxy.get(0).getImage()).price(galaxy.get(0).getPrice()).build();
+
         for (FriendWith allFriend : allFriends) {
-            contributorService.contributing(allFriend.getFriend(), friendWishItemInfoDTO, 10000);
+            List<WishItem> all = wishItemRepository.findAll(member);
+
+            for (WishItem wishItem : all) {
+                contributorService.contributing(allFriend.getFriend(), wishItem.getId(), 10000);
+            }
 
         }
 //        친구들이 만원 씩 투자
@@ -227,63 +205,47 @@ public class WishItemServiceTest {
 
     }
 
+    @Test
+    @DisplayName("펀딩 덜 한 경우.. == > inprogress에서만 나와야 한다")
+    public void testInProgress() {
+        Item item = galaxy.get(3);
+
+        WishItem wishItem = WishItem.builder().item(item).money(item.getPrice()).member(member).build();
+
+        wishItemRepository.join(wishItem);
 
 
+        Integer price = item.getPrice();
 
-    private String search(String query) {
-        RestTemplate rest = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Naver-Client-Id", "Pi8zB3f4zuenOa7Lpdpl");
-        headers.add("X-Naver-Client-Secret", "cB7nj_4ahS");
-        String body = "";
+        contributorService.contributing(friend1, wishItem.getId(), (Integer) (price / 3) + 1);
+        contributorService.contributing(friend2, wishItem.getId(), (Integer) (price / 3) + 1);
 
-        HttpEntity<String> requestEntity = new HttpEntity<String>(body, headers);
-        ResponseEntity<String> responseEntity = rest.exchange("https://openapi.naver.com/v1/search/shop.json?" + "display=100" + "&filter=1" + "&exclude=used:rental:cbshop" + "&query=" + query, HttpMethod.GET, requestEntity, String.class);
-        HttpStatusCode httpStatus = responseEntity.getStatusCode();
-        int status = httpStatus.value();
-        String response = responseEntity.getBody();
-        return response;
+
+        FirstWishItem inProgress = wishItemService.findWishListInProgress(member.getId()).get(0);
+
+
+        Assertions.assertThat(inProgress.getWishItemId()).isEqualTo(wishItem.getId());
+        Assertions.assertThat(inProgress.getFundAmount()).isLessThan(wishItem.getPrice());
+        Assertions.assertThat(wishItem.getGiftStatus()).isEqualTo(GiftStatus.IN_PROGRESS);
+
+    }
+
+    @Test
+    @DisplayName("완료된 놈들 test")
+    public void testUsed() {
+        Item item = galaxy.get(4);
+        WishItem wishItem = WishItem.builder().item(item).money(item.getPrice()).member(member).build();
+        wishItemRepository.join(wishItem);
+        Integer price2 = item.getPrice();
+
+        contributorService.contributing(friend1, wishItem.getId(), (Integer) (price2 / 2) + 1);
+        contributorService.contributing(friend2, wishItem.getId(), (Integer) (price2 / 2) + 1);
+
+        FirstWishItem completed = wishItemService.findWishListCompleted(member.getId()).get(0);
+        Assertions.assertThat(completed.getWishItemId()).isEqualTo(wishItem.getId());
+        Assertions.assertThat(completed.getFundAmount()).isGreaterThanOrEqualTo(wishItem.getPrice());
+        Assertions.assertThat(wishItem.getGiftStatus()).isEqualTo(GiftStatus.COMPLETED);
     }
 
 
-    private void categoryProcess(JSONArray items) {
-        for (int i = 0; i < items.length(); i++) {
-            JSONObject itemJson = (JSONObject) items.get(i);
-            if (itemJson.getInt("productType") != 1) {
-                continue;
-            }
-            Category[] c = new Category[4];
-            ApiItemDTO itemDTO = new ApiItemDTO(itemJson);
-            List<String> categoryList = itemDTO.getCategoryList();
-            for (int j = 0; j < 4; j++) {
-                {   //카테고리 존재 x
-                    Category category;
-                    if (categoryList.get(j).length() == 0) {
-                        break;
-                    }
-                    if (categoryRepository.findByName(categoryList.get(j)) == null) {
-                        category = new Category(categoryList.get(j));
-
-
-                    } else {
-                        category = categoryRepository.findByName(categoryList.get(j));
-                    }
-
-                    c[j] = category;
-                    categoryRepository.join(category);
-                }
-            }
-            for (int j = 1; j < 4; j++) {
-                {   //카테고리 존재 x
-                    if (c[j] == null) {
-                        break;
-                    }
-                    c[j].setParent(c[j - 1]);
-                }
-
-            }
-
-
-        }
-    }
 }

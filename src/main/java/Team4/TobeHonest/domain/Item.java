@@ -35,4 +35,13 @@ public class Item {
         this.stockQuantity = 100;
     }
 
+    public void buyItem() {
+        this.stockQuantity -= 1;
+    }
+
+    public void chargeItem(Integer stockQuantity){
+        this.stockQuantity += stockQuantity;
+    }
+
+
 }

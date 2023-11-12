@@ -3,6 +3,7 @@ package Team4.TobeHonest.repo;
 import Team4.TobeHonest.domain.*;
 import Team4.TobeHonest.dto.contributor.ContributorDTO;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -64,9 +65,8 @@ public class ContributorRepository {
     }
 
     public List<ContributorDTO> findContributorsInWishItem(Long wid) {
-
         return jqf.select(Projections.constructor(ContributorDTO.class, wishItem.id,
-                        contributor.contributor.id, friendWith.specifiedName, contributor.fundMoney))
+                        contributor.contributor.id, contributor.fundMoney))
                 .from(contributor, friendWith)
                 .innerJoin(contributor.wishItem, wishItem)
                 .where(this.wishItem.id.eq(wid)
@@ -74,6 +74,52 @@ public class ContributorRepository {
                         .and(friendWith.friend.eq(contributor.contributor))).fetch();
 
     }
+
+
+    public Contributor findContributorsInWishItem(Long wid, Member member) {
+        List<Contributor> fetch = jqf.select(contributor)
+                .from(contributor)
+                .innerJoin(contributor.wishItem, wishItem)
+                .where(contributor.contributor.eq(member)
+                        .and(wishItem.id.eq(wid))).fetch();
+
+        if (fetch.isEmpty()){
+            return null;
+        }
+        return fetch.get(0);
+    }
+
+    //나에게 contribution한 사람들 찾기
+    public List<Long> findAllContributors(Long memberId){
+        return jqf.select(contributor.contributor.id)
+                .from(contributor)
+                .innerJoin(contributor.wishItem, wishItem)
+                .where(wishItem.member.id.eq(memberId)).fetch();
+
+    }
+    //내가 contribution한 놈들 찾기..
+    public List<Long> findMyContributions(Long memberId){
+        return jqf.select(wishItem.member.id)
+                .from(contributor)
+                .innerJoin(contributor.wishItem, wishItem)
+                .innerJoin(wishItem.member, this.member)
+                .where(contributor.contributor.id.eq(memberId)
+                        .and(contributor.wishItem.eq(wishItem))).fetch();
+
+    }
+
+    public Integer findFundedAmount(WishItem wishItem){
+        NumberExpression<Integer> sumFundMoney = contributor.fundMoney.sum();
+        return jqf.select(sumFundMoney).from(contributor)
+                .innerJoin(contributor.wishItem, this.wishItem)
+                .where(this.wishItem.eq(wishItem)).fetchOne();
+    }
+
+
+
+
+
+
 
 
 }

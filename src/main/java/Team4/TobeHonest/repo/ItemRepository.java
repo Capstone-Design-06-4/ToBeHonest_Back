@@ -1,6 +1,5 @@
 package Team4.TobeHonest.repo;
 
-import Team4.TobeHonest.domain.Category;
 import Team4.TobeHonest.domain.Item;
 import Team4.TobeHonest.domain.QCategory;
 import Team4.TobeHonest.domain.QItem;
@@ -21,6 +20,7 @@ public class ItemRepository {
     private final QItem i = new QItem("i");
     private final QCategory c = new QCategory("c");
 
+    @Transactional
     public void join(Item item) {
         em.persist(item);
     }

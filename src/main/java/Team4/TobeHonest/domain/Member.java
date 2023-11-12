@@ -1,9 +1,11 @@
 package Team4.TobeHonest.domain;
 
+import Team4.TobeHonest.exception.NoPointsException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,8 +36,16 @@ public class Member implements UserDetails {
     private String phoneNumber;
 
     private LocalDate birthDate;
-    //프사 추가해야함
 
+    private Integer points = 0;
+    //프사 추가해야함
+    private String profileImg = "https://tobehonest.s3.ap-northeast-2.amazonaws.com/default.jpeg";
+
+    public void changeProfileImg(String profileImg) {
+        this.profileImg = profileImg;
+    }
+
+    @Builder
     public Member(String email, String name, String password, String phoneNumber, LocalDate birthDate) {
         this.email = email;
         this.name = name;
@@ -48,6 +58,17 @@ public class Member implements UserDetails {
     public static String hashPassword(String password, PasswordEncoder passwordEncoder) {
         return passwordEncoder.encode(password);
 
+    }
+
+    public void addPoints(Integer money){
+        this.points += money;
+    }
+
+    public void usePoints(Integer money){
+        if (points < money){
+            throw new NoPointsException("포인트가 부족합니다.");
+        }
+        this.points -= money;
     }
 
     public FriendWith addFriend(Member friend) {
