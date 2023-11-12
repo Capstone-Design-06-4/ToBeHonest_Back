@@ -24,11 +24,23 @@ public class QMessage extends EntityPathBase<Message> {
 
     public final StringPath content = createString("content");
 
+    public final NumberPath<Integer> fundMoney = createNumber("fundMoney", Integer.class);
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final ListPath<MessageImg, QMessageImg> messageImgList = this.<MessageImg, QMessageImg>createList("messageImgList", MessageImg.class, QMessageImg.class, PathInits.DIRECT2);
+
+    public final EnumPath<Team4.TobeHonest.enumer.MessageType> messageType = createEnum("messageType", Team4.TobeHonest.enumer.MessageType.class);
+
+    public final QMember receiver;
 
     public final QWishItem relatedItem;
 
+    public final QMember sender;
+
     public final DateTimePath<java.time.LocalDateTime> time = createDateTime("time", java.time.LocalDateTime.class);
+
+    public final StringPath title = createString("title");
 
     public QMessage(String variable) {
         this(Message.class, forVariable(variable), INITS);
@@ -48,7 +60,9 @@ public class QMessage extends EntityPathBase<Message> {
 
     public QMessage(Class<? extends Message> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.receiver = inits.isInitialized("receiver") ? new QMember(forProperty("receiver")) : null;
         this.relatedItem = inits.isInitialized("relatedItem") ? new QWishItem(forProperty("relatedItem"), inits.get("relatedItem")) : null;
+        this.sender = inits.isInitialized("sender") ? new QMember(forProperty("sender")) : null;
     }
 
 }
