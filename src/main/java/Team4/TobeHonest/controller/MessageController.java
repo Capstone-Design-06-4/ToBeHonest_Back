@@ -37,7 +37,7 @@ public class MessageController {
     @PostMapping(value = "/send" ,consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     //@RequestBodt ==> only 1개 mapping  ==> @RequestPart로 나누기
     public ResponseEntity<String> sendMessage(@RequestPart(name = "request") SendMessageWithNoIMG sendMessageWithNoIMG,
-                                              @RequestPart List<MultipartFile> images,
+                                              @RequestPart(required = false) List<MultipartFile> images,
                                               @AuthenticationPrincipal UserDetails userDetails) throws IOException {
 
         String userEmail = userDetails.getUsername();

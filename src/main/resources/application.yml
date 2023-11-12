@@ -1,9 +1,21 @@
 spring:
+
+
+  servlet:
+    multipart:
+      maxFileSize: 10MB
+      maxRequestSize: 20MB
+#  datasource:
+#    url: jdbc:h2:tcp://localhost/~/TobeHonest
+#    username: sa
+#    password:
+#    driver-class-name: org.h2.Driver
   datasource:
-    url: jdbc:h2:tcp://localhost/~/TobeHonest
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/tobehonest?serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: 5471
+
   jpa:
     hibernate:
       ddl-auto: create
@@ -20,6 +32,17 @@ spring:
     redis:
       host: localhost
       port: 6379
+
+#절 ~ 때 깃허브에 안올리지
+cloud:
+  aws:
+    s3:
+      bucket: tobehonest
+    stack.auto: false
+    region.static: ap-northeast-2
+    credentials:
+      accessKey: AKIAYJC6YAT3SCVMUU56
+      secretKey: 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
 logging.level:
   org.hibernate.SQL: error
   org.hibernate.orm.jdbc.bind: error #스프링 부트 3.x, hibernate6

@@ -15,7 +15,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -58,7 +57,6 @@ public class MessageService {
                 .messageType(sendMessageDTO.getMessageType())
                 .fundMoney(sendMessageDTO.getFundMoney())
                 .build();
-
         //메시지 레포에 저장?
         messageRepository.join(message);
         //이미지 저장

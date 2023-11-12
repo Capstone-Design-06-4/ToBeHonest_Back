@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class FriendWith {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JoinColumn(name = "owner_id")

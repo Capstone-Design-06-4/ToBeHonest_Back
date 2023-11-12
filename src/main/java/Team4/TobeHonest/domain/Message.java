@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Message {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "message_id")
     private Long id;
     private String title;

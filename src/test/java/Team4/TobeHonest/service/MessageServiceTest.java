@@ -23,6 +23,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -52,6 +53,8 @@ public class MessageServiceTest {
     public ItemRepository itemRepository;
     @Autowired
     public MemberService memberService;
+    @Autowired
+    public ImageService imageService;
     public Member member;
     public Member friend1;
     public Member friend2;
@@ -77,7 +80,7 @@ public class MessageServiceTest {
 
     @Test
     @DisplayName("메시지 보내기..")
-    public void sendMessageTest(){
+    public void sendMessageTest() throws IOException {
 
         MultipartFile multipartFile = convertUrlToMultipartFile(galaxy.get(0).getImage());
         List<MultipartFile> list = new ArrayList<>();
@@ -86,15 +89,17 @@ public class MessageServiceTest {
         list.add(multipartFile);
         WishItem wishItem = wishItemRepository.findAll(member).get(0);
         SendMessageDTO sendMessageDTO = SendMessageDTO.builder()
-                .title("돈갚아라").contents("돈갚으라고").images(list)
+                .title("돈갚아라").contents("돈갚으라고")
+                .images(list)
                 .receiverId(member.getId()).senderId(friend1.getId())
                 .wishItemId(wishItem.getId())
                 .build();
-        messageService.sendMessage(sendMessageDTO);
+        Message message1 = messageService.sendMessage(sendMessageDTO);
+
         List<Message> all = messageRepository.findAll();
         Assertions.assertThat(all.size()).isEqualTo(1);
         Message message = all.get(0);
-
+        imageService.saveMessageImg(list, message1);
         Assertions.assertThat(message.getRelatedItem().getId())
                 .isEqualTo(wishItem.getId());
         //2개다 저장됐는가..

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class MessageImg {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "image_id")
     private Long id;
 

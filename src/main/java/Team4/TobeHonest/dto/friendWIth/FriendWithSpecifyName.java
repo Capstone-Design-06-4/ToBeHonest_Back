@@ -1,5 +1,6 @@
 package Team4.TobeHonest.dto.friendWIth;
 
+import Team4.TobeHonest.domain.FriendWith;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,7 +23,7 @@ public class FriendWithSpecifyName {
     private Boolean myGive;
     //내가 받은적이 있는가
     private Boolean myTake;
-
+    @Builder
     public FriendWithSpecifyName(Long friendId, Long friendWithId, String specifiedName, LocalDate birthDate, String profileURL) {
         this.friendId = friendId;
         this.friendWithId = friendWithId;

@@ -159,7 +159,7 @@ public class MessageControllerTest {
                 .contents("ㅗ").build();
         String json = objectMapper.writeValueAsString(build);
         MockMultipartFile sendMessageWithNoIMGPart =
-                new MockMultipartFile("sendMessageWithNoIMG", "", "application/json",
+                new MockMultipartFile("request", "", "application/json",
                 json.getBytes(StandardCharsets.UTF_8));
 
         mockMvc.perform(multipart("/message/send")
@@ -186,7 +186,7 @@ public class MessageControllerTest {
                 .contents("ㅗ").build();
         String json = objectMapper.writeValueAsString(build);
         MockMultipartFile sendMessageWithNoIMGPart =
-                new MockMultipartFile("sendMessageWithNoIMG", "", "application/json",
+                new MockMultipartFile("request", "", "application/json",
                         json.getBytes(StandardCharsets.UTF_8));
 
 

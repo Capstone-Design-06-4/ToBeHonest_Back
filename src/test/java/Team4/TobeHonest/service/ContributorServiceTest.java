@@ -60,6 +60,9 @@ public class ContributorServiceTest {
         this.member = memberService.findByEmail("alswns2631@cau.ac.kr");
         this.friend1 = memberService.findByEmail("alswns2631@gmail.com");
         this.friend2 = memberService.findByEmail("alswns2631@naver.com");
+        member.addPoints(1000000000);
+        friend2.addPoints(1000000000);
+        friend1.addPoints(1000000000);
         friendService.addFriendList(member, friend1.getId());
         friendService.addFriendList(member, friend2.getId());
         friendService.addFriendList(friend1, member.getId());

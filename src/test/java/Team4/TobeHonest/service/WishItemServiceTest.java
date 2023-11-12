@@ -1,6 +1,7 @@
 package Team4.TobeHonest.service;
 
 import Team4.TobeHonest.enumer.GiftStatus;
+import Team4.TobeHonest.exception.NoPointsException;
 import Team4.TobeHonest.setup.NaverSearchService;
 import Team4.TobeHonest.domain.*;
 import Team4.TobeHonest.dto.item.ItemInfoDTO;
@@ -13,6 +14,7 @@ import Team4.TobeHonest.repo.CategoryRepository;
 import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.ItemRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
@@ -83,6 +85,8 @@ public class WishItemServiceTest {
         this.member = memberService.findByEmail("alswns2631@cau.ac.kr");
         this.friend1 = memberService.findByEmail("alswns2631@gmail.com");
         this.friend2 = memberService.findByEmail("alswns2631@naver.com");
+        friend1.addPoints(1000000000);
+        friend2.addPoints(1000000000);
         friendService.addFriendList(member, friend1);
         friendService.addFriendList(member, friend2);
         friendService.addFriendList(friend1, member);
@@ -247,5 +251,44 @@ public class WishItemServiceTest {
         Assertions.assertThat(wishItem.getGiftStatus()).isEqualTo(GiftStatus.COMPLETED);
     }
 
+    @DisplayName("wishItem사용하기 - 정상 사용")
+    @Test
+    public void usingWishItem(){
+        Item item = galaxy.get(4);
+        WishItem wishItem = WishItem.builder().item(item).money(item.getPrice()).member(member).build();
+        wishItemRepository.join(wishItem);
+        Integer price2 = item.getPrice();
+        Integer fundedAmount = (Integer) (price2 / 2) + 1;
+        friend1.addPoints(fundedAmount);
+        friend2.addPoints(fundedAmount + 1);
+        contributorService.contributing(friend1, wishItem.getId(), fundedAmount);
+        contributorService.contributing(friend2, wishItem.getId(), fundedAmount + 1);
+        Member member1 = wishItem.getMember();
+        Integer i = wishItemService.useWishItem(member1.getEmail(), wishItem.getId());
+        Assertions.assertThat(i).isEqualTo(fundedAmount * 2 + 1);
+        Assertions.assertThat(member1.getPoints()).isEqualTo(i);
+        Assertions.assertThat(wishItem.getGiftStatus()).isEqualTo(GiftStatus.USED);
+    }
+
+    @DisplayName("wishItem사용하기 - 펀딩 덜 된 경우")
+    @Test
+    public void usingNotFinishedWishItem(){
+        Item item = galaxy.get(4);
+        WishItem wishItem = WishItem.builder().item(item).money(item.getPrice()).member(member).build();
+        wishItemRepository.join(wishItem);
+        Integer price2 = item.getPrice();
+        Integer fundedAmount = (Integer) (price2 / 3) + 1;
+
+        friend1.addPoints(fundedAmount);
+        friend2.addPoints(fundedAmount + 1);
+        contributorService.contributing(friend1, wishItem.getId(), fundedAmount);
+        contributorService.contributing(friend2, wishItem.getId(), fundedAmount + 1);
+
+        Member member1 = wishItem.getMember();
+
+        org.junit.jupiter.api.Assertions.assertThrows(NoPointsException.class,
+                () -> wishItemService.useWishItem(member1.getEmail(), wishItem.getId()));
+
+    }
 
 }

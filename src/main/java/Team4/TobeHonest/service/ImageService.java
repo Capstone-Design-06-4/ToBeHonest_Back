@@ -67,6 +67,7 @@ public class ImageService {
         metadata.setContentLength(file.getSize());
         amazonS3Client.putObject(bucket, fileName, file.getInputStream(), metadata);
         String encodedReturnURL = "https://" + bucket + ".s3.amazonaws.com/" + fileName;
+        message.addImage(encodedReturnURL);
         MessageImg messageImg = MessageImg.builder().imgURL(encodedReturnURL).message(message).build();
         imageRepository.save(messageImg);
     }

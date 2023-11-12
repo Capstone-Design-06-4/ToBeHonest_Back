@@ -83,7 +83,7 @@ public class LoginTest {
         String s = objectMapper.writeValueAsString(login);
         mockMvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(s)).
                 andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
 

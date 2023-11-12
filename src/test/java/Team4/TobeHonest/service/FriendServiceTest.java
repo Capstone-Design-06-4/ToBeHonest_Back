@@ -140,7 +140,8 @@ public class FriendServiceTest {
     public void testSpecifyName(){
         Member member1 = memberService.findByEmail("alswns2631@cau.ac.kr");
         Member member2 = memberService.findByEmail("alswns2631@kakao.com");
-        FriendWith friendWith = friendService.addFriendList(member1, member2.getId());
+        friendService.addFriendList(member1, member2.getId());
+        FriendWith friendWith = friendRepository.findFriend(member1, member2).get(0);
         Assertions.assertThat(friendWith.getSpecifiedName()).isEqualTo(member2.getName());
         friendWith.changeFriendName("아이유");
         Assertions.assertThat(friendWith.getSpecifiedName()).isEqualTo("아이유");
@@ -152,8 +153,8 @@ public class FriendServiceTest {
     public void deleteFriend(){
         Member member1 = memberService.findByEmail("alswns2631@cau.ac.kr");
         Member member2 = memberService.findByEmail("alswns2631@kakao.com");
-        FriendWith friendWith = friendService.addFriendList(member1, member2.getId());
-
+        friendService.addFriendList(member1, member2.getId());
+        FriendWith friendWith = friendRepository.findFriend(member1, member2).get(0);
 
         List<FriendWith> friend = friendRepository.findFriend(member1, member2.getId());
         Assertions.assertThat(friend).contains(friendWith);
