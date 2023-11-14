@@ -105,8 +105,19 @@ public class MemberController {
 
     @GetMapping("/search/phoneNumber/{phoneNumber}")
     @ResponseBody
-    public MemberSearch findMemberByPhoneNumber(@PathVariable String phoneNumber) {
-        return memberService.memberSearchByPhoneNumber(phoneNumber);
+    public MemberSearch findMemberByPhoneNumber(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable String phoneNumber) {
+        String memberEmail = userDetails.getUsername();
+        String email = memberService.findByPhoneNumberRetEmail(phoneNumber);
+        FriendStatus friendStatus = findFriendStatus( email, memberEmail);
+        if (friendStatus == FriendStatus.EMPTY)
+        {
+            return MemberSearch.builder().friendStatus(friendStatus).build();
+        }
+        MemberSearch memberSearch = memberService.memberSearchByEmail(email);
+        memberSearch.setFriendStatus(friendStatus);
+        return memberSearch;
     }
 
 

@@ -118,6 +118,14 @@ public class MemberService {
         return member;
 
     }
+    public String findByPhoneNumberRetEmail(String phoneNumber) {
+        Member member = memberRepository.findByPhoneNumber(phoneNumber);
+        if (member == null) {
+            return "";
+        }
+        return member.getEmail();
+
+    }
 
     public MemberSearch memberSearchByEmail(String email) {
         Member member = this.findByEmail(email);
