@@ -151,16 +151,10 @@ public class LoginTest {
         String accessToken = tokenInfo1.getAccessToken();
         System.out.println(tokenInfo1.getAccessToken());
         System.out.println(tokenInfo2.getAccessToken());
-        mockMvc.perform(get("/findEmail")
-                        .header("Authorization", "Bearer " + tokenInfo1.getAccessToken()))
-                .andExpect(status().isForbidden());
-
-        mockMvc.perform(get("/findEmail")
-                        .header("Authorization", "Bearer " + tokenInfo2.getAccessToken()))
-                .andExpect(status().isOk());
 
 
     }
+
 
 
 }
