@@ -230,6 +230,7 @@ public class WishItemServiceTest {
 
         Assertions.assertThat(inProgress.getWishItemId()).isEqualTo(wishItem.getId());
         Assertions.assertThat(inProgress.getFundAmount()).isLessThan(wishItem.getPrice());
+        Assertions.assertThat(inProgress.getItemName()).isEqualTo(wishItem.getItem().getName());
         Assertions.assertThat(wishItem.getGiftStatus()).isEqualTo(GiftStatus.IN_PROGRESS);
 
     }
@@ -247,6 +248,7 @@ public class WishItemServiceTest {
 
         FirstWishItem completed = wishItemService.findWishListCompleted(member.getId()).get(0);
         Assertions.assertThat(completed.getWishItemId()).isEqualTo(wishItem.getId());
+        Assertions.assertThat(completed.getItemName()).isEqualTo(wishItem.getItem().getName());
         Assertions.assertThat(completed.getFundAmount()).isGreaterThanOrEqualTo(wishItem.getPrice());
         Assertions.assertThat(wishItem.getGiftStatus()).isEqualTo(GiftStatus.COMPLETED);
     }
@@ -288,6 +290,23 @@ public class WishItemServiceTest {
 
         org.junit.jupiter.api.Assertions.assertThrows(NoPointsException.class,
                 () -> wishItemService.useWishItem(member1.getEmail(), wishItem.getId()));
+
+    }
+
+    @Test
+    @DisplayName("하나도 펀딩 못받은 경우..")
+    public void no_fuding_check(){
+        Item item = galaxy.get(4);
+        WishItem wishItem = WishItem.builder().item(item).money(item.getPrice()).member(member).build();
+        wishItemRepository.join(wishItem);
+        Integer price2 = item.getPrice();
+        Integer fundedAmount = (Integer) (price2 / 3) + 1;
+
+
+        Member member1 = wishItem.getMember();
+
+        List<WishItem> all = wishItemRepository.findAll(member1);
+        Assertions.assertThat(all.size()).isEqualTo(1);
 
     }
 

@@ -15,10 +15,8 @@ import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.ItemRepository;
 import Team4.TobeHonest.repo.MemberRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
-import jakarta.persistence.LockModeType;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,41 +72,60 @@ public class WishItemService {
 
     public List<FirstWishItem> findAllWishList(Long memberId) {
         Member member = memberRepository.findById(memberId);
-        return wishItemRepository.findFirstWishList(member);
+        List<FirstWishItem> firstWishList = wishItemRepository.findFirstWishList(member);
+        setFundedAmount(firstWishList);
+        return firstWishList;
+
     }
 
     public List<FirstWishItem> findWishListInProgress(Long memberId) {
-        return wishItemRepository.findWishItemInProgress(memberId);
+        List<FirstWishItem> firstWishList = wishItemRepository.findWishItemInProgress(memberId);
+        setFundedAmount(firstWishList);
+        return firstWishList;
+    }
 
+    private void setFundedAmount(List<FirstWishItem> firstWishList) {
+        firstWishList.forEach(i -> i.setFundAmount(
+                contributorRepository.findFundedAmount(wishItemRepository.findWishItemById(i.getWishItemId()))));
     }
 
 
     public List<FirstWishItem> findWishListCompleted(Long memberId) {
-        return wishItemRepository.findWishItemCompleted(memberId);
-
+        List<FirstWishItem> firstWishList = wishItemRepository.findWishItemCompleted(memberId);
+        setFundedAmount(firstWishList);
+        return firstWishList;
     }
 
     public List<FirstWishItem> findWishListUsed(Long memberId) {
-        return wishItemRepository.findWishItemUsed(memberId);
+
+        List<FirstWishItem> firstWishList = wishItemRepository.findWishItemUsed(memberId);
+        setFundedAmount(firstWishList);
+        return firstWishList;
+
+
     }
 
 
     public List<WishItemDetail> findWishItemDetail(Long wishItemId) {
-        return wishItemRepository.findWishItemDetail(wishItemId);
+        List<WishItemDetail> wishItemDetail = wishItemRepository.findWishItemDetail(wishItemId);
+        wishItemDetail.forEach(i -> i.setFund(
+                contributorRepository.findFundedAmount(wishItemRepository.findWishItemById(i.getWishItemId()))));
+        return wishItemDetail;
+
     }
 
 
     //wishItem사용하기
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public Integer useWishItem(String memberEmail,  Long wishItemId) {
+    public Integer useWishItem(String memberEmail, Long wishItemId) {
         WishItem wishItem = wishItemRepository.findWishItemById(wishItemId);
-        if (!wishItem.getMember().getEmail().equals(memberEmail)){
+        if (!wishItem.getMember().getEmail().equals(memberEmail)) {
             throw new NotValidWishItemException();
         }
         Integer fundedAmount = contributorRepository.findFundedAmount(wishItem);
         Member member = wishItem.getMember();
         Integer itemPrice = wishItem.getItem().getPrice();
-        if (itemPrice > fundedAmount){
+        if (itemPrice > fundedAmount) {
             throw new NoPointsException();
         }
         wishItem.getMember().addPoints(fundedAmount);

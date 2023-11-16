@@ -112,50 +112,43 @@ public class WishItemRepository {
 
 
 
+
 //    맨처음에 나오는 위시리스트 화면용
     public List<FirstWishItem> findFirstWishList(Member m){
 //      집계함수
-        NumberExpression<Integer> sumFundMoney = contributor.fundMoney.sum();
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.name, item.price, sumFundMoney))
-                .from(contributor)
-                .innerJoin(contributor.wishItem, wishItem)
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.name, item.price))
+                .from(wishItem)
                 .innerJoin(wishItem.item, item)
                 .innerJoin(wishItem.member, member)
                 .where(member.eq(m))
                 .groupBy(wishItem.id)
-                .orderBy(sumFundMoney.desc())
                 .fetch();
+
     }
 
 
 
     public List<WishItemDetail> findWishItemDetail(Long wishItemId){
-        NumberExpression<Integer> sumFundMoney = contributor.fundMoney.sum();
         return jqf.select(Projections.constructor(WishItemDetail.class, wishItem.id,
-                item.name, item.price, sumFundMoney, item.image))
-                .from(contributor)
-                .innerJoin(contributor.wishItem, wishItem)
+                item.name, item.price,  item.image))
+                .from(wishItem)
                 .innerJoin(wishItem.item, item)
                 .where(wishItem.id.eq(wishItemId))
                 .groupBy(wishItem.id)
-                .orderBy(sumFundMoney.desc())
                 .fetch();
     }
 
     //미 완료된 선물 찾기
     public List<FirstWishItem> findWishItemInProgress(Long memberId){
-        NumberExpression<Integer> sumFundMoney = contributor.fundMoney.sum();
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image,item.name ,item.price, sumFundMoney))
-                .from(contributor)
-                .innerJoin(contributor.wishItem, wishItem)
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image,item.name ,item.price))
+                .from(wishItem)
                 .innerJoin(wishItem.item, item)
                 .innerJoin(wishItem.member, member)
                 .where(member.id.eq(memberId)
                         .and(wishItem.giftStatus.eq(GiftStatus.IN_PROGRESS)))
                 .groupBy(wishItem.id)
-                .orderBy(sumFundMoney.desc())
                 .fetch();
 
     }
@@ -163,35 +156,29 @@ public class WishItemRepository {
     //미 완료된 선물 찾기
 
     public List<FirstWishItem> findWishItemCompleted(Long memberId){
-        NumberExpression<Integer> sumFundMoney = contributor.fundMoney.sum();
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.name,item.price, sumFundMoney))
-                .from(contributor)
-                .innerJoin(contributor.wishItem, wishItem)
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.name,item.price))
+                .from(wishItem)
                 .innerJoin(wishItem.item, item)
                 .innerJoin(wishItem.member, member)
                 .where(member.id.eq(memberId)
 
                         .and(wishItem.giftStatus.eq(GiftStatus.COMPLETED)))
                 .groupBy(wishItem.id)
-                .orderBy(sumFundMoney.desc())
                 .fetch();
 
     }
 
     //미 완료된 선물 찾기
     public List<FirstWishItem> findWishItemUsed(Long memberId){
-        NumberExpression<Integer> sumFundMoney = contributor.fundMoney.sum();
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.name, item.price, sumFundMoney))
-                .from(contributor)
-                .innerJoin(contributor.wishItem, wishItem)
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.name, item.price))
+                .from(wishItem)
                 .innerJoin(wishItem.item, item)
                 .innerJoin(wishItem.member, member)
                 .where(member.id.eq(memberId)
                         .and(wishItem.giftStatus.eq(GiftStatus.USED)))
                 .groupBy(wishItem.id)
-                .orderBy(sumFundMoney.desc())
                 .fetch();
 
     }
