@@ -13,6 +13,7 @@ import lombok.*;
 public class FirstWishItem {
     private Long wishItemId;
     private String image;
+    private String itemName;
     //총가격
     private Integer itemPrice;
     //펀딩된 총 가격

@@ -117,7 +117,7 @@ public class WishItemRepository {
 //      집계함수
         NumberExpression<Integer> sumFundMoney = contributor.fundMoney.sum();
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.price, sumFundMoney))
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.name, item.price, sumFundMoney))
                 .from(contributor)
                 .innerJoin(contributor.wishItem, wishItem)
                 .innerJoin(wishItem.item, item)
@@ -147,7 +147,7 @@ public class WishItemRepository {
     public List<FirstWishItem> findWishItemInProgress(Long memberId){
         NumberExpression<Integer> sumFundMoney = contributor.fundMoney.sum();
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.price, sumFundMoney))
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image,item.name ,item.price, sumFundMoney))
                 .from(contributor)
                 .innerJoin(contributor.wishItem, wishItem)
                 .innerJoin(wishItem.item, item)
@@ -165,7 +165,7 @@ public class WishItemRepository {
     public List<FirstWishItem> findWishItemCompleted(Long memberId){
         NumberExpression<Integer> sumFundMoney = contributor.fundMoney.sum();
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.price, sumFundMoney))
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.name,item.price, sumFundMoney))
                 .from(contributor)
                 .innerJoin(contributor.wishItem, wishItem)
                 .innerJoin(wishItem.item, item)
@@ -183,7 +183,7 @@ public class WishItemRepository {
     public List<FirstWishItem> findWishItemUsed(Long memberId){
         NumberExpression<Integer> sumFundMoney = contributor.fundMoney.sum();
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.price, sumFundMoney))
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.name, item.price, sumFundMoney))
                 .from(contributor)
                 .innerJoin(contributor.wishItem, wishItem)
                 .innerJoin(wishItem.item, item)
