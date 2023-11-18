@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 
 public class WishItem {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue()
     @Column(name = "wish_item_id")
     private Long id;
 

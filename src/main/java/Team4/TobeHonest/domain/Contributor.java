@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Contributor {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue()
     private Long id;
 
     @JoinColumn(name = "wish_item_id")

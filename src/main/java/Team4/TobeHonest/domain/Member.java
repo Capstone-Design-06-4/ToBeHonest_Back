@@ -19,7 +19,7 @@ import java.util.Collections;
 public class Member implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue()
     @Column(name = "member_id")
     private Long id;
     //member_id와 중복이 있어서 memberId라 하지 않음.
