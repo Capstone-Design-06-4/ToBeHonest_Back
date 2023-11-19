@@ -39,6 +39,12 @@ public class FriendRepository {
                 where(friendWith.owner.eq(owner).and(friendWith.friend.id.eq(friendId))).
                 fetch();
     }
+    public List<FriendWith> findFriend(Long ownerId, Long friendId) {
+        return jqf.select(friendWith).
+                from(friendWith).
+                where(friendWith.owner.id.eq(ownerId).and(friendWith.friend.id.eq(friendId))).
+                fetch();
+    }
 
     public List<FriendWith> findAllFriends(Member owner) {
         return jqf.select(friendWith).

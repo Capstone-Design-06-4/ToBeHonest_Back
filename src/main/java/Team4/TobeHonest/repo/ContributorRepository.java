@@ -66,12 +66,10 @@ public class ContributorRepository {
 
     public List<ContributorDTO> findContributorsInWishItem(Long wid) {
         return jqf.select(Projections.constructor(ContributorDTO.class, wishItem.id,
-                        contributor.contributor.id, contributor.fundMoney))
-                .from(contributor, friendWith)
+                        contributor.contributor.id, contributor.contributor.name, contributor.contributor.profileImg ,contributor.fundMoney))
+                .from(contributor)
                 .innerJoin(contributor.wishItem, wishItem)
-                .where(this.wishItem.id.eq(wid)
-                        .and(wishItem.member.eq(friendWith.owner))
-                        .and(friendWith.friend.eq(contributor.contributor))).fetch();
+                .where(wishItem.id.eq(wid)).fetch();
 
     }
 

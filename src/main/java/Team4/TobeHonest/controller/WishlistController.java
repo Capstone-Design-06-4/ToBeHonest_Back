@@ -15,6 +15,7 @@ import Team4.TobeHonest.service.WishItemService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,6 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/wishlist")
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@Slf4j
 public class WishlistController {
 
     private final WishItemService wishItemService;
@@ -75,6 +77,7 @@ public class WishlistController {
         List<ContributorDTO> contributor;
 
         if (member.getId().equals(memberId)) {
+            log.info("login Member");
             contributor = contributorService.findContributor(wishItemId);
             response.setContributor(contributor);
         }
