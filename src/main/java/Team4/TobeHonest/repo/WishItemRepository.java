@@ -130,7 +130,7 @@ public class WishItemRepository {
 
 
     public List<WishItemDetail> findWishItemDetail(Long wishItemId){
-        return jqf.select(Projections.constructor(WishItemDetail.class, wishItem.id,
+        return jqf.select(Projections.constructor(WishItemDetail.class, wishItem.id, item.id,
                 item.name, item.price,  item.image))
                 .from(wishItem)
                 .innerJoin(wishItem.item, item)

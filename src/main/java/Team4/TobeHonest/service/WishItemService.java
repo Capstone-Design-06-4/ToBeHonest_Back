@@ -139,4 +139,6 @@ public class WishItemService {
         wishItem.changeGiftStatus(GiftStatus.USED);
         return fundedAmount;
     }
+
+
 }
