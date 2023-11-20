@@ -69,4 +69,17 @@ public class MessageRepository {
     }
 
 
+    public List<MessageResponseDTO> msgWithWithWishItem(Long wishItemId) {
+        return jqf.select(
+                        Projections.constructor(
+                                MessageResponseDTO.class,
+                                item.name, item.image, m.title, m.content, m.sender.id, m.receiver.id, m.messageType, m.fundMoney))
+                .from(m).innerJoin(m.relatedItem, this.wishItem)
+                .innerJoin(this.wishItem.item, this.item)
+                .where(wishItem.id.eq(wishItemId)
+
+                ).orderBy(m.time.asc()).fetch();
+
+    }
+
 }

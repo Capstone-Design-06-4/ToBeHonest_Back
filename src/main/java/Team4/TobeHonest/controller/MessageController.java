@@ -74,4 +74,13 @@ public class MessageController {
 
     }
 
+    @GetMapping("/find/{wishItemId}")
+    public List<MessageResponseDTO> findMessageWithWishItem(@AuthenticationPrincipal UserDetails userDetails,
+                                                            @PathVariable Long wishItemId){
+
+        String loginEmail = userDetails.getUsername();
+        return messageService.findMessageWithWishItemId(wishItemId, loginEmail);
+
+    }
+
 }

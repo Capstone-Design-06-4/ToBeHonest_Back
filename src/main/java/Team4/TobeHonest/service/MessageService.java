@@ -68,4 +68,8 @@ public class MessageService {
         return messageRepository.msgWithMyFriend(memberId, friendId);
     }
 
+    public List<MessageResponseDTO> findMessageWithWishItemId(Long wishItemId){
+        return messageRepository.msgWithWithWishItem(wishItemId);
+    }
+
 }
