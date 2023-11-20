@@ -7,10 +7,7 @@ import Team4.TobeHonest.dto.item.ItemInfoDTO;
 import Team4.TobeHonest.dto.wishitem.FirstWishItem;
 import Team4.TobeHonest.dto.wishitem.WishItemDetail;
 import Team4.TobeHonest.enumer.GiftStatus;
-import Team4.TobeHonest.exception.DuplicateWishItemException;
-import Team4.TobeHonest.exception.ItemNotInWishlistException;
-import Team4.TobeHonest.exception.NoPointsException;
-import Team4.TobeHonest.exception.NotValidWishItemException;
+import Team4.TobeHonest.exception.*;
 import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.ItemRepository;
 import Team4.TobeHonest.repo.MemberRepository;
@@ -69,6 +66,16 @@ public class WishItemService {
         wishItemRepository.deleteWishItem(wishItem);
     }
 
+
+    @Transactional
+    public void deleteWIshItem(Long wishItemId){
+        WishItem wishItem = wishItemRepository.findWishItemById(wishItemId);
+        if (wishItem== null){
+            throw new NoWishItemException("해당 아이템은 위시리스트에 존재하지 않습니다.");
+        }
+        wishItemRepository.deleteWishItem(wishItem);
+
+    }
 
     public List<FirstWishItem> findAllWishList(Long memberId) {
         Member member = memberRepository.findById(memberId);

@@ -96,16 +96,15 @@ public class WishlistController {
         return ResponseEntity.status(HttpStatus.OK).body("위시아이템" + byItemID.getName() + " 추가완료");
     }
 
-    @DeleteMapping("/delete/{itemId}")
-    public ResponseEntity<String> deleteWishItem(@PathVariable Long itemId,
+    @DeleteMapping("/delete/{wishItemId}")
+    public ResponseEntity<String> deleteWishItem(@PathVariable Long wishItemId,
                                                  @AuthenticationPrincipal UserDetails userDetails) {
         String userEmail = userDetails.getUsername();
         Member member = memberService.findByEmail(userEmail);
 
 
-        ItemInfoDTO itemInfoDTO = itemService.findByItembyID(itemId);
-        wishItemService.deleteWishListByItemId((Member) userDetails, itemInfoDTO.getId());
-        return ResponseEntity.status(HttpStatus.OK).body("위시아이템" + itemInfoDTO.getName() + " 추가완료");
+        wishItemService.deleteWIshItem(wishItemId);
+        return ResponseEntity.status(HttpStatus.OK).body("아이템 제거완료");
     }
 
     @PostMapping("/use/{wishItemId}")
