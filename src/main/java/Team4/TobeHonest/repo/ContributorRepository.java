@@ -106,7 +106,7 @@ public class ContributorRepository {
 
     }
 
-    public Integer findFundedAmount(WishItem wishItem){
+    public Integer findTotalFundedAmount(WishItem wishItem){
         NumberExpression<Integer> sumFundMoney = contributor.fundMoney.sum();
         return jqf.select(sumFundMoney).from(contributor)
                 .innerJoin(contributor.wishItem, this.wishItem)
@@ -115,6 +115,12 @@ public class ContributorRepository {
 
 
 
+    public Integer findFundedAmount(WishItem wishItem, Member contributeMember){
+        return jqf.select(contributor.fundMoney)
+                .from(contributor)
+                .where(contributor.contributor.eq(contributeMember)
+                        .and(contributor.wishItem.eq(wishItem))).fetchOne();
+    }
 
 
 

@@ -9,7 +9,11 @@ import lombok.*;
 @Data
 public class FirstWishItem {
     private Long wishItemId;
+
+    private Long itemId;
+
     private String image;
+
     private String itemName;
     //총가격
     private Integer itemPrice;
@@ -19,8 +23,9 @@ public class FirstWishItem {
 
 
     @Builder
-    public FirstWishItem(Long wishItemId, String image, String itemName, Integer itemPrice) {
+    public FirstWishItem(Long wishItemId, Long itemId, String image, String itemName, Integer itemPrice) {
         this.wishItemId = wishItemId;
+        this.itemId = itemId;
         this.image = image;
         this.itemName = itemName;
         this.itemPrice = itemPrice;

@@ -117,7 +117,7 @@ public class WishItemRepository {
     public List<FirstWishItem> findFirstWishList(Member m){
 //      집계함수
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.name, item.price))
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.id, item.image, item.name, item.price))
                 .from(wishItem)
                 .innerJoin(wishItem.item, item)
                 .innerJoin(wishItem.member, member)
@@ -142,7 +142,7 @@ public class WishItemRepository {
     //미 완료된 선물 찾기
     public List<FirstWishItem> findWishItemInProgress(Long memberId){
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image,item.name ,item.price))
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.id, item.image,item.name ,item.price))
                 .from(wishItem)
                 .innerJoin(wishItem.item, item)
                 .innerJoin(wishItem.member, member)
@@ -157,7 +157,7 @@ public class WishItemRepository {
 
     public List<FirstWishItem> findWishItemCompleted(Long memberId){
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.name,item.price))
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.id, item.image, item.name,item.price))
                 .from(wishItem)
                 .innerJoin(wishItem.item, item)
                 .innerJoin(wishItem.member, member)
@@ -172,7 +172,7 @@ public class WishItemRepository {
     //미 완료된 선물 찾기
     public List<FirstWishItem> findWishItemUsed(Long memberId){
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.image, item.name, item.price))
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.id, item.image, item.name, item.price))
                 .from(wishItem)
                 .innerJoin(wishItem.item, item)
                 .innerJoin(wishItem.member, member)

@@ -1,4 +1,4 @@
-package Team4.TobeHonest.dto.message;
+package Team4.TobeHonest.dto.message.thanks;
 
 
 import Team4.TobeHonest.enumer.MessageType;
@@ -14,11 +14,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 //내가 전송 하는 message
-public class SendMessageDTO {
+public class ThanksMessageDTO {
 
     private Long wishItemId;
-    private Long senderId;
-    private Long receiverId;
     private String title;
     private String contents;
     private MessageType messageType;

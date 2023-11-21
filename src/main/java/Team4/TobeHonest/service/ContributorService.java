@@ -61,7 +61,7 @@ public class ContributorService {
         }
 
         //가격이상 펀딩되면 상태 변경하기..
-        if (friendsWish.getPrice() <= contributorRepository.findFundedAmount(friendsWish)) {
+        if (friendsWish.getPrice() <= contributorRepository.findTotalFundedAmount(friendsWish)) {
             friendsWish.changeGiftStatus(GiftStatus.COMPLETED);
         }
 

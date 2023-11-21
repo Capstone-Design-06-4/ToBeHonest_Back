@@ -93,7 +93,7 @@ public class WishItemService {
 
     private void setFundedAmount(List<FirstWishItem> firstWishList) {
         firstWishList.forEach(i -> i.setFundAmount(
-                contributorRepository.findFundedAmount(wishItemRepository.findWishItemById(i.getWishItemId()))));
+                contributorRepository.findTotalFundedAmount(wishItemRepository.findWishItemById(i.getWishItemId()))));
     }
 
 
@@ -116,7 +116,7 @@ public class WishItemService {
     public List<WishItemDetail> findWishItemDetail(Long wishItemId) {
         List<WishItemDetail> wishItemDetail = wishItemRepository.findWishItemDetail(wishItemId);
         wishItemDetail.forEach(i -> i.setFund(
-                contributorRepository.findFundedAmount(wishItemRepository.findWishItemById(i.getWishItemId()))));
+                contributorRepository.findTotalFundedAmount(wishItemRepository.findWishItemById(i.getWishItemId()))));
         return wishItemDetail;
 
     }
@@ -129,7 +129,7 @@ public class WishItemService {
         if (!wishItem.getMember().getEmail().equals(memberEmail)) {
             throw new NotValidWishItemException();
         }
-        Integer fundedAmount = contributorRepository.findFundedAmount(wishItem);
+        Integer fundedAmount = contributorRepository.findTotalFundedAmount(wishItem);
         Member member = wishItem.getMember();
         Integer itemPrice = wishItem.getItem().getPrice();
         if (itemPrice > fundedAmount) {
