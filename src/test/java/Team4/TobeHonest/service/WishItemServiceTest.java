@@ -201,6 +201,7 @@ public class WishItemServiceTest {
 
 
         Assertions.assertThat(detail.getWishItemId()).isEqualTo(wishItemId);
+        Assertions.assertThat(detail.getItemId()).isEqualTo(itemRepository.findByName(this.galaxy.get(0).getName()).getId());
         Assertions.assertThat(detail.getItemName()).isEqualTo(this.galaxy.get(0).getName());
         Assertions.assertThat(detail.getFund()).isEqualTo(20000);
         Assertions.assertThat(detail.getTotal()).isEqualTo(this.galaxy.get(0).getPrice());
