@@ -6,17 +6,19 @@ import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.domain.WishItem;
 import Team4.TobeHonest.dto.item.ItemInfoDTO;
 import Team4.TobeHonest.dto.message.SendMessageWithNoIMG;
+import Team4.TobeHonest.dto.message.celebrate.SendCelebrateMessage;
+import Team4.TobeHonest.dto.message.thanks.ThanksMessageDTO;
+import Team4.TobeHonest.dto.message.thanks.ThanksWithNoImg;
 import Team4.TobeHonest.dto.signup.LoginDTO;
 import Team4.TobeHonest.dto.wishitem.FirstWishItem;
+import Team4.TobeHonest.enumer.MessageType;
 import Team4.TobeHonest.repo.ItemRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
-import Team4.TobeHonest.service.FriendService;
-import Team4.TobeHonest.service.MemberService;
-import Team4.TobeHonest.service.MessageService;
-import Team4.TobeHonest.service.WishItemService;
+import Team4.TobeHonest.service.*;
 import Team4.TobeHonest.setup.FriendJoinService;
 import Team4.TobeHonest.setup.NaverSearchService;
 import Team4.TobeHonest.utils.jwt.TokenInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -84,6 +86,8 @@ public class MessageControllerTest {
     @Autowired
     WishItemRepository wishItemRepository;
 
+    @Autowired
+    ContributorService contributorService;
     MockHttpSession mockSession = new MockHttpSession();
     @Autowired
     HttpServletRequest request;
@@ -129,16 +133,49 @@ public class MessageControllerTest {
         //access토큰이 정상적으로 expire됐는가?
 
         this.accessToken = tokenInfo.getAccessToken();
+        friend1.addPoints(100000000);
+        friend2.addPoints(100000000);
+        contributorService.contributing(friend1, wishItem.getId(), (Integer)(wishItem.getItem().getPrice() / 3) + 3);
+        contributorService.contributing(friend2, wishItem.getId(), ((Integer)(wishItem.getItem().getPrice() / 3)) * 2);
+
+
+
 
     }
 
-   /* @Test
-    @DisplayName("정상 메시지 전송")
+
+
+    //위에서 이미지 전송 잘되는 것을 확인 했으니.. pass
+    @Test
+    @DisplayName("축하 메시지 전달")
     @WithMockUser
-    //@WithMockUser 어노테이션을 사용하면 다음과 같이 간단하게 인증된 사용자를 만들지 않아도 테스트를 요청할 수 있다.
-    public void sendMessageTest_Success() throws Exception {
-        SendMessageDTO sendMessage = new SendMessageDTO();
-        // 여기에 sendMessage 객체를 초기화하는 코드 추가
+    public void sendContirbuteMessage() throws Exception {
+
+
+
+        SendCelebrateMessage dto = SendCelebrateMessage.builder()
+                .messageType(MessageType.CELEBRATION_MSG)
+                .wishItemId(wishItem.getId())
+                .title("돈갚아라1")
+                .contents("돈갚아라1")
+                .build();
+
+
+        String body = objectMapper.writeValueAsString(dto);
+        mockMvc.perform(MockMvcRequestBuilders.post("/message/send-celebrate")
+                .header("Authorization", "Bearer " + accessToken)
+                .contentType(MediaType.APPLICATION_JSON).content(body)
+
+        ).andExpect(status().isOk()).andDo(print());
+
+
+    }
+
+    @Test
+    @DisplayName("감사 메시지 전달")
+    @WithMockUser
+    public void sendThanksMessage() throws Exception {
+
         String filePath1 = "C:\\Users\\alswn\\TobeHonest\\src\\main\\resources\\profile\\default.jpeg";
         String filePath2 = "C:\\Users\\alswn\\TobeHonest\\src\\main\\resources\\messages\\1\\1.jpg";
 
@@ -150,18 +187,19 @@ public class MessageControllerTest {
         byte[] content2 = Files.readAllBytes(path2);
         MockMultipartFile file2 = new MockMultipartFile("images", "1.jpg", "image/jpg", content2);
 
-        SendMessageWithNoIMG build = SendMessageWithNoIMG.builder()
-                .senderId(member.getId())
-                .receiverId(friend1.getId())
+        ThanksWithNoImg dto = ThanksWithNoImg.builder()
                 .wishItemId(wishItem.getId())
-                .title("메롱")
-                .contents("ㅗ").build();
-        String json = objectMapper.writeValueAsString(build);
+                .title("돈안갚냐?")
+                .contents("돈갚아라고")
+                .messageType(MessageType.THANKS_MSG)
+                .build();
+        String json = objectMapper.writeValueAsString(dto);
         MockMultipartFile sendMessageWithNoIMGPart =
                 new MockMultipartFile("request", "", "application/json",
-                json.getBytes(StandardCharsets.UTF_8));
+                        json.getBytes(StandardCharsets.UTF_8));
 
-        mockMvc.perform(multipart("/message/send")
+
+        mockMvc.perform(multipart("/message/send-thanks")
                         .file(sendMessageWithNoIMGPart)
                         .file(file1)
                         .file(file2)
@@ -169,44 +207,9 @@ public class MessageControllerTest {
                         .session(mockSession))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print());
-    }
-*/
 
-    //위에서 이미지 전송 잘되는 것을 확인 했으니.. pass
-    @Test
-    @DisplayName("로그인 유저와 sender의 정보가 다른 경우..")
-    @WithMockUser
-    public void sendMessageTest_NonAuthorized() throws Exception{
-        SendMessageWithNoIMG build = SendMessageWithNoIMG.builder()
-                .senderId(friend2.getId())
-                .receiverId(friend1.getId())
-                .wishItemId(wishItem.getId())
-                .title("메롱")
-                .contents("ㅗ").build();
-        String json = objectMapper.writeValueAsString(build);
-        MockMultipartFile sendMessageWithNoIMGPart =
-                new MockMultipartFile("request", "", "application/json",
-                        json.getBytes(StandardCharsets.UTF_8));
-
-
-        mockMvc.perform(multipart("/message/send")
-                        .file(sendMessageWithNoIMGPart)
-                        .file(sendMessageWithNoIMGPart)
-                        .contentType(MediaType.MULTIPART_FORM_DATA).header("Authorization", "Bearer " + accessToken)
-                        .session(mockSession))
-                .andExpect(status().isUnauthorized())
-                .andDo(MockMvcResultHandlers.print());
 
     }
-
-
-    @Test
-    @DisplayName("메시지 주고받았을 때, 해방 정보를 return해주기 ")
-    @WithMockUser
-    public void sendReceive_Check(){
-
-    }
-
 
 
 
