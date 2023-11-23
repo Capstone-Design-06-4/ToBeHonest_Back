@@ -17,6 +17,7 @@ public class Item {
     private Long naverId;
     private String name;
     private Integer price;
+    private String brandName;
 
     //이미지 파일 경로를 지정
     private String image;

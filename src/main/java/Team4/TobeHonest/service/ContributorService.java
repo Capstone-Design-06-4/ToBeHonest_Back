@@ -2,15 +2,18 @@ package Team4.TobeHonest.service;
 
 
 import Team4.TobeHonest.domain.Contributor;
+import Team4.TobeHonest.domain.FriendWith;
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.domain.WishItem;
 import Team4.TobeHonest.dto.contributor.ContributorDTO;
 import Team4.TobeHonest.enumer.GiftStatus;
 import Team4.TobeHonest.exception.NoWishItemException;
 import Team4.TobeHonest.repo.ContributorRepository;
+import Team4.TobeHonest.repo.FriendRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +23,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Transactional(readOnly = true)
+@Slf4j
 public class ContributorService {
 
     private final WishItemRepository wishItemRepository;
     private final ContributorRepository contributorRepository;
+    private final FriendRepository friendRepository;
 
     //    후원하기기능
 //    로그인한 회원이 친구의 wishItem에 펀딩을 하는 기능..
@@ -56,7 +61,7 @@ public class ContributorService {
         }
 
         //가격이상 펀딩되면 상태 변경하기..
-        if (friendsWish.getPrice() <= contributorRepository.findFundedAmount(friendsWish)) {
+        if (friendsWish.getPrice() <= contributorRepository.findTotalFundedAmount(friendsWish)) {
             friendsWish.changeGiftStatus(GiftStatus.COMPLETED);
         }
 
@@ -65,7 +70,18 @@ public class ContributorService {
 
 
     public List<ContributorDTO> findContributor(Long wishItemId) {
-        return contributorRepository.findContributorsInWishItem(wishItemId);
+        Member member = wishItemRepository.findWishItemById(wishItemId).getMember();
+        List<ContributorDTO> contributorsInWishItem = contributorRepository.findContributorsInWishItem(wishItemId);
+        contributorsInWishItem.forEach((contributorDTO ->
+        {
+            List<FriendWith> friend = friendRepository.findFriend(member, contributorDTO.friendId);
+            if(!friendRepository.findFriend(member, contributorDTO.friendId).isEmpty()){
+                contributorDTO.setFriendName(friend.get(0).getSpecifiedName());
+            }
+        }
+
+                ));
+        return contributorsInWishItem;
     }
 
     public List<Long> findGiftGiversToMe(Long myId) {
@@ -75,6 +91,7 @@ public class ContributorService {
     public List<Long> getGiftReceiversFromMe(Long myId) {
         return contributorRepository.findMyContributions(myId);
     }
+
 
 
 }

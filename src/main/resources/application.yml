@@ -10,15 +10,10 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
-#  datasource:
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://localhost:3306/tobehonest?serverTimezone=UTC&characterEncoding=UTF-8
-#    username: root
-#    password: 5471
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     properties:
       hibernate:
         # show_sql: true

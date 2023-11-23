@@ -2,19 +2,16 @@ package Team4.TobeHonest.controller;
 
 
 import Team4.TobeHonest.domain.Member;
-import Team4.TobeHonest.domain.Message;
 import Team4.TobeHonest.dto.message.MessageResponseDTO;
-import Team4.TobeHonest.dto.message.SendMessageDTO;
-import Team4.TobeHonest.dto.message.SendMessageWithNoIMG;
-import Team4.TobeHonest.exception.NoWishItemException;
+import Team4.TobeHonest.dto.message.celebrate.SendCelebrateMessage;
+import Team4.TobeHonest.dto.message.thanks.ThanksWithNoImg;
+import Team4.TobeHonest.dto.message.thanks.ThanksMessageDTO;
 import Team4.TobeHonest.service.ImageService;
 import Team4.TobeHonest.service.MemberService;
 import Team4.TobeHonest.service.MessageService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,45 +29,62 @@ import java.util.List;
 public class MessageController {
 
     private final MessageService messageService;
-    private final MemberService memberService;
-    private final ImageService imageService;
-    @PostMapping(value = "/send" ,consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+
+    @PostMapping(value = "/send-thanks" ,consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     //@RequestBodt ==> only 1개 mapping  ==> @RequestPart로 나누기
-    public ResponseEntity<String> sendMessage(@RequestPart(name = "request") SendMessageWithNoIMG sendMessageWithNoIMG,
+    public ResponseEntity<String> sendThanksMessage(@RequestPart ThanksWithNoImg request,
                                               @RequestPart(required = false) List<MultipartFile> images,
                                               @AuthenticationPrincipal UserDetails userDetails) throws IOException {
 
         String userEmail = userDetails.getUsername();
-        Member member = memberService.findByEmail(userEmail);
-        SendMessageDTO sendMessage = SendMessageDTO.builder()
-                .senderId(sendMessageWithNoIMG.getSenderId())
-                .receiverId(sendMessageWithNoIMG.getReceiverId())
-                .wishItemId(sendMessageWithNoIMG.getWishItemId())
-                .title(sendMessageWithNoIMG.getTitle())
-                .contents(sendMessageWithNoIMG.getContents())
-                .messageType(sendMessageWithNoIMG.getMessageType())
-                .fundMoney(sendMessageWithNoIMG.getFundMoney())
+        ThanksMessageDTO sendMessage = ThanksMessageDTO.builder()
+                .wishItemId(request.getWishItemId())
+                .title(request.getTitle())
+                .contents(request.getContents())
+                .messageType(request.getMessageType())
                 .build();
 
 
         sendMessage.setImages(images);
-        if (!sendMessage.getSenderId().equals(member.getId())){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("sender와 로그인 한 유저의 정보가 다릅니다");
-        }
-        Message message = messageService.sendMessage(sendMessage);
-        imageService.saveMessageImg(images, message);
+
+
+        messageService.sendThanksMessageToAllContributor(sendMessage, userEmail);
+
+
+        return ResponseEntity.ok("감사 메세지 전송 완료");
+    }
+
+    @PostMapping(value = "/send-celebrate")
+    //@RequestBodt ==> only 1개 mapping  ==> @RequestPart로 나누기
+    public ResponseEntity<String> sendMessageToAllContributor(@RequestBody SendCelebrateMessage request,
+                                                              @AuthenticationPrincipal UserDetails userDetails) throws IOException {
+
+        String userEmail = userDetails.getUsername();
+        messageService.sendCelebrateMessage(request, userEmail);
 
         return ResponseEntity.ok("메세지 전송 완료");
     }
 
-    //친구랑 주고 받은 메시지를 return 해주는 controller
-    @GetMapping("/find/{friendId}")
-    public List<MessageResponseDTO> findMessageWithFriend(@AuthenticationPrincipal UserDetails userDetails,
-                                                          @PathVariable Long friendId){
-        String userEmail = userDetails.getUsername();
-        Member member = memberService.findByEmail(userEmail);
 
-        return messageService.messageWithFriend(member.getId(), friendId);
+    //친구랑 주고 받은 메시지를 return 해주는 controller
+
+
+    @GetMapping("/find/wish-item/{wishItemId}")
+    public List<MessageResponseDTO> findMessageWithWishItem(@AuthenticationPrincipal UserDetails userDetails,
+                                                            @PathVariable Long wishItemId){
+
+        String loginEmail = userDetails.getUsername();
+        return messageService.findMessageWithWishItemId(wishItemId, loginEmail);
+
+    }
+
+    @GetMapping("/find/friend-id" +
+            "/{friendId}")
+    public List<MessageResponseDTO> findMessageWithFriendId(@AuthenticationPrincipal UserDetails userDetails,
+                                                            @PathVariable Long friendId){
+
+        String loginEmail = userDetails.getUsername();
+        return messageService.findMessageWithFriendId(friendId, loginEmail);
 
     }
 

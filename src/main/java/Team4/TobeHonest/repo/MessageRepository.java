@@ -6,13 +6,14 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class MessageRepository {
+public class MessageRepository  {
 
     private final EntityManager em;
     private final JPAQueryFactory jqf;
@@ -69,4 +70,21 @@ public class MessageRepository {
     }
 
 
+    public List<MessageResponseDTO> msgWithWithWishItem(Long wishItemId) {
+        return jqf.select(
+                        Projections.constructor(
+                                MessageResponseDTO.class,
+                                this.wishItem.id, item.id,
+                                item.name, item.image, m.title, m.content, m.sender.id, m.receiver.id, m.messageType, m.fundMoney))
+                .from(m).innerJoin(m.relatedItem, this.wishItem)
+                .innerJoin(this.wishItem.item, this.item)
+                .where(wishItem.id.eq(wishItemId))
+                .orderBy(m.time.asc()).fetch();
+
+    }
+
+
+    public void saveAll(List<Message> messages){
+        messages.forEach(em::persist);
+    }
 }

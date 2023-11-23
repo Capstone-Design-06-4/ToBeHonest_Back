@@ -40,6 +40,7 @@ public class Message {
     @ManyToOne
     @JoinColumn(name = "sender_id")
     private Member sender;
+
     @ManyToOne
     @JoinColumn(name = "receiver_id")
     private Member receiver;
