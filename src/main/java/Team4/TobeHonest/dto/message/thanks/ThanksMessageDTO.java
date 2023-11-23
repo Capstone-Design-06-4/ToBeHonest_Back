@@ -21,7 +21,6 @@ public class ThanksMessageDTO {
     private String contents;
     private MessageType messageType;
     //펀딩한 금액..
-    private Integer fundMoney;
     //이미지와 json은 병렬화 할 수 없다..
     private List<MultipartFile> images = new ArrayList<>();
 

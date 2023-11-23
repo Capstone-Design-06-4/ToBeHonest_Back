@@ -42,7 +42,6 @@ public class MessageController {
                 .title(request.getTitle())
                 .contents(request.getContents())
                 .messageType(request.getMessageType())
-                .fundMoney(request.getFundMoney())
                 .build();
 
 
@@ -55,9 +54,9 @@ public class MessageController {
         return ResponseEntity.ok("감사 메세지 전송 완료");
     }
 
-    @PostMapping(value = "/send-celebrate" ,consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/send-celebrate")
     //@RequestBodt ==> only 1개 mapping  ==> @RequestPart로 나누기
-    public ResponseEntity<String> sendMessageToAllContributor(@RequestPart(name = "request") SendCelebrateMessage request,
+    public ResponseEntity<String> sendMessageToAllContributor(@RequestBody SendCelebrateMessage request,
                                                               @AuthenticationPrincipal UserDetails userDetails) throws IOException {
 
         String userEmail = userDetails.getUsername();

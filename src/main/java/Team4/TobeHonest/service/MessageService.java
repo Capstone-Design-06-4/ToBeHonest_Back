@@ -120,6 +120,5 @@ public class MessageService {
         //메시지 레포에 저장?
         messageRepository.join(message);
         //이미지 저장
-
     }
 }

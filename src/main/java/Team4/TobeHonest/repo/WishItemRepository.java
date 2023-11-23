@@ -5,7 +5,6 @@ import Team4.TobeHonest.dto.wishitem.FirstWishItem;
 import Team4.TobeHonest.dto.wishitem.WishItemDetail;
 import Team4.TobeHonest.enumer.GiftStatus;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,7 @@ public class WishItemRepository {
     }
 
     public void deleteWishItem(WishItem wishItem) {
-        em.remove(wishItem);
+        wishItem.changeGiftStatus(GiftStatus.DELETED);
     }
 
     //    위시리스트에 있는 아이템 찾기..
@@ -42,8 +41,7 @@ public class WishItemRepository {
         List<WishItem> result = jqf.select(wishItem)
                 .from(wishItem)
                 .innerJoin(wishItem.item, this.item).innerJoin(wishItem.member, this.member)
-                .where(wishItem.member.eq(member))
-                .fetch();
+                .where(wishItem.member.eq(member).and(wishItem.giftStatus.ne(GiftStatus.DELETED))).fetch();
         if (result.isEmpty()) {
             return null;
         }
@@ -55,8 +53,10 @@ public class WishItemRepository {
         List<WishItem> result = jqf.select(wishItem)
                 .from(wishItem)
                 .innerJoin(wishItem.item, this.item).innerJoin(wishItem.member, this.member)
-                .where(wishItem.member.eq(member).and(this.item.name.eq(itemName)))
-                .fetch();
+                .where(wishItem.member.eq(member)
+                        .and(wishItem.giftStatus.ne(GiftStatus.DELETED))
+                        .and(this.item.name.eq(itemName))).fetch();
+
         if (result.isEmpty()) {
             return null;
         }
@@ -68,7 +68,9 @@ public class WishItemRepository {
         List<WishItem> result = jqf.select(wishItem)
                 .from(wishItem)
                 .innerJoin(wishItem.item, this.item).innerJoin(wishItem.member, this.member)
-                .where(wishItem.member.eq(member).and(this.item.id.eq(id)))
+                .where(wishItem.member.eq(member)
+                        .and(this.item.id.eq(id))
+                        .and(wishItem.giftStatus.ne(GiftStatus.DELETED)))
                 .fetch();
         if (result.isEmpty()) {
             return null;
@@ -77,11 +79,14 @@ public class WishItemRepository {
     }
 
 
-    public WishItem findWishItemByEmailAndItemName(String email, String itemName){
+    public WishItem findWishItemByEmailAndItemName(String email, String itemName) {
         List<WishItem> result = jqf.select(wishItem)
                 .from(wishItem)
                 .innerJoin(wishItem.item, this.item).innerJoin(wishItem.member, this.member)
-                .where(wishItem.member.email.eq(email).and(this.item.name.eq(itemName)))
+                .where(wishItem.member.email.eq(email)
+                        .and(this.item.name.eq(itemName))
+                        .and(wishItem.giftStatus.ne(GiftStatus.DELETED))
+                )
                 .fetch();
         if (result.isEmpty()) {
             return null;
@@ -90,11 +95,13 @@ public class WishItemRepository {
     }
 
 
-    public WishItem findWishItemByIdAndItemName(Long friendId, String itemName){
+    public WishItem findWishItemByIdAndItemName(Long friendId, String itemName) {
         List<WishItem> result = jqf.select(wishItem)
                 .from(wishItem)
                 .innerJoin(wishItem.item, this.item).innerJoin(wishItem.member, this.member)
-                .where(wishItem.member.id.eq(friendId).and(this.item.name.eq(itemName)))
+                .where(wishItem.member.id.eq(friendId)
+                        .and(this.item.name.eq(itemName))
+                        .and(wishItem.giftStatus.ne(GiftStatus.DELETED)))
                 .fetch();
         if (result.isEmpty()) {
             return null;
@@ -103,35 +110,33 @@ public class WishItemRepository {
     }
 
 
-
-    public List<WishItem> findAll(Member m){
+    public List<WishItem> findAll(Member m) {
         return jqf.select(wishItem).
                 from(wishItem).
-                where(wishItem.member.eq(m)).fetch();
+                where(wishItem.member.eq(m)
+                        .and(wishItem.giftStatus.ne(GiftStatus.DELETED))).fetch();
     }
 
 
-
-
-//    맨처음에 나오는 위시리스트 화면용
-    public List<FirstWishItem> findFirstWishList(Member m){
+    //    맨처음에 나오는 위시리스트 화면용
+    public List<FirstWishItem> findFirstWishList(Member m) {
 //      집계함수
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
         return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.id, item.image, item.name, item.price))
                 .from(wishItem)
                 .innerJoin(wishItem.item, item)
                 .innerJoin(wishItem.member, member)
-                .where(member.eq(m))
+                .where(member.eq(m).and(wishItem.giftStatus.ne(GiftStatus.DELETED))
+                )
                 .groupBy(wishItem.id)
                 .fetch();
 
     }
 
 
-
-    public List<WishItemDetail> findWishItemDetail(Long wishItemId){
+    public List<WishItemDetail> findWishItemDetail(Long wishItemId) {
         return jqf.select(Projections.constructor(WishItemDetail.class, wishItem.id, item.id,
-                item.name, item.price,  item.image))
+                        item.name, item.price, item.image))
                 .from(wishItem)
                 .innerJoin(wishItem.item, item)
                 .where(wishItem.id.eq(wishItemId))
@@ -140,9 +145,9 @@ public class WishItemRepository {
     }
 
     //미 완료된 선물 찾기
-    public List<FirstWishItem> findWishItemInProgress(Long memberId){
+    public List<FirstWishItem> findWishItemInProgress(Long memberId) {
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.id, item.image,item.name ,item.price))
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.id, item.image, item.name, item.price))
                 .from(wishItem)
                 .innerJoin(wishItem.item, item)
                 .innerJoin(wishItem.member, member)
@@ -155,9 +160,9 @@ public class WishItemRepository {
 
     //미 완료된 선물 찾기
 
-    public List<FirstWishItem> findWishItemCompleted(Long memberId){
+    public List<FirstWishItem> findWishItemCompleted(Long memberId) {
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.id, item.image, item.name,item.price))
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.id, item.image, item.name, item.price))
                 .from(wishItem)
                 .innerJoin(wishItem.item, item)
                 .innerJoin(wishItem.member, member)
@@ -170,7 +175,7 @@ public class WishItemRepository {
     }
 
     //미 완료된 선물 찾기
-    public List<FirstWishItem> findWishItemUsed(Long memberId){
+    public List<FirstWishItem> findWishItemUsed(Long memberId) {
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
         return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.id, item.image, item.name, item.price))
                 .from(wishItem)
@@ -182,8 +187,6 @@ public class WishItemRepository {
                 .fetch();
 
     }
-
-
 
 
 }
