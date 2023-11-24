@@ -7,11 +7,9 @@ import Team4.TobeHonest.dto.item.ItemInfoDTO;
 import Team4.TobeHonest.dto.wishitem.FirstWishItem;
 import Team4.TobeHonest.dto.wishitem.WishItemDetail;
 import Team4.TobeHonest.enumer.GiftStatus;
+import Team4.TobeHonest.enumer.IsThanksMessagedSend;
 import Team4.TobeHonest.exception.*;
-import Team4.TobeHonest.repo.ContributorRepository;
-import Team4.TobeHonest.repo.ItemRepository;
-import Team4.TobeHonest.repo.MemberRepository;
-import Team4.TobeHonest.repo.WishItemRepository;
+import Team4.TobeHonest.repo.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,6 +35,7 @@ public class WishItemService {
         if (wishItem != null) {
             throw new DuplicateWishItemException("이미 위시리스트에 존재하는 아이템입니다!");
         }
+
         Item item = itemRepository.findByName(itemInfoDTO.getName());
         wishItem = WishItem.builder()
                 .item(item)
@@ -81,8 +80,19 @@ public class WishItemService {
         Member member = memberRepository.findById(memberId);
         List<FirstWishItem> firstWishList = wishItemRepository.findFirstWishList(member);
         setFundedAmount(firstWishList);
+
+        changeThanksMessagedSend(firstWishList);
+
         return firstWishList;
 
+    }
+
+    private void changeThanksMessagedSend(List<FirstWishItem> firstWishList) {
+        firstWishList.forEach(firstWishItem -> {
+            if (!wishItemRepository.isThanksMessagedSend(firstWishItem.getWishItemId()).isEmpty())
+                firstWishItem.setIsMessaged(IsThanksMessagedSend.MESSAGED);
+
+        });
     }
 
     public List<FirstWishItem> findWishListInProgress(Long memberId) {
@@ -94,12 +104,15 @@ public class WishItemService {
     private void setFundedAmount(List<FirstWishItem> firstWishList) {
         firstWishList.forEach(i -> i.setFundAmount(
                 contributorRepository.findTotalFundedAmount(wishItemRepository.findWishItemById(i.getWishItemId()))));
+
+
     }
 
 
     public List<FirstWishItem> findWishListCompleted(Long memberId) {
         List<FirstWishItem> firstWishList = wishItemRepository.findWishItemCompleted(memberId);
         setFundedAmount(firstWishList);
+        changeThanksMessagedSend(firstWishList);
         return firstWishList;
     }
 
@@ -107,17 +120,29 @@ public class WishItemService {
 
         List<FirstWishItem> firstWishList = wishItemRepository.findWishItemUsed(memberId);
         setFundedAmount(firstWishList);
+        changeThanksMessagedSend(firstWishList);
         return firstWishList;
 
 
     }
 
 
-    public List<WishItemDetail> findWishItemDetail(Long wishItemId) {
+    public WishItemDetail findWishItemDetail(Long wishItemId) {
         List<WishItemDetail> wishItemDetail = wishItemRepository.findWishItemDetail(wishItemId);
-        wishItemDetail.forEach(i -> i.setFund(
-                contributorRepository.findTotalFundedAmount(wishItemRepository.findWishItemById(i.getWishItemId()))));
-        return wishItemDetail;
+        //잘못된 위시아이템 접근
+        if (wishItemDetail.isEmpty()){
+            throw new NoWishItemException("위시아이템이 존재하지 않습니다!");
+        }
+
+        WishItemDetail wishItemDetail1 = wishItemDetail.get(0);
+        //위시아이템에 fundedAmount찾기
+        wishItemDetail1.setFund(contributorRepository.findTotalFundedAmount(wishItemRepository.findWishItemById(wishItemId)));
+
+        //감사 메시지를 보냈는가 확인
+        if (!wishItemRepository.isThanksMessagedSend(wishItemId).isEmpty()){
+            wishItemDetail1.setIsThanksMessagedSend(IsThanksMessagedSend.MESSAGED);
+        }
+        return wishItemDetail1;
 
     }
 

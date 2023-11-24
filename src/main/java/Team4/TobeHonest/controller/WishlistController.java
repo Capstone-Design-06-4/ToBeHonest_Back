@@ -67,8 +67,7 @@ public class WishlistController {
                                                  @AuthenticationPrincipal UserDetails userDetails) {
 
         WishItemResponseDTO response = new WishItemResponseDTO();
-        List<WishItemDetail> wishItemDetail = wishItemService.findWishItemDetail(wishItemId);
-        response.setWishItemDetail(wishItemDetail);
+        response.getWishItemDetail().add(wishItemService.findWishItemDetail(wishItemId));
         String userEmail = userDetails.getUsername();
 
         Member member = memberService.findByEmail(userEmail);
