@@ -26,6 +26,7 @@ public class Member implements UserDetails {
     //private String userId;
 
     //  사실상 id 역할
+    @Column(unique = true)
     private String email;
     private String name;
     private String password;

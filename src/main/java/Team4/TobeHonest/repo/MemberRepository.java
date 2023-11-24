@@ -7,6 +7,7 @@ import Team4.TobeHonest.domain.QWishItem;
 import Team4.TobeHonest.dto.member.MemberDetailInformation;
 import Team4.TobeHonest.dto.message.MessageResponseDTO;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class MemberRepository {
     private final EntityManager em;
     private final JPAQueryFactory jqf;
     private final QMember m = new QMember("m");
+    private final QWishItem wishItem = new QWishItem("m");
 
 
     public void join(Member member) {
@@ -70,7 +72,19 @@ public class MemberRepository {
         return find.get(0);
     }
 
+    public MemberDetailInformation findMemberDetail(Member member){
+       /* private final QWishItem wishItem1 = new QWishItem("m");
+        private final QWishItem wishItem2 = new QWishItem("m");
+        private final QWishItem wishItem3 = new QWishItem("m");
+        NumberExpression<Integer> progress = wishItem.count().intValue();
+        NumberExpression<Integer> completed = wishItem.count().intValue();
+        NumberExpression<Integer> progress = wishItem.count().intValue();*/
 
+        return jqf.select(Projections.constructor(
+                MemberDetailInformation.class,
+                m.name, m.profileImg, m.birthDate, m.points)).from(m).where(m.eq(member)).fetchOne();
+
+    }
 
 
 }

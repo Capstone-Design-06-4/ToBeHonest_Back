@@ -4,8 +4,10 @@ import Team4.TobeHonest.domain.*;
 import Team4.TobeHonest.dto.wishitem.FirstWishItem;
 import Team4.TobeHonest.dto.wishitem.WishItemDetail;
 import Team4.TobeHonest.enumer.GiftStatus;
+import Team4.TobeHonest.enumer.IsThanksMessagedSend;
 import Team4.TobeHonest.enumer.MessageType;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -124,7 +126,7 @@ public class WishItemRepository {
     public List<FirstWishItem> findFirstWishList(Member m) {
 //      집계함수
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.id, item.image, item.name, item.price))
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.id, item.image, item.name, item.price, wishItem.isThanksMessagedSend))
                 .from(wishItem)
                 .innerJoin(wishItem.item, item)
                 .innerJoin(wishItem.member, member)
@@ -137,8 +139,7 @@ public class WishItemRepository {
 
 
     public List<WishItemDetail> findWishItemDetail(Long wishItemId) {
-        return jqf.select(Projections.constructor(WishItemDetail.class, wishItem.id, item.id,
-                        item.name, item.price, item.image))
+        return jqf.select(Projections.constructor(WishItemDetail.class, wishItem.id, item.id, item.name, item.price, item.image, wishItem.isThanksMessagedSend))
                 .from(wishItem)
                 .innerJoin(wishItem.item, item)
                 .where(wishItem.id.eq(wishItemId))
@@ -149,7 +150,7 @@ public class WishItemRepository {
     //미 완료된 선물 찾기
     public List<FirstWishItem> findWishItemInProgress(Long memberId) {
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.id, item.image, item.name, item.price))
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.id, item.image, item.name, item.price, wishItem.isThanksMessagedSend))
                 .from(wishItem)
                 .innerJoin(wishItem.item, item)
                 .innerJoin(wishItem.member, member)
@@ -164,7 +165,7 @@ public class WishItemRepository {
 
     public List<FirstWishItem> findWishItemCompleted(Long memberId) {
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.id, item.image, item.name, item.price))
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.id, item.image, item.name, item.price, wishItem.isThanksMessagedSend))
                 .from(wishItem)
                 .innerJoin(wishItem.item, item)
                 .innerJoin(wishItem.member, member)
@@ -176,10 +177,9 @@ public class WishItemRepository {
 
     }
 
-    //미 완료된 선물 찾기
     public List<FirstWishItem> findWishItemUsed(Long memberId) {
         //집계함수를 기준으로 내림차순. 이건 뭐 나중에 변경하면 되니까..
-        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.id, item.image, item.name, item.price))
+        return jqf.select(Projections.constructor(FirstWishItem.class, wishItem.id, item.id, item.image, item.name, item.price, wishItem.isThanksMessagedSend))
                 .from(wishItem)
                 .innerJoin(wishItem.item, item)
                 .innerJoin(wishItem.member, member)
@@ -191,12 +191,51 @@ public class WishItemRepository {
     }
 
 
-    //선물에 감사 메시지가 전송됐는가?
-    public List<Message> isThanksMessagedSend(Long wishItemId){
 
-        return jqf.select(message).from(message)
-                .innerJoin(message.relatedItem, wishItem)
-                .where(message.messageType.eq(MessageType.THANKS_MSG)).fetch();
+
+    public Integer countProgressNum(Member member){
+
+        NumberExpression<Integer> progress = wishItem.count().intValue();
+        Integer i = jqf.select(progress)
+                .from(wishItem)
+                .where(wishItem.member.eq(member)
+                        .and(wishItem.giftStatus.eq(GiftStatus.IN_PROGRESS))).fetchOne();
+        return (i == null) ? 0 : i;
+    }
+
+    public Integer completedNum(Member member){
+
+        NumberExpression<Integer> progress = wishItem.count().intValue();
+        Integer i = jqf.select(progress)
+                .from(wishItem)
+                .where(wishItem.member.eq(member)
+                        .and(wishItem.giftStatus.eq(GiftStatus.COMPLETED))).fetchOne();
+
+        return (i == null) ? 0 : i;
+    }
+
+    public Integer usedNoMsgNum(Member member){
+
+        NumberExpression<Integer> progress = wishItem.count().intValue();
+        Integer i = jqf.select(progress)
+                .from(wishItem)
+                .where(wishItem.member.eq(member)
+                        .and(wishItem.giftStatus.eq(GiftStatus.USED))
+                .and(wishItem.isThanksMessagedSend.eq(IsThanksMessagedSend.NOT_MESSAGED))).fetchOne();
+        return (i == null) ? 0 : i;
+//
+    }
+    public Integer usedMsgNum(Member member){
+
+        NumberExpression<Integer> progress = wishItem.count().intValue();
+        Integer i = jqf.select(progress)
+                .from(wishItem)
+                .where(wishItem.member.eq(member)
+                        .and(wishItem.giftStatus.eq(GiftStatus.USED))
+                        .and(wishItem.isThanksMessagedSend.eq(IsThanksMessagedSend.MESSAGED))
+                ).fetchOne();
+
+        return (i == null) ? 0 : i;
     }
 
 

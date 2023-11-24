@@ -24,4 +24,10 @@ public class MemberDetailInformation {
     Integer usedNoMsgNum;
     Integer usedMsgNum;
 
+    public MemberDetailInformation(String name, String profileURL, LocalDate birthDate, Integer myPoints) {
+        this.name = name;
+        this.profileURL = profileURL;
+        this.birthDate = birthDate;
+        this.myPoints = myPoints;
+    }
 }

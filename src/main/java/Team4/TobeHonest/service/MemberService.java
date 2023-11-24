@@ -205,20 +205,16 @@ public class MemberService {
     public MemberDetailInformation findMemberDetail(String memberEmail){
         Member member = memberRepository.findByEmail(memberEmail);
 
-        List<FirstWishItem> wishItemUsed = wishItemRepository.findWishItemUsed(member.getId());
 
-        int sendMessageSize = wishItemUsed.stream().filter(firstWishItem -> firstWishItem.getIsMessaged().equals(IsThanksMessagedSend.MESSAGED)).toList().size();
+        MemberDetailInformation memberDetail = memberRepository.findMemberDetail(member);
 
-        return MemberDetailInformation.builder()
-                .name(member.getName())
-                .profileURL(member.getProfileImg())
-                .birthDate(member.getBirthDate())
-                .myPoints(member.getPoints())
-                .progressNum(wishItemRepository.findWishItemInProgress(member.getId()).size())
-                .completedNum(wishItemRepository.findWishItemCompleted(member.getId()).size())
-                .usedMsgNum(sendMessageSize)
-                .usedNoMsgNum(wishItemUsed.size() - sendMessageSize)
-                .build();
+        memberDetail.setProgressNum(wishItemRepository.countProgressNum(member));
+        memberDetail.setCompletedNum(wishItemRepository.completedNum(member));
+        memberDetail.setUsedNoMsgNum(wishItemRepository.usedNoMsgNum(member));
+        memberDetail.setUsedMsgNum(wishItemRepository.usedMsgNum(member));
+
+
+        return memberDetail;
 
     }
 
