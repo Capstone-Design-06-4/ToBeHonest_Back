@@ -1,13 +1,17 @@
 package Team4.TobeHonest.service;
 
 import Team4.TobeHonest.domain.Member;
+import Team4.TobeHonest.dto.member.MemberDetailInformation;
 import Team4.TobeHonest.dto.member.MemberSearch;
 import Team4.TobeHonest.dto.signup.JoinDTO;
+import Team4.TobeHonest.dto.wishitem.FirstWishItem;
 import Team4.TobeHonest.enumer.FriendStatus;
+import Team4.TobeHonest.enumer.IsThanksMessagedSend;
 import Team4.TobeHonest.exception.DuplicateMemberException;
 import Team4.TobeHonest.exception.NoMemberException;
 import Team4.TobeHonest.repo.FriendRepository;
 import Team4.TobeHonest.repo.MemberRepository;
+import Team4.TobeHonest.repo.WishItemRepository;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.AccessLevel;
@@ -38,6 +42,10 @@ public class MemberService {
     private final AmazonS3Client amazonS3Client;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
+
+    private final WishItemRepository wishItemRepository;
+
+
 
     @Transactional
     public void join(JoinDTO joinDTO) {
@@ -104,8 +112,7 @@ public class MemberService {
 
     public Member findByEmailWithNoException(String email) {
 
-        Member member = memberRepository.findByEmail(email);
-        return member;
+        return memberRepository.findByEmail(email);
     }
 
 
@@ -194,6 +201,26 @@ public class MemberService {
 
     }
 
+
+    public MemberDetailInformation findMemberDetail(String memberEmail){
+        Member member = memberRepository.findByEmail(memberEmail);
+
+        List<FirstWishItem> wishItemUsed = wishItemRepository.findWishItemUsed(member.getId());
+
+        int sendMessageSize = wishItemUsed.stream().filter(firstWishItem -> firstWishItem.getIsMessaged().equals(IsThanksMessagedSend.MESSAGED)).toList().size();
+
+        return MemberDetailInformation.builder()
+                .name(member.getName())
+                .profileURL(member.getProfileImg())
+                .birthDate(member.getBirthDate())
+                .myPoints(member.getPoints())
+                .progressNum(wishItemRepository.findWishItemInProgress(member.getId()).size())
+                .completedNum(wishItemRepository.findWishItemCompleted(member.getId()).size())
+                .usedMsgNum(sendMessageSize)
+                .usedNoMsgNum(wishItemUsed.size() - sendMessageSize)
+                .build();
+
+    }
 
 
 }

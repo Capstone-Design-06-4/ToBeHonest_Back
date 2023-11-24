@@ -3,6 +3,10 @@ package Team4.TobeHonest.repo;
 
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.domain.QMember;
+import Team4.TobeHonest.domain.QWishItem;
+import Team4.TobeHonest.dto.member.MemberDetailInformation;
+import Team4.TobeHonest.dto.message.MessageResponseDTO;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -65,6 +69,8 @@ public class MemberRepository {
         }
         return find.get(0);
     }
+
+
 
 
 }
