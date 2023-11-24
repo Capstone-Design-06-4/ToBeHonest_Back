@@ -1,5 +1,6 @@
 package Team4.TobeHonest.dto.wishitem;
 
+import Team4.TobeHonest.enumer.IsThanksMessagedSend;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,7 +14,7 @@ public class WishItemDetail {
     Integer total;
     Integer fund;
     String image;
-
+    IsThanksMessagedSend isThanksMessagedSend = IsThanksMessagedSend.NOT_MESSAGED;
 
     @Builder
     public WishItemDetail(Long wishItemId, Long itemId, String itemName, Integer total,  String image) {

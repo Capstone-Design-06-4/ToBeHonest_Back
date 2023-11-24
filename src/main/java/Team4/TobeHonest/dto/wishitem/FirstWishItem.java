@@ -1,7 +1,7 @@
 package Team4.TobeHonest.dto.wishitem;
 
 
-import com.querydsl.core.types.Projections;
+import Team4.TobeHonest.enumer.IsThanksMessagedSend;
 import lombok.*;
 
 //최초 위시리스트에 나오는 정보들..
@@ -19,6 +19,8 @@ public class FirstWishItem {
     private Integer itemPrice;
     //펀딩된 총 가격
     private Integer fundAmount;
+
+    private IsThanksMessagedSend isMessaged = IsThanksMessagedSend.NOT_MESSAGED;
 
 
 

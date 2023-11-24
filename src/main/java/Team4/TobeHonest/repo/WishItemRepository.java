@@ -4,6 +4,7 @@ import Team4.TobeHonest.domain.*;
 import Team4.TobeHonest.dto.wishitem.FirstWishItem;
 import Team4.TobeHonest.dto.wishitem.WishItemDetail;
 import Team4.TobeHonest.enumer.GiftStatus;
+import Team4.TobeHonest.enumer.MessageType;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -19,6 +20,7 @@ public class WishItemRepository {
     private final EntityManager em;
     private final JPAQueryFactory jqf;
     private final QWishItem wishItem = new QWishItem("wishItem");
+    private final QMessage message = new QMessage("message");
     private final QItem item = new QItem("item");
     private final QMember member = new QMember("member");
     private final QFriendWith friendWith = new QFriendWith("friendWith");
@@ -186,6 +188,15 @@ public class WishItemRepository {
                 .groupBy(wishItem.id)
                 .fetch();
 
+    }
+
+
+    //선물에 감사 메시지가 전송됐는가?
+    public List<Message> isThanksMessagedSend(Long wishItemId){
+
+        return jqf.select(message).from(message)
+                .innerJoin(message.relatedItem, wishItem)
+                .where(message.messageType.eq(MessageType.THANKS_MSG)).fetch();
     }
 
 

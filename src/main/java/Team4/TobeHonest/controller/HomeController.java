@@ -61,7 +61,6 @@ public class HomeController {
     @PostMapping("/Logout")
     public ResponseEntity<String> logout() {
 
-        HttpHeaders headers = new HttpHeaders();
         String logout = loginService.logout();
         return ResponseEntity.status(HttpStatus.OK).body(logout);
 
