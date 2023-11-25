@@ -239,4 +239,31 @@ public class WishItemRepository {
     }
 
 
+
+    public Double checkPercentage(Item item1){
+
+        int s = Math.max(item1.getPrice() - 20000, 0);
+        int d = item1.getPrice() + 20000;
+        NumberExpression<Integer> all = wishItem.count().intValue();
+        NumberExpression<Integer> success = wishItem.count().intValue();
+
+
+        Integer allNum = jqf.select(all).from(wishItem)
+                .innerJoin(wishItem.item, item)
+                .where(item.price.gt(s).and(item.price.lt(d))).fetchOne();
+
+        if (allNum == null || allNum == 0)
+            return 0.0;
+        Integer part = jqf.select(all).from(wishItem)
+                .innerJoin(wishItem.item, item)
+                .where(
+                        (item.price.gt(s).and(item.price.lt(d)))
+                                .and(wishItem.giftStatus.eq(GiftStatus.USED).or(wishItem.giftStatus.eq(GiftStatus.USED)))).fetchOne();
+        if (part == null || part == 0)
+            return 0.0;
+
+        return (double) ((part / allNum) * 100);
+
+    }
+
 }

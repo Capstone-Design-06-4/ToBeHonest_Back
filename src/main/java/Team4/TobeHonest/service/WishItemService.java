@@ -72,6 +72,9 @@ public class WishItemService {
         if (wishItem== null){
             throw new NoWishItemException("해당 아이템은 위시리스트에 존재하지 않습니다.");
         }
+        Member member = wishItem.getMember();
+        Integer totalFundedAmount = contributorRepository.findTotalFundedAmount(wishItem);
+        member.addPoints(totalFundedAmount);
         wishItemRepository.deleteWishItem(wishItem);
 
     }
@@ -152,5 +155,14 @@ public class WishItemService {
         return fundedAmount;
     }
 
+
+    public Double checkPercentage(Long itemId){
+        Item item = itemRepository.findByItem(itemId);
+        if(item == null){
+            throw new NoItemException("아이템이 DB에 존재하지 않습니다");
+        }
+        return wishItemRepository.checkPercentage(item);
+
+    }
 
 }

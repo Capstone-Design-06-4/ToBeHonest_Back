@@ -4,15 +4,11 @@ import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.contributor.ContributorDTO;
 import Team4.TobeHonest.dto.item.ItemInfoDTO;
 import Team4.TobeHonest.dto.wishitem.FirstWishItem;
-import Team4.TobeHonest.dto.wishitem.WishItemDetail;
 import Team4.TobeHonest.dto.wishitem.WishItemResponseDTO;
-import Team4.TobeHonest.exception.DuplicateWishItemException;
-import Team4.TobeHonest.exception.ItemNotInWishlistException;
 import Team4.TobeHonest.service.ContributorService;
 import Team4.TobeHonest.service.ItemService;
 import Team4.TobeHonest.service.MemberService;
 import Team4.TobeHonest.service.WishItemService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -98,8 +93,6 @@ public class WishlistController {
     @DeleteMapping("/delete/{wishItemId}")
     public ResponseEntity<String> deleteWishItem(@PathVariable Long wishItemId,
                                                  @AuthenticationPrincipal UserDetails userDetails) {
-        String userEmail = userDetails.getUsername();
-        Member member = memberService.findByEmail(userEmail);
 
 
         wishItemService.deleteWIshItem(wishItemId);
@@ -113,6 +106,13 @@ public class WishlistController {
         wishItemService.useWishItem(userEmail, wishItemId);
 
         return ResponseEntity.status(HttpStatus.OK).body("충전완료");
+    }
+
+
+    @GetMapping("/check/{itemId}")
+    public ResponseEntity<Double> checkPossibilty(@PathVariable Long itemId){
+        Double v = wishItemService.checkPercentage(itemId);
+        return ResponseEntity.status(HttpStatus.OK).body(v);
     }
 
 }
