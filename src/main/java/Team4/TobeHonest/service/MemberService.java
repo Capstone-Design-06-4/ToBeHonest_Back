@@ -1,5 +1,6 @@
 package Team4.TobeHonest.service;
 
+import Team4.TobeHonest.domain.FriendWith;
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.member.MemberDetailInformation;
 import Team4.TobeHonest.dto.member.MemberSearch;
@@ -9,6 +10,7 @@ import Team4.TobeHonest.enumer.FriendStatus;
 import Team4.TobeHonest.enumer.IsThanksMessagedSend;
 import Team4.TobeHonest.exception.DuplicateMemberException;
 import Team4.TobeHonest.exception.NoMemberException;
+import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.FriendRepository;
 import Team4.TobeHonest.repo.MemberRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
@@ -31,6 +33,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -44,7 +48,8 @@ public class MemberService {
     private String bucket;
 
     private final WishItemRepository wishItemRepository;
-
+    private final ContributorRepository contributorRepository;
+    private final FriendRepository friendRepository;
 
 
     @Transactional
@@ -215,6 +220,28 @@ public class MemberService {
 
 
         return memberDetail;
+
+    }
+
+
+    public Integer findMyExpected(String memberEmail){
+        Member member = memberRepository.findByEmail(memberEmail);
+        List<FriendWith> allFriends = friendRepository.findAllFriends(member);
+        long daysBetween = ChronoUnit.DAYS.between(member.getJoinDate(), LocalDate.now());
+        int myYearlyContribution = (int) (contributorRepository.findMyAllContributeAmount(member) / daysBetween);
+
+        int allFriendContributeSum = allFriends.stream().mapToInt(friendWith -> {
+            Member friend = friendWith.getFriend();
+            long day = ChronoUnit.DAYS.between(friend.getJoinDate(), LocalDate.now());
+            return (int) (contributorRepository.findMyAllContributeAmount(friend) / day);
+        }).sum();
+        int allFriendReceiveSum = allFriends.stream().mapToInt(friendWith -> {
+            Member friend = friendWith.getFriend();
+            long day = ChronoUnit.DAYS.between(friend.getJoinDate(), LocalDate.now());
+            return (int) (contributorRepository.findMyAllReceiveAmount(friend) / day);
+        }).sum();
+
+        return (int) myYearlyContribution * (allFriendContributeSum / allFriendReceiveSum);
 
     }
 

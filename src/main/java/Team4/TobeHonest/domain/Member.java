@@ -3,6 +3,7 @@ package Team4.TobeHonest.domain;
 import Team4.TobeHonest.exception.NoPointsException;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -39,6 +40,7 @@ public class Member implements UserDetails {
     //프사 추가해야함
     private String profileImg = "https://tobehonest.s3.ap-northeast-2.amazonaws.com/default.jpeg";
 
+    private LocalDate joinDate;
     public void changeProfileImg(String profileImg) {
         this.profileImg = profileImg;
     }
@@ -50,6 +52,7 @@ public class Member implements UserDetails {
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.birthDate = birthDate;
+        this.joinDate = LocalDate.now();
     }
 
     //    로그인 해시값 찾기

@@ -179,4 +179,10 @@ public class MemberController {
         return FriendStatus.NOT_FRIEND;
     }
 
+
+    @GetMapping("/myExpected")
+    public ResponseEntity<Integer> myExpectedAmount(@AuthenticationPrincipal UserDetails userDetails) {
+        Integer myExpected = memberService.findMyExpected(userDetails.getUsername());
+        return ResponseEntity.status(HttpStatus.OK).body(myExpected);
+    }
 }

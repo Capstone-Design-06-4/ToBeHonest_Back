@@ -10,6 +10,7 @@ import Team4.TobeHonest.enumer.GiftStatus;
 import Team4.TobeHonest.exception.NoWishItemException;
 import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.FriendRepository;
+import Team4.TobeHonest.repo.MemberRepository;
 import Team4.TobeHonest.repo.WishItemRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class ContributorService {
     private final WishItemRepository wishItemRepository;
     private final ContributorRepository contributorRepository;
     private final FriendRepository friendRepository;
+    private final MemberRepository memberRepository;
 
     //    후원하기기능
 //    로그인한 회원이 친구의 wishItem에 펀딩을 하는 기능..
@@ -91,6 +93,7 @@ public class ContributorService {
     public List<Long> getGiftReceiversFromMe(Long myId) {
         return contributorRepository.findMyContributions(myId);
     }
+
 
 
 
