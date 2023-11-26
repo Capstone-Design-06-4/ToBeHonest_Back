@@ -1,13 +1,19 @@
 package Team4.TobeHonest.service;
 
+import Team4.TobeHonest.domain.FriendWith;
 import Team4.TobeHonest.domain.Member;
+import Team4.TobeHonest.dto.member.MemberDetailInformation;
 import Team4.TobeHonest.dto.member.MemberSearch;
 import Team4.TobeHonest.dto.signup.JoinDTO;
+import Team4.TobeHonest.dto.wishitem.FirstWishItem;
 import Team4.TobeHonest.enumer.FriendStatus;
+import Team4.TobeHonest.enumer.IsThanksMessagedSend;
 import Team4.TobeHonest.exception.DuplicateMemberException;
 import Team4.TobeHonest.exception.NoMemberException;
+import Team4.TobeHonest.repo.ContributorRepository;
 import Team4.TobeHonest.repo.FriendRepository;
 import Team4.TobeHonest.repo.MemberRepository;
+import Team4.TobeHonest.repo.WishItemRepository;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.AccessLevel;
@@ -27,6 +33,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -38,6 +46,11 @@ public class MemberService {
     private final AmazonS3Client amazonS3Client;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
+
+    private final WishItemRepository wishItemRepository;
+    private final ContributorRepository contributorRepository;
+    private final FriendRepository friendRepository;
+
 
     @Transactional
     public void join(JoinDTO joinDTO) {
@@ -104,8 +117,7 @@ public class MemberService {
 
     public Member findByEmailWithNoException(String email) {
 
-        Member member = memberRepository.findByEmail(email);
-        return member;
+        return memberRepository.findByEmail(email);
     }
 
 
@@ -194,6 +206,44 @@ public class MemberService {
 
     }
 
+
+    public MemberDetailInformation findMemberDetail(String memberEmail){
+        Member member = memberRepository.findByEmail(memberEmail);
+
+
+        MemberDetailInformation memberDetail = memberRepository.findMemberDetail(member);
+
+        memberDetail.setProgressNum(wishItemRepository.countProgressNum(member));
+        memberDetail.setCompletedNum(wishItemRepository.completedNum(member));
+        memberDetail.setUsedNoMsgNum(wishItemRepository.usedNoMsgNum(member));
+        memberDetail.setUsedMsgNum(wishItemRepository.usedMsgNum(member));
+
+
+        return memberDetail;
+
+    }
+
+
+    public Integer findMyExpected(String memberEmail){
+        Member member = memberRepository.findByEmail(memberEmail);
+        List<FriendWith> allFriends = friendRepository.findAllFriends(member);
+        long daysBetween = ChronoUnit.DAYS.between(member.getJoinDate(), LocalDate.now());
+        int myYearlyContribution = (int) (contributorRepository.findMyAllContributeAmount(member) / daysBetween);
+
+        int allFriendContributeSum = allFriends.stream().mapToInt(friendWith -> {
+            Member friend = friendWith.getFriend();
+            long day = ChronoUnit.DAYS.between(friend.getJoinDate(), LocalDate.now());
+            return (int) (contributorRepository.findMyAllContributeAmount(friend) / day);
+        }).sum();
+        int allFriendReceiveSum = allFriends.stream().mapToInt(friendWith -> {
+            Member friend = friendWith.getFriend();
+            long day = ChronoUnit.DAYS.between(friend.getJoinDate(), LocalDate.now());
+            return (int) (contributorRepository.findMyAllReceiveAmount(friend) / day);
+        }).sum();
+
+        return (int) myYearlyContribution * (allFriendContributeSum / allFriendReceiveSum);
+
+    }
 
 
 }

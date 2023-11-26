@@ -45,6 +45,7 @@ public class Message {
     @JoinColumn(name = "receiver_id")
     private Member receiver;
 
+    @Enumerated(EnumType.STRING)
     private MessageType messageType;
 
     @Builder

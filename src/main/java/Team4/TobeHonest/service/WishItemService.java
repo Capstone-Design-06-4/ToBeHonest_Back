@@ -72,6 +72,9 @@ public class WishItemService {
         if (wishItem== null){
             throw new NoWishItemException("해당 아이템은 위시리스트에 존재하지 않습니다.");
         }
+        Member member = wishItem.getMember();
+        Integer totalFundedAmount = contributorRepository.findTotalFundedAmount(wishItem);
+        member.addPoints(totalFundedAmount);
         wishItemRepository.deleteWishItem(wishItem);
 
     }
@@ -81,19 +84,12 @@ public class WishItemService {
         List<FirstWishItem> firstWishList = wishItemRepository.findFirstWishList(member);
         setFundedAmount(firstWishList);
 
-        changeThanksMessagedSend(firstWishList);
 
         return firstWishList;
 
     }
 
-    private void changeThanksMessagedSend(List<FirstWishItem> firstWishList) {
-        firstWishList.forEach(firstWishItem -> {
-            if (!wishItemRepository.isThanksMessagedSend(firstWishItem.getWishItemId()).isEmpty())
-                firstWishItem.setIsMessaged(IsThanksMessagedSend.MESSAGED);
 
-        });
-    }
 
     public List<FirstWishItem> findWishListInProgress(Long memberId) {
         List<FirstWishItem> firstWishList = wishItemRepository.findWishItemInProgress(memberId);
@@ -112,7 +108,6 @@ public class WishItemService {
     public List<FirstWishItem> findWishListCompleted(Long memberId) {
         List<FirstWishItem> firstWishList = wishItemRepository.findWishItemCompleted(memberId);
         setFundedAmount(firstWishList);
-        changeThanksMessagedSend(firstWishList);
         return firstWishList;
     }
 
@@ -120,7 +115,6 @@ public class WishItemService {
 
         List<FirstWishItem> firstWishList = wishItemRepository.findWishItemUsed(memberId);
         setFundedAmount(firstWishList);
-        changeThanksMessagedSend(firstWishList);
         return firstWishList;
 
 
@@ -138,10 +132,7 @@ public class WishItemService {
         //위시아이템에 fundedAmount찾기
         wishItemDetail1.setFund(contributorRepository.findTotalFundedAmount(wishItemRepository.findWishItemById(wishItemId)));
 
-        //감사 메시지를 보냈는가 확인
-        if (!wishItemRepository.isThanksMessagedSend(wishItemId).isEmpty()){
-            wishItemDetail1.setIsThanksMessagedSend(IsThanksMessagedSend.MESSAGED);
-        }
+
         return wishItemDetail1;
 
     }
@@ -155,7 +146,6 @@ public class WishItemService {
             throw new NotValidWishItemException();
         }
         Integer fundedAmount = contributorRepository.findTotalFundedAmount(wishItem);
-        Member member = wishItem.getMember();
         Integer itemPrice = wishItem.getItem().getPrice();
         if (itemPrice > fundedAmount) {
             throw new NoPointsException();
@@ -165,5 +155,14 @@ public class WishItemService {
         return fundedAmount;
     }
 
+
+    public Double checkPercentage(Long itemId){
+        Item item = itemRepository.findByItem(itemId);
+        if(item == null){
+            throw new NoItemException("아이템이 DB에 존재하지 않습니다");
+        }
+        return wishItemRepository.checkPercentage(item);
+
+    }
 
 }

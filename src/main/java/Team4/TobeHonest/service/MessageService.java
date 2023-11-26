@@ -72,6 +72,8 @@ public class MessageService {
         if (wishItem == null) {
             throw new NoWishItemException();
         }
+        //메시지 보낸걸로 바꾸기
+        wishItem.changeIsThanksMessagedSend();
 
         List<ContributorDTO> contributorsInWishItem = contributorRepository.findContributorsInWishItem(wishItem.getId());
         List<Long> allContributors = contributorsInWishItem.stream().map(ContributorDTO::getFriendId).toList();

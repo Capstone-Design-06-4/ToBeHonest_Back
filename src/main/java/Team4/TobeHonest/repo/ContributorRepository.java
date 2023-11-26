@@ -123,7 +123,29 @@ public class ContributorRepository {
     }
 
 
+    public Integer findMyAllContributeAmount(Member member){
+        NumberExpression<Integer> sumFundMoney = contributor.fundMoney.sum();
+        Integer i = jqf.select(sumFundMoney).from(contributor)
+                .where(contributor.contributor.eq(member)).fetchOne();
+        if (i == null ){
+            return 0;
+        }
+        return i;
+
+    }
 
 
+    public Integer findMyAllReceiveAmount(Member member){
+        NumberExpression<Integer> sumFundMoney = contributor.fundMoney.sum();
+
+        Integer i = jqf.select(sumFundMoney).from(contributor)
+                .innerJoin(contributor.wishItem, wishItem)
+                .where(wishItem.member.eq(member)).fetchOne();
+
+        if (i == null ){
+            return 0;
+        }
+        return i;
+    }
 
 }

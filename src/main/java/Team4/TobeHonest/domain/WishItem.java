@@ -1,6 +1,7 @@
 package Team4.TobeHonest.domain;
 
 import Team4.TobeHonest.enumer.GiftStatus;
+import Team4.TobeHonest.enumer.IsThanksMessagedSend;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,6 +31,9 @@ public class WishItem {
     //오류뜨는데, 나중에 바뀐다..
     private GiftStatus giftStatus = GiftStatus.IN_PROGRESS;
 
+    @Enumerated(EnumType.STRING)
+    private IsThanksMessagedSend isThanksMessagedSend = IsThanksMessagedSend.NOT_MESSAGED;
+
     @Builder
     public WishItem(Item item, Member member, Integer money) {
         this.item = item;
@@ -39,5 +43,9 @@ public class WishItem {
 
     public void changeGiftStatus(GiftStatus giftStatus) {
         this.giftStatus = giftStatus;
+    }
+
+    public void changeIsThanksMessagedSend() {
+        this.isThanksMessagedSend = IsThanksMessagedSend.MESSAGED;
     }
 }

@@ -32,4 +32,14 @@ public class FirstWishItem {
         this.itemName = itemName;
         this.itemPrice = itemPrice;
     }
+
+    @Builder
+    public FirstWishItem(Long wishItemId, Long itemId, String image, String itemName, Integer itemPrice, IsThanksMessagedSend isMessaged) {
+        this.wishItemId = wishItemId;
+        this.itemId = itemId;
+        this.image = image;
+        this.itemName = itemName;
+        this.itemPrice = itemPrice;
+        this.isMessaged = isMessaged;
+    }
 }
