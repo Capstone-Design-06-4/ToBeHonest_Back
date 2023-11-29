@@ -227,21 +227,40 @@ public class MemberService {
     public Integer findMyExpected(String memberEmail){
         Member member = memberRepository.findByEmail(memberEmail);
         List<FriendWith> allFriends = friendRepository.findAllFriends(member);
-        long daysBetween = ChronoUnit.DAYS.between(member.getJoinDate(), LocalDate.now());
-        int myYearlyContribution = (int) (contributorRepository.findMyAllContributeAmount(member) / daysBetween);
+        //long daysBetween = ChronoUnit.DAYS.between(member.getJoinDate(), LocalDate.now());
+        //int myYearlyContribution = (int) (contributorRepository.findMyAllContributeAmount(member) / daysBetween);
+        int myYearlyContribution = contributorRepository.findMyAllContributeAmount(member);
 
-        int allFriendContributeSum = allFriends.stream().mapToInt(friendWith -> {
+        /*int allFriendContributeSum = allFriends.stream().mapToInt(friendWith -> {
             Member friend = friendWith.getFriend();
             long day = ChronoUnit.DAYS.between(friend.getJoinDate(), LocalDate.now());
             return (int) (contributorRepository.findMyAllContributeAmount(friend) / day);
+        }).sum();*/
+        double allFriendContributeSum = allFriends.stream().mapToInt(friendWith -> {
+            Member friend = friendWith.getFriend();
+            //long day = ChronoUnit.DAYS.between(friend.getJoinDate(), LocalDate.now());
+            return (contributorRepository.findMyAllContributeAmount(friend));
         }).sum();
-        int allFriendReceiveSum = allFriends.stream().mapToInt(friendWith -> {
+
+
+        double allFriendReceiveSum = allFriends.stream().mapToInt(friendWith -> {
+            Member friend = friendWith.getFriend();
+            //long day = ChronoUnit.DAYS.between(friend.getJoinDate(), LocalDate.now());
+            return (int) (contributorRepository.findMyAllReceiveAmount(friend));
+        }).sum();
+
+        double size = allFriends.size();
+        System.out.println(myYearlyContribution);
+        System.out.println(allFriendContributeSum);
+        System.out.println(allFriendReceiveSum);
+     /*   int allFriendReceiveSum = allFriends.stream().mapToInt(friendWith -> {
             Member friend = friendWith.getFriend();
             long day = ChronoUnit.DAYS.between(friend.getJoinDate(), LocalDate.now());
             return (int) (contributorRepository.findMyAllReceiveAmount(friend) / day);
-        }).sum();
+        }).sum();*/
 
-        return (int) myYearlyContribution * (allFriendContributeSum / allFriendReceiveSum);
+        System.out.println((double) (allFriendContributeSum / allFriendReceiveSum));
+        return (int) (myYearlyContribution *  (allFriendContributeSum / allFriendReceiveSum) / size);
 
     }
 

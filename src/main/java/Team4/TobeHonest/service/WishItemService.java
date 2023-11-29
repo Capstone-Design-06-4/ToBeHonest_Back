@@ -30,7 +30,7 @@ public class WishItemService {
     private final ContributorRepository contributorRepository;
 
     @Transactional
-    public void addWishList(Member member, ItemInfoDTO itemInfoDTO) {
+    public WishItem addWishList(Member member, ItemInfoDTO itemInfoDTO) {
         WishItem wishItem = wishItemRepository.findWishItemByItemId(member, itemInfoDTO.getId());
         if (wishItem != null) {
             throw new DuplicateWishItemException("이미 위시리스트에 존재하는 아이템입니다!");
@@ -42,7 +42,7 @@ public class WishItemService {
                 .money(item.getPrice())
                 .member(member).build();
         wishItemRepository.join(wishItem);
-
+        return wishItem;
     }
 
     @Transactional

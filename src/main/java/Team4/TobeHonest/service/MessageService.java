@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class MessageService {
     private final MemberRepository memberRepository;
     private final WishItemRepository wishItemRepository;
     private final ContributorRepository contributorRepository;
+    private final ImageService imageService;
     //message 전송하기..
 
 
@@ -88,9 +90,19 @@ public class MessageService {
                 .fundMoney(contributorRepository.findFundedAmount(wishItem, memberRepository.findById(e)))
                 .build()).toList();
 
-        messageRepository.saveAll(messages);
+
+        messages.forEach((message -> {
+            try {
+
+                imageService.saveMessageImg(sendMessageDTO.getImages(), message);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }));
         //이미지 저장
 
+
+        messageRepository.saveAll(messages);
     }
 
 

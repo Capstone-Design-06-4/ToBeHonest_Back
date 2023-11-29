@@ -1,14 +1,12 @@
 package Team4.TobeHonest.controller;
 
 
-import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.message.MessageResponseDTO;
 import Team4.TobeHonest.dto.message.celebrate.SendCelebrateMessage;
-import Team4.TobeHonest.dto.message.thanks.ThanksWithNoImg;
 import Team4.TobeHonest.dto.message.thanks.ThanksMessageDTO;
-import Team4.TobeHonest.service.ImageService;
-import Team4.TobeHonest.service.MemberService;
+import Team4.TobeHonest.dto.message.thanks.ThanksWithNoImg;
 import Team4.TobeHonest.service.MessageService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,11 +28,15 @@ public class MessageController {
 
     private final MessageService messageService;
 
-    @PostMapping(value = "/send-thanks" ,consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    //@RequestBodt ==> only 1개 mapping  ==> @RequestPart로 나누기
-    public ResponseEntity<String> sendThanksMessage(@RequestPart ThanksWithNoImg request,
-                                              @RequestPart(required = false) List<MultipartFile> images,
-                                              @AuthenticationPrincipal UserDetails userDetails) throws IOException {
+    @PostMapping(value = "/send-thanks", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    //@RequestBod ==> only 1개 mapping  ==> @RequestPart로 나누기
+    public ResponseEntity<String> sendThanksMessage(@RequestPart String requestJson,
+                                                    @RequestPart(required = false) List<MultipartFile> images,
+                                                    @AuthenticationPrincipal UserDetails userDetails) throws IOException {
+
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        ThanksWithNoImg request = objectMapper.readValue(requestJson, ThanksWithNoImg.class);
 
         String userEmail = userDetails.getUsername();
         ThanksMessageDTO sendMessage = ThanksMessageDTO.builder()
@@ -71,17 +73,16 @@ public class MessageController {
 
     @GetMapping("/find/wish-item/{wishItemId}")
     public List<MessageResponseDTO> findMessageWithWishItem(@AuthenticationPrincipal UserDetails userDetails,
-                                                            @PathVariable Long wishItemId){
+                                                            @PathVariable Long wishItemId) {
 
         String loginEmail = userDetails.getUsername();
         return messageService.findMessageWithWishItemId(wishItemId, loginEmail);
 
     }
 
-    @GetMapping("/find/friend-id" +
-            "/{friendId}")
+    @GetMapping("/find/friend-id/{friendId}")
     public List<MessageResponseDTO> findMessageWithFriendId(@AuthenticationPrincipal UserDetails userDetails,
-                                                            @PathVariable Long friendId){
+                                                            @PathVariable Long friendId) {
 
         String loginEmail = userDetails.getUsername();
         return messageService.findMessageWithFriendId(friendId, loginEmail);
