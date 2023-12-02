@@ -9,6 +9,8 @@ import Team4.TobeHonest.dto.message.thanks.ThanksMessageDTO;
 import Team4.TobeHonest.service.ImageService;
 import Team4.TobeHonest.service.MemberService;
 import Team4.TobeHonest.service.MessageService;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,9 +34,12 @@ public class MessageController {
 
     @PostMapping(value = "/send-thanks" ,consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     //@RequestBodt ==> only 1개 mapping  ==> @RequestPart로 나누기
-    public ResponseEntity<String> sendThanksMessage(@RequestPart ThanksWithNoImg request,
+    public ResponseEntity<String> sendThanksMessage(@RequestPart String requestJson,
                                               @RequestPart(required = false) List<MultipartFile> images,
                                               @AuthenticationPrincipal UserDetails userDetails) throws IOException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        ThanksWithNoImg request = objectMapper.readValue(requestJson, ThanksWithNoImg.class);
 
         String userEmail = userDetails.getUsername();
         ThanksMessageDTO sendMessage = ThanksMessageDTO.builder()
