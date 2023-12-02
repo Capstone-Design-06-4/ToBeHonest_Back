@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class MessageService {
     private final MemberRepository memberRepository;
     private final WishItemRepository wishItemRepository;
     private final ContributorRepository contributorRepository;
+    private final ImageService imageService;
     //message 전송하기..
 
 
@@ -40,23 +42,33 @@ public class MessageService {
 
         Member member = memberRepository.findByEmail(userEmail);
 
-        if (memberRepository.findById(friendId) == null){
+        if (memberRepository.findById(friendId) == null) {
             throw new NoMemberException("friend가 존재하지 않습니다");
         }
-        return messageRepository.msgWithMyFriend(member.getId(), friendId);
+        //return messageRepository.msgWithMyFriend(member.getId(), friendId);
+        List<MessageResponseDTO> messageResponseDTOS = messageRepository.msgWithMyFriend(member.getId(), friendId);
+        messageResponseDTOS.forEach(messageResponseDTO -> {
+            messageResponseDTO.setMessageImgURLs(messageRepository.findMessageImg(messageResponseDTO.getMsgId()));
+        });
+        return messageResponseDTOS;
     }
 
 
-    public List<MessageResponseDTO> findMessageWithWishItemId(Long wishItemId, String userEmail){
+    public List<MessageResponseDTO> findMessageWithWishItemId(Long wishItemId, String userEmail) {
         WishItem wishItem = wishItemRepository.findWishItemById(wishItemId);
-        if (wishItem == null){
+        if (wishItem == null) {
             throw new NoWishItemException("wishItem이 존재하지 않습니다");
         }
 
-        if(!wishItem.getMember().getEmail().equals(userEmail)){
+        if (!wishItem.getMember().getEmail().equals(userEmail)) {
             throw new NotValidWishItemException("접근권한이 없습니다");
         }
-        return messageRepository.msgWithWithWishItem(wishItemId);
+        //return messageRepository.msgWithWithWishItem(wishItemId);
+        List<MessageResponseDTO> messageResponseDTOS = messageRepository.msgWithWithWishItem(wishItemId);
+        messageResponseDTOS.forEach(messageResponseDTO -> {
+            messageResponseDTO.setMessageImgURLs(messageRepository.findMessageImg(messageResponseDTO.getMsgId()));
+        });
+        return messageResponseDTOS;
     }
 
 
@@ -88,11 +100,17 @@ public class MessageService {
                 .fundMoney(contributorRepository.findFundedAmount(wishItem, memberRepository.findById(e)))
                 .build()).toList();
 
+        messages.forEach((message -> {
+            try {
+                imageService.saveMessageImg(sendMessageDTO.getImages(), message);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }));
+
         messageRepository.saveAll(messages);
         //이미지 저장
-
     }
-
 
 
     @Transactional

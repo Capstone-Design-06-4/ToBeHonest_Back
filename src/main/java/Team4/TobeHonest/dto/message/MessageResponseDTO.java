@@ -17,6 +17,7 @@ import java.util.List;
 public class MessageResponseDTO {
     Long wishItemId;
     Long itemId;
+    Long msgId;
     //server에서 제공하는 message.. ==>
     String itemName;
     String itemImage;
@@ -39,9 +40,12 @@ public class MessageResponseDTO {
     @Builder
 
     public MessageResponseDTO(Long wishItemId,
-                              Long itemId, String itemName, String itemImage, String messageTitle, String messageContents, Long senderId, Long receiverId, MessageType messageType, Integer fundMoney) {
+                              Long itemId,
+                              Long msgId,
+                              String itemName, String itemImage, String messageTitle, String messageContents, Long senderId, Long receiverId, MessageType messageType, Integer fundMoney) {
         this.wishItemId = wishItemId;
         this.itemId = itemId;
+        this.msgId = msgId;
         this.itemName = itemName;
         this.itemImage = itemImage;
         this.messageTitle = messageTitle;

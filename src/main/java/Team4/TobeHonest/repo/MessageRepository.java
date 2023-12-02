@@ -18,6 +18,7 @@ public class MessageRepository  {
     private final EntityManager em;
     private final JPAQueryFactory jqf;
     private final QMessage m = new QMessage("m");
+    private final QMessageImg qMessageImg = new QMessageImg("img");
     private final QWishItem wishItem = new QWishItem("wi");
     private final QItem item = new QItem("i");
 
@@ -59,6 +60,7 @@ public class MessageRepository  {
         return jqf.select(
                         Projections.constructor(
                                 MessageResponseDTO.class,
+                                wishItem.id, item.id, m.id,
                                 item.name, item.image, m.title, m.content, m.sender.id, m.receiver.id, m.messageType, m.fundMoney))
                 .from(m).innerJoin(m.relatedItem, this.wishItem)
                 .innerJoin(this.wishItem.item, this.item)
@@ -74,7 +76,7 @@ public class MessageRepository  {
         return jqf.select(
                         Projections.constructor(
                                 MessageResponseDTO.class,
-                                this.wishItem.id, item.id,
+                                this.wishItem.id, item.id, m.id,
                                 item.name, item.image, m.title, m.content, m.sender.id, m.receiver.id, m.messageType, m.fundMoney))
                 .from(m).innerJoin(m.relatedItem, this.wishItem)
                 .innerJoin(this.wishItem.item, this.item)
@@ -86,5 +88,9 @@ public class MessageRepository  {
 
     public void saveAll(List<Message> messages){
         messages.forEach(em::persist);
+    }
+
+    public List<String> findMessageImg(Long msgId){
+        return jqf.select(qMessageImg.imgURL).from(qMessageImg).where(qMessageImg.message.id.eq(msgId)).fetch();
     }
 }

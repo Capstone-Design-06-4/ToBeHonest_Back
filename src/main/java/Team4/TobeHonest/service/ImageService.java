@@ -69,7 +69,7 @@ public class ImageService {
         String encodedReturnURL = "https://" + bucket + ".s3.amazonaws.com/" + fileName;
         message.addImage(encodedReturnURL);
         MessageImg messageImg = MessageImg.builder().imgURL(encodedReturnURL).message(message).build();
-        imageRepository.save(messageImg);
+        //imageRepository.save(messageImg);
     }
 
 }
