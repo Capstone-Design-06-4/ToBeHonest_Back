@@ -45,31 +45,6 @@ public class NaverLoginService {
     private final RedisTemplate<String, String> redisTemplate;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
-    private String getNaverClientId = "Pi8zB3f4zuenOa7Lpdpl";
-    private String getNaverClientSecret = "cB7nj_4ahS";
-
-
-    public String createURL() throws UnsupportedEncodingException {
-        StringBuffer url = new StringBuffer();
-
-        // 카카오 API 명세에 맞춰서 작성
-        String redirectURI = URLEncoder.encode("http://10.210.60.138:8080/oauth/naver-login", "UTF-8"); // redirectURI 설정 부분
-        SecureRandom random = new SecureRandom();
-        String state = new BigInteger(130, random).toString();
-
-        url.append("https://nid.naver.com/oauth2.0/authorize?response_type=code");
-        url.append("&client_id=" + getNaverClientId);
-        url.append("&state=" + state);
-        url.append("&redirect_uri=" + redirectURI);
-
-    /* 로그인 중 선택 권한 허용 URL로 redirect 문제 해결하기
-       로그인 시도시, "현재 UYouBooDan은 개발 중 상태입니다. 개발 중 상태에서는 등록된 아이디만 로그인할 수 있습니다." 화면으로 가버림.
-       아래와 같은 URL로 리다이렉트 되도록 유도하는 해결책 찾기
-       : https://nid.naver.com/oauth2.0/authorize?client_id=avgLtiDUfWMFfHpplTZh&redirect_uri=https://developers.naver.com/proxyapi/forum/auth/oAuth2&response_type=code&state=RZ760w
-     */
-
-        return url.toString();
-    }
 
     @Transactional
     public String login(String accessToken) throws JsonProcessingException {
@@ -88,7 +63,6 @@ public class NaverLoginService {
                 naverProfileRequest,
                 String.class
         );
-        log.info("good");
         // 요청 응답 확인
 
         // 네이버로부터 받은 정보를 객체화

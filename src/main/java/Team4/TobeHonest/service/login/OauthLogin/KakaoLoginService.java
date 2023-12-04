@@ -2,15 +2,12 @@ package Team4.TobeHonest.service.login.OauthLogin;
 
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.login.KakaoProfileVo;
-import Team4.TobeHonest.dto.login.KakaoTokenVo;
-import Team4.TobeHonest.dto.login.NaverProfileVo;
 import Team4.TobeHonest.service.MemberService;
 import Team4.TobeHonest.utils.jwt.JwtTokenProvider;
 import Team4.TobeHonest.utils.jwt.TokenInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -24,14 +21,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
-import java.io.*;
-import java.net.*;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 @Service
 @Transactional(readOnly = true)
@@ -43,7 +34,6 @@ public class KakaoLoginService {
     private final RedisTemplate<String, String> redisTemplate;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
-    private String clientId = "c91d8a66aca04badaf1b630ae744dea3";
 
     @Transactional
     public String login(String accessToken) throws JsonProcessingException {
@@ -76,7 +66,7 @@ public class KakaoLoginService {
         }
 
         Member member = memberService.findByEmailWithNoException(kakaoProfileVo.getKakao_account().getEmail());
-        if (member == null){
+        if (member == null) {
             member = dtoToEntity(kakaoProfileVo);
             memberService.joinMember(member);
         }
@@ -85,9 +75,7 @@ public class KakaoLoginService {
     }
 
 
-
-    private Member dtoToEntity(KakaoProfileVo vo){
-
+    private Member dtoToEntity(KakaoProfileVo vo) {
 
 
 //        String randPassword = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 12);
