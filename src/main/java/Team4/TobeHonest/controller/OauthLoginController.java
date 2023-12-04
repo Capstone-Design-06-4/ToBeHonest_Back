@@ -29,8 +29,14 @@ public class OauthLoginController {
 
     @GetMapping("/naver")
     public ResponseEntity<?> naverLogin(@RequestParam String accessToken) throws JsonProcessingException {
+        log.info("TEST");
+        log.info(accessToken);
         String email = naverService.login(accessToken);
+        log.info("TEST2");
+
         TokenInfo login = naverService.tokenInfo(email);
+        log.info("TEST3");
+
         return ResponseEntity.status(HttpStatus.OK).body(login);
 
     }
