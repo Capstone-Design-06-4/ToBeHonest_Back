@@ -31,9 +31,8 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
         log.info(path);
         log.info(httpRequest.getRequestURL().toString());
-        log.info(httpRequest.getQueryString());
         // /login, /signup, /test 경로는 필터를 실행하지 않고 다음 필터로 넘긴다
-
+        log.info("Log changed?");
 
         // 1. Request Header 에서 JWT 토큰 추출
         String token = resolveToken((HttpServletRequest) request);
