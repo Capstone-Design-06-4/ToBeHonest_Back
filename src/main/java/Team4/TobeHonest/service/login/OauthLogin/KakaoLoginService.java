@@ -24,6 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -34,6 +37,19 @@ public class KakaoLoginService {
     private final RedisTemplate<String, String> redisTemplate;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
+    private String clientId = "c91d8a66aca04badaf1b630ae744dea3";
+
+
+    public String createURL() throws UnsupportedEncodingException {
+        String redirectURI = URLEncoder.encode("http://52.78.37.19:8080/oauth/kakao-login", "UTF-8"); // redirectURI 인코딩
+
+        String url = "https://kauth.kakao.com/oauth/authorize" +
+                "?client_id=" + clientId +
+                "&redirect_uri=" + redirectURI +
+                "&response_type=code";
+
+        return url;
+    }
 
     @Transactional
     public String login(String accessToken) throws JsonProcessingException {
