@@ -101,7 +101,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntimeException(SignatureException e) {
+    public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
         log.info("error: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
