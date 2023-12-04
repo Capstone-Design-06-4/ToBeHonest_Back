@@ -25,20 +25,9 @@ public class OauthLoginController {
     private final NaverLoginService naverService;
     private final KakaoLoginService kakaoLoginService;
 
+
+
     @GetMapping("/naver")
-    public String naverConnect() throws UnsupportedEncodingException {
-        String url = naverService.createURL();
-        return url; // 프론트 브라우저로 보내는 주소
-    }
-
-    @GetMapping("/kakao")
-    public String kakaoConnect() throws UnsupportedEncodingException {
-        String url = kakaoLoginService.createURL();
-        return url; // 프론트 브라우저로 보내는 주소
-    }
-
-
-    @GetMapping("/naver-login")
     public ResponseEntity<?> naverLogin(@RequestParam String accessToken) throws JsonProcessingException {
         String email = naverService.login(accessToken);
         TokenInfo login = naverService.tokenInfo(email);
@@ -46,7 +35,7 @@ public class OauthLoginController {
 
     }
 
-    @GetMapping("/kakao-login")
+    @GetMapping("/kakao")
     public ResponseEntity<?> kakaoLogin(@RequestParam String accessToken) throws JsonProcessingException {
         String email = kakaoLoginService.login(accessToken);
 

@@ -45,24 +45,7 @@ public class NaverLoginService {
     private final RedisTemplate<String, String> redisTemplate;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
-    private String getNaverClientId = "Pi8zB3f4zuenOa7Lpdpl";
 
-    public String createURL() throws UnsupportedEncodingException {
-        StringBuffer url = new StringBuffer();
-
-        // 카카오 API 명세에 맞춰서 작성
-        String redirectURI = URLEncoder.encode("http://52.78.37.19:8080/oauth/naver-login", "UTF-8"); // redirectURI 설정 부분
-        SecureRandom random = new SecureRandom();
-        String state = new BigInteger(130, random).toString();
-
-        url.append("https://nid.naver.com/oauth2.0/authorize?response_type=code");
-        url.append("&client_id=" + getNaverClientId);
-        url.append("&state=" + state);
-        url.append("&redirect_uri=" + redirectURI);
-
-
-        return url.toString();
-    }
     @Transactional
     public String login(String accessToken) throws JsonProcessingException {
 
