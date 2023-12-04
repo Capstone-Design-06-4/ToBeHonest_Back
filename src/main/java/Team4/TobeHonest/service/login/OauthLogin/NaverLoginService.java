@@ -48,10 +48,7 @@ public class NaverLoginService {
 
     @Transactional
     public String login(String accessToken) throws JsonProcessingException {
-        if (accessToken.isEmpty()){
-            throw new RuntimeException("No Token");
 
-        }
         log.info("test1");
         log.info("{} accessToken", accessToken);
         // 토큰을 이용해 정보를 받아올 API 요청을 보낼 로직 작성하기
