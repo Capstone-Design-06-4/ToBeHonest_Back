@@ -52,13 +52,15 @@ public class NaverLoginService {
             throw new RuntimeException("No Token");
 
         }
+        log.info("test1");
+        log.info("{} accessToken", accessToken);
         // 토큰을 이용해 정보를 받아올 API 요청을 보낼 로직 작성하기
         RestTemplate profile_rt = new RestTemplate();
         HttpHeaders userDetailReqHeaders = new HttpHeaders();
         userDetailReqHeaders.add("Authorization", "Bearer " + accessToken);
         userDetailReqHeaders.add("Content-type", "application/x-www-form-urlencoded;charset=UTF-8");
         HttpEntity<MultiValueMap<String, String>> naverProfileRequest = new HttpEntity<>(userDetailReqHeaders);
-        log.info(accessToken);
+        log.info("test2");
         // 서비스서버 - 네이버 인증서버 : 유저 정보 받아오는 API 요청
         ResponseEntity<String> userDetailResponse = profile_rt.exchange(
                 "https://openapi.naver.com/v1/nid/me",
@@ -67,6 +69,7 @@ public class NaverLoginService {
                 String.class
         );
         // 요청 응답 확인
+        log.info("test3");
 
         // 네이버로부터 받은 정보를 객체화
         // *이때, 공식문서에는 응답 파라미터에 mobile 밖에없지만, 국제전화 표기로 된 mobile_e164도 같이 옴. 따라서 NaverProfileVo에 mobile_e164 필드도 있어야 정상적으로 객체가 생성됨
@@ -77,6 +80,8 @@ public class NaverLoginService {
         } catch (JsonMappingException je) {
             je.printStackTrace();
         }
+        log.info("test4");
+
         Member member = memberService.findByEmailWithNoException(naverProfile.getResponse().getEmail());
         if (member == null){
             member = dtoToEntity(naverProfile);
