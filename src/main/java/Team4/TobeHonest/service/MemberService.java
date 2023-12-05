@@ -250,16 +250,13 @@ public class MemberService {
         }).sum();
 
         double size = allFriends.size();
-        System.out.println(myYearlyContribution);
-        System.out.println(allFriendContributeSum);
-        System.out.println(allFriendReceiveSum);
+
      /*   int allFriendReceiveSum = allFriends.stream().mapToInt(friendWith -> {
             Member friend = friendWith.getFriend();
             long day = ChronoUnit.DAYS.between(friend.getJoinDate(), LocalDate.now());
             return (int) (contributorRepository.findMyAllReceiveAmount(friend) / day);
         }).sum();*/
 
-        System.out.println((double) (allFriendContributeSum / allFriendReceiveSum));
         return (int) (myYearlyContribution *  (allFriendContributeSum / allFriendReceiveSum) / size);
 
     }

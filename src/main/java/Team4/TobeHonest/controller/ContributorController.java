@@ -23,7 +23,7 @@ import java.net.URI;
 
 
 @RestController
-@RequestMapping("/api/contribution")
+@RequestMapping("/contribution")
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Slf4j
 public class ContributorController {
