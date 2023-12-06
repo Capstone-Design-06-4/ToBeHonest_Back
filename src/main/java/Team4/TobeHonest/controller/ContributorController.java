@@ -31,9 +31,9 @@ public class ContributorController {
     private final ContributorService contributorService;
 
 
-    @PostMapping("{wishItemId}")
+    @PostMapping("{wishItemId}/{fundAmount}")
     public ResponseEntity<String> contributing(@PathVariable Long wishItemId,
-                                            @RequestBody Integer fundAmount,
+                                            @PathVariable Integer fundAmount,
                                             @AuthenticationPrincipal UserDetails userDetails) {
 
         String userEmail = userDetails.getUsername();
