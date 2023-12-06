@@ -73,7 +73,9 @@ public class WishItemService {
             throw new NoWishItemException("해당 아이템은 위시리스트에 존재하지 않습니다.");
         }
         Member member = wishItem.getMember();
-        Integer totalFundedAmount = contributorRepository.findTotalFundedAmount(wishItem);
+        Integer totalFundedAmount = (contributorRepository.findTotalFundedAmount(wishItem) != null) ?
+                contributorRepository.findTotalFundedAmount(wishItem) :
+                0;
         member.addPoints(totalFundedAmount);
         wishItemRepository.deleteWishItem(wishItem);
 
