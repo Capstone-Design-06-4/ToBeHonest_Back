@@ -134,10 +134,10 @@ public class MemberController {
         return memberSearch;
     }
 
-    @PostMapping("/points/add")
+    @PostMapping("/points/add/{points}")
     @ResponseBody
     public void pointsAdd(@AuthenticationPrincipal UserDetails userDetails,
-                          @RequestBody Integer points) {
+                          @PathVariable Integer points) {
 
         String memberEmail = userDetails.getUsername();
         memberService.pointRecharge(memberEmail, points);
