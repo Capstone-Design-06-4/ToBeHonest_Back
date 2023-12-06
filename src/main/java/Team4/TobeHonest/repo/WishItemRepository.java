@@ -243,8 +243,8 @@ public class WishItemRepository {
 
     public Double checkPercentage(Item item1){
 
-//        int s = Math.max(item1.getPrice() - 500000, 0);
-        int s = 0;
+        int s = Math.max(item1.getPrice() - 50000, 0);
+
         int d = item1.getPrice() + 50000;
         NumberExpression<Integer> all = wishItem.count().intValue();
         NumberExpression<Integer> success = wishItem.count().intValue();
