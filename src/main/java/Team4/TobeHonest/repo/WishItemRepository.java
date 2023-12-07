@@ -270,7 +270,7 @@ public class WishItemRepository {
             return 0.0;
 
 
-        allNum -= Math.max(allNum - i, 0);
+        allNum = Math.max(allNum - i, 0);
         Integer part = jqf.select(success).from(wishItem)
                 .where(
                         (wishItem.price.gt(s).and(wishItem.price.lt(d)))
