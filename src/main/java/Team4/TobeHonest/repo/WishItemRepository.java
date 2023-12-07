@@ -248,13 +248,28 @@ public class WishItemRepository {
         int d = item1.getPrice() + 50000;
         NumberExpression<Integer> all = wishItem.count().intValue();
         NumberExpression<Integer> success = wishItem.count().intValue();
+        NumberExpression<Integer> temp = wishItem.count().intValue();
 
 
         Integer allNum = jqf.select(all).from(wishItem)
                 .where(wishItem.item.price.gt(s).and(wishItem.item.price.lt(d))).fetchOne();
 
+        Integer i = jqf
+                .select(temp)
+                .from(wishItem)
+                .where(wishItem.item.price.gt(s).and(wishItem.item.price.lt(d))
+                        .and(wishItem.giftStatus.eq(GiftStatus.IN_PROGRESS))).fetchOne();
+        if (i == null){
+            i = 0;
+        }
+
+
+
         if (allNum == null || allNum == 0)
             return 0.0;
+
+
+        allNum -= Math.max(allNum - i, 0);
         Integer part = jqf.select(success).from(wishItem)
                 .where(
                         (wishItem.price.gt(s).and(wishItem.price.lt(d)))
