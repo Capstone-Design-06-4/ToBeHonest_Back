@@ -254,14 +254,14 @@ public class WishItemRepository {
         Integer allNum = jqf.select(all).from(wishItem)
                 .where(wishItem.item.price.gt(s).and(wishItem.item.price.lt(d))).fetchOne();
 
-/*        Integer i = jqf
+        Integer i = jqf
                 .select(temp)
                 .from(wishItem)
                 .where(wishItem.item.price.gt(s).and(wishItem.item.price.lt(d))
                         .and(wishItem.giftStatus.eq(GiftStatus.IN_PROGRESS))).fetchOne();
         if (i == null){
             i = 0;
-        }*/
+        }
 
 
 
@@ -269,7 +269,7 @@ public class WishItemRepository {
             return 0.0;
 
 
-//        allNum -= Math.max(allNum - i, 0);
+        allNum -= Math.max(allNum - i, 0);
         Integer part = jqf.select(success).from(wishItem)
                 .where(
                         (wishItem.price.gt(s).and(wishItem.price.lt(d)))
