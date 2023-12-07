@@ -263,7 +263,8 @@ public class WishItemRepository {
             i = 0;
         }
 
-
+        log.info(i.toString());
+        log.info(allNum.toString());
 
         if (allNum == null || allNum == 0)
             return 0.0;
