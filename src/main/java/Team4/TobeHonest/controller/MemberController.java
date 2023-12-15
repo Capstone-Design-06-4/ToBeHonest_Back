@@ -3,6 +3,7 @@ package Team4.TobeHonest.controller;
 
 import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.friendWIth.FriendWithSpecifyName;
+import Team4.TobeHonest.dto.member.ExpectedDTO;
 import Team4.TobeHonest.dto.member.MemberDetailInformation;
 import Team4.TobeHonest.dto.member.MemberSearch;
 import Team4.TobeHonest.enumer.FriendStatus;
@@ -180,9 +181,10 @@ public class MemberController {
     }
 
 
-    @GetMapping("/myExpected")
-    public ResponseEntity<Integer> myExpectedAmount(@AuthenticationPrincipal UserDetails userDetails) {
+    @GetMapping("/my-expected")
+    public ResponseEntity<?> myExpectedAmount(@AuthenticationPrincipal UserDetails userDetails) {
         Integer myExpected = memberService.findMyExpected(userDetails.getUsername());
-        return ResponseEntity.status(HttpStatus.OK).body(myExpected);
+        ExpectedDTO expectedDTO = new ExpectedDTO(myExpected);
+        return ResponseEntity.status(HttpStatus.OK).body(expectedDTO);
     }
 }

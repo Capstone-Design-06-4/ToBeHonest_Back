@@ -4,6 +4,7 @@ import Team4.TobeHonest.domain.Member;
 import Team4.TobeHonest.dto.contributor.ContributorDTO;
 import Team4.TobeHonest.dto.item.ItemInfoDTO;
 import Team4.TobeHonest.dto.wishitem.FirstWishItem;
+import Team4.TobeHonest.dto.wishitem.PercentageResponse;
 import Team4.TobeHonest.dto.wishitem.WishItemResponseDTO;
 import Team4.TobeHonest.service.ContributorService;
 import Team4.TobeHonest.service.ItemService;
@@ -110,9 +111,12 @@ public class WishlistController {
 
 
     @GetMapping("/check/{itemId}")
-    public ResponseEntity<Double> checkPossibilty(@PathVariable Long itemId){
+    public ResponseEntity<PercentageResponse> checkPossibilty(@PathVariable Long itemId){
         Double v = wishItemService.checkPercentage(itemId);
-        return ResponseEntity.status(HttpStatus.OK).body(v);
+        PercentageResponse percentageResponse = new PercentageResponse(v);
+        return ResponseEntity.status(HttpStatus.OK).body(percentageResponse);
     }
+
+
 
 }

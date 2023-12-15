@@ -11,13 +11,14 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-
+@Slf4j
 public class WishItemRepository {
     private final EntityManager em;
     private final JPAQueryFactory jqf;
@@ -242,27 +243,41 @@ public class WishItemRepository {
 
     public Double checkPercentage(Item item1){
 
-        int s = Math.max(item1.getPrice() - 20000, 0);
-        int d = item1.getPrice() + 20000;
+        int s = Math.max(item1.getPrice() - 50000, 0);
+
+        int d = item1.getPrice() + 50000;
         NumberExpression<Integer> all = wishItem.count().intValue();
         NumberExpression<Integer> success = wishItem.count().intValue();
+        NumberExpression<Integer> temp = wishItem.count().intValue();
 
 
         Integer allNum = jqf.select(all).from(wishItem)
-                .innerJoin(wishItem.item, item)
-                .where(item.price.gt(s).and(item.price.lt(d))).fetchOne();
+                .where(wishItem.item.price.gt(s).and(wishItem.item.price.lt(d))).fetchOne();
+
+        Integer i = jqf
+                .select(temp)
+                .from(wishItem)
+                .where(wishItem.item.price.gt(s).and(wishItem.item.price.lt(d))
+                        .and(wishItem.giftStatus.eq(GiftStatus.IN_PROGRESS))).fetchOne();
+        if (i == null){
+            i = 0;
+        }
+
+        log.info(i.toString());
+        log.info(allNum.toString());
 
         if (allNum == null || allNum == 0)
             return 0.0;
-        Integer part = jqf.select(all).from(wishItem)
-                .innerJoin(wishItem.item, item)
+
+
+        allNum = Math.max(allNum - i, 0);
+        Integer part = jqf.select(success).from(wishItem)
                 .where(
-                        (item.price.gt(s).and(item.price.lt(d)))
-                                .and(wishItem.giftStatus.eq(GiftStatus.USED).or(wishItem.giftStatus.eq(GiftStatus.USED)))).fetchOne();
+                        (wishItem.price.gt(s).and(wishItem.price.lt(d)))
+                                .and(wishItem.giftStatus.eq(GiftStatus.USED).or(wishItem.giftStatus.eq(GiftStatus.COMPLETED)))).fetchOne();
         if (part == null || part == 0)
             return 0.0;
-
-        return (double) ((part / allNum) * 100);
+        return (double) ((part* 100 / allNum) );
 
     }
 

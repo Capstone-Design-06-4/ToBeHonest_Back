@@ -38,7 +38,6 @@ public class MessageResponseDTO {
     Integer fundMoney;
 
     @Builder
-
     public MessageResponseDTO(Long wishItemId,
                               Long itemId,
                               Long msgId,
@@ -55,4 +54,5 @@ public class MessageResponseDTO {
         this.messageType = messageType;
         this.fundMoney = fundMoney;
     }
+
 }

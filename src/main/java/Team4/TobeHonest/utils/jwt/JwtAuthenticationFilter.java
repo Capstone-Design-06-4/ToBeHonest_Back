@@ -28,8 +28,10 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String path = httpRequest.getRequestURI();
+
         log.info(path);
         log.info(httpRequest.getRequestURL().toString());
+        log.info(httpRequest.getQueryString());
         // /login, /signup, /test 경로는 필터를 실행하지 않고 다음 필터로 넘긴다
 
 
@@ -52,8 +54,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             }
 
         }
-
-
 
         chain.doFilter(request, response);
     }

@@ -195,7 +195,7 @@ public class MessageControllerTest {
                 .build();
         String json = objectMapper.writeValueAsString(dto);
         MockMultipartFile sendMessageWithNoIMGPart =
-                new MockMultipartFile("request", "", "application/json",
+                new MockMultipartFile("requestJson", "", "application/json",
                         json.getBytes(StandardCharsets.UTF_8));
 
 

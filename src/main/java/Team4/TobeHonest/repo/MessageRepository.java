@@ -22,6 +22,8 @@ public class MessageRepository  {
     private final QWishItem wishItem = new QWishItem("wi");
     private final QItem item = new QItem("i");
 
+    private final QMessageImg qMessageImg = new QMessageImg("img");
+
     public void join(Message message) {
         em.persist(message);
     }
@@ -62,7 +64,8 @@ public class MessageRepository  {
                                 MessageResponseDTO.class,
                                 wishItem.id, item.id, m.id,
                                 item.name, item.image, m.title, m.content, m.sender.id, m.receiver.id, m.messageType, m.fundMoney))
-                .from(m).innerJoin(m.relatedItem, this.wishItem)
+                .from(m).
+                innerJoin(m.relatedItem, this.wishItem)
                 .innerJoin(this.wishItem.item, this.item)
                 .where(m.receiver.id.eq(memberId)
                         .and(m.sender.id.eq(friendId))

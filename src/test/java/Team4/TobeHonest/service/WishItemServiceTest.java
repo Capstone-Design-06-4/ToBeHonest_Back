@@ -196,8 +196,7 @@ public class WishItemServiceTest {
 
         List<WishItem> all = wishItemRepository.findAll(member);
         Long wishItemId = all.get(0).getId();
-        List<WishItemDetail> wishItemDetail = wishItemService.findWishItemDetail(wishItemId);
-        WishItemDetail detail = wishItemDetail.get(0);
+        WishItemDetail detail = wishItemService.findWishItemDetail(wishItemId);
 
 
         Assertions.assertThat(detail.getWishItemId()).isEqualTo(wishItemId);
