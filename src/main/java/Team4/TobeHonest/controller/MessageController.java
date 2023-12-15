@@ -28,11 +28,11 @@ public class MessageController {
 
     private final MessageService messageService;
 
-    @PostMapping(value = "/send-thanks" ,consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/send-thanks", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     //@RequestBodt ==> only 1개 mapping  ==> @RequestPart로 나누기
     public ResponseEntity<String> sendThanksMessage(@RequestPart String requestJson,
-                                              @RequestPart(required = false) List<MultipartFile> images,
-                                              @AuthenticationPrincipal UserDetails userDetails) throws IOException {
+                                                    @RequestPart(required = false) List<MultipartFile> images,
+                                                    @AuthenticationPrincipal UserDetails userDetails) throws IOException {
 
         ObjectMapper objectMapper = new ObjectMapper();
         ThanksWithNoImg request = objectMapper.readValue(requestJson, ThanksWithNoImg.class);

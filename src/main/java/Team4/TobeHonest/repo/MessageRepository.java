@@ -13,7 +13,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class MessageRepository  {
+public class MessageRepository {
 
     private final EntityManager em;
     private final JPAQueryFactory jqf;
@@ -89,11 +89,11 @@ public class MessageRepository  {
     }
 
 
-    public void saveAll(List<Message> messages){
+    public void saveAll(List<Message> messages) {
         messages.forEach(em::persist);
     }
 
-    public List<String> findMessageImg(Long msgId){
+    public List<String> findMessageImg(Long msgId) {
         return jqf.select(qMessageImg.imgURL).from(qMessageImg).where(qMessageImg.message.id.eq(msgId)).fetch();
     }
 }

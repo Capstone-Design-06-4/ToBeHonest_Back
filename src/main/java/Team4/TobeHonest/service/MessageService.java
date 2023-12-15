@@ -37,8 +37,6 @@ public class MessageService {
     //message 전송하기..
 
 
-
-
     public List<MessageResponseDTO> findMessageWithFriendId(Long friendId, String userEmail) {
 
 
@@ -72,8 +70,6 @@ public class MessageService {
         });
         return messageResponseDTOS;
     }
-
-
 
 
     @Transactional
