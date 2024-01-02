@@ -10,10 +10,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -58,8 +63,13 @@ public class MessageController {
 
     @PostMapping(value = "/send-celebrate")
     //@RequestBodt ==> only 1개 mapping  ==> @RequestPart로 나누기
-    public ResponseEntity<String> sendMessageToAllContributor(@RequestBody SendCelebrateMessage request,
+    public ResponseEntity<String> sendMessageToAllContributor(@RequestBody @Validated SendCelebrateMessage request, BindingResult bindingResult,
                                                               @AuthenticationPrincipal UserDetails userDetails) throws IOException {
+
+        if (bindingResult.hasErrors()) {
+            String errorMessage = displayError(bindingResult);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+        }
 
         String userEmail = userDetails.getUsername();
         messageService.sendCelebrateMessage(request, userEmail);
@@ -89,4 +99,16 @@ public class MessageController {
 
     }
 
+
+    private String displayError(BindingResult bindingResult) {
+        StringBuilder sb = new StringBuilder();
+        List<ObjectError> allErrors = bindingResult.getAllErrors();
+        for (ObjectError error : allErrors) {
+            FieldError fieldError = (FieldError) error;
+            String message = error.getDefaultMessage();
+            sb.append("field: ").append(fieldError.getField());
+            sb.append("message: ").append(message);
+        }
+        return sb.toString();
+    }
 }
